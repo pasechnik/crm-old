@@ -1,0 +1,62 @@
+{% if  selectlinks %}
+
+{# crap #}
+{% set opt = '' %}
+
+    <select id="sendEmail">
+        <option value="">Send Email</option>
+
+         {% for icon_key, link in selectlinks %}
+
+             {% if opt != link.folder_title and loop.index0 != 0  %}
+                  </optgroup>
+             {% endif %}
+
+             {% if opt != link.folder_title %}
+                  <optgroup label="{{ link.folder_title }}">
+             {% endif %}
+
+                  <option value="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">
+                      {{ translate(link.label) }}
+                  </option>
+
+             {% set opt =  link.folder_title %}
+
+         {% endfor %}
+    </select>
+ {# endcrap #}
+
+{% endif %}
+
+{% block style %}
+    <style>
+        li>strong.select2-results__group{
+           font-size: 20px;
+            text-decoration: underline;
+        }
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+        $(function()
+        {
+            $('select#sendEmail').select2(
+            {
+                placeholder: "Send Email",
+                templateSelection: function (item)
+                {
+                    if (item.id !='') {
+                        window.location.href = item.id;
+                    }
+                    return $('<div />').text(item.title || item.text).html();
+                }
+            });
+
+            $('.select2-selection').click(function()
+            {
+                $('.select2-search__field').focus();
+            });
+        });
+    </script>
+{% endblock script %}

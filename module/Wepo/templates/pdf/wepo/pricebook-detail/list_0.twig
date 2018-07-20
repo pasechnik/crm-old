@@ -1,0 +1,103 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Pricebook detail')~': '~pricebook.pricebook %}
+
+{% block right_top_links %}
+        <div style = "float: right; margin:0 0 0 12px;">
+            <div  class="buttons clearfix" >
+                {% if saurlback !='/' %}
+                    <a href="{{ saurlback }}">{{ translate('Cancel') }}</a>
+                {% else %}
+                    <a href="{{ url( 'pricebook', { 'action': 'list' } ) }}">{{translate('Cancel')}}</a>
+                {% endif %}
+            </div>
+        </div>
+{% endblock right_top_links %}
+{% block link %}
+    <a href="{{ url( 'pricebook', { 'action': 'edit', 'id': pricebook.id()} )~saurl }}">{{translate('Edit pricebook')}}</a>
+    <a href="{{ url( 'pricebookdetail', { 'action': 'add', 'pricebookid': pricebook.id()} )~saurl }}">{{translate('Add new product')}}</a>
+    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">{{translate('Choose output fields')}}</a>
+{% endblock link %}
+
+{% block uppertable %}
+    <div>
+        <table>
+            <thead>
+                <tr>
+                   <th colspan="2">
+                       {{translate('pricebook details:')}}
+                   </th>
+               </tr>
+            </thead>
+            {% for key, value in pricebook.toView %}
+               <tr>
+                   <th>&nbsp&nbsp{{field_labels[key]}}</th>
+                    {% if key == 'owner'%}
+                        {% if pricebook.owner_id is not empty %}
+                            <td><a href="{{ url( 'user', { 'action': 'view','id':''~pricebook.owner_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                        {% else %}
+                            <td>&nbsp;&nbsp;{{value}}</td>
+                        {%endif%}{#
+                    {% elseif key == 'contact'%}
+                        {%if pricebook.contact_id != 0 %}
+                            <td><a href="{{ url( 'contact', { 'action': 'view','id':pricebook.contact_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                        {%else%}
+                            <td>&nbsp;&nbsp;{{value}}</td>
+                        {%endif%} #}
+                    {% elseif key == 'changer'%}
+                        {%if pricebook.changer_id is not empty %}
+                            <td><a href="{{ url( 'user', { 'action': 'view','id':''~pricebook.changer_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                        {%else%}
+                            <td>&nbsp;&nbsp;{{value}}</td>
+                        {%endif%}
+                    {% else %}
+                        <td>&nbsp;&nbsp;{{value}}</td>
+                    {% endif %}
+               </tr>
+            {% endfor %}
+        </table>
+        <br/>
+    </div>
+{% endblock uppertable %}
+
+{% block data %}
+    {% if key == 'product' %}
+        {% if attribute(avalue, 'product_id') is not empty %}
+            <a href="{{ url( 'product', { 'action': 'view','id':''~attribute(avalue, 'product_id')} )~saurl }}" >{{ attribute(avalue, key) }}</a>
+        {%else%}
+            {{ attribute(avalue, key) }}
+        {%endif%}
+    {% else %}
+        {{ attribute(avalue, key) }}
+    {%endif%}
+{% endblock data %}
+
+{% block table_link %}
+    <td onclick='location.href="{{ url( 'pricebookdetail', { 'action': 'view','pricebookid':''~avalue.pricebook_id, 'id':''~avalue.id() } )~saurl }}"'>
+{% endblock table_link %}
+
+{% block action %}
+    <a href="{{ url( 'pricebookdetail', { 'action': 'view', 'pricebookid':pricebook.id,'id':avalue.id } )~saurl }}"><img src="/img/1.png" class="view" /></a>&nbsp;
+    <a href="{{ url( 'pricebookdetail', { 'action': 'edit', 'pricebookid':pricebook.id,'id':avalue.id } )~saurl }}"><img src="/img/1.png" class="edit" /></a>&nbsp;
+    <a href="{{ url( 'pricebookdetail', { 'action': 'delete', 'pricebookid':pricebook.id,'id':avalue.id } )~saurl }}"><img src="/img/1.png" class="delete" /></a>
+{% endblock action %}
+
+{% block sortUrlConstruction %}
+    {% for key,value in labels %}
+        {% if (params.desc!=0) %}
+            <th>
+                <b><a href="{{ url( modelname, { 'action': 'list', 'pricebookid':pricebook.id,'sort':key,'desc':0} ) }}">{{value}}</a></b>
+                {% if params.sort==key%}
+                    &#9650;
+                {% endif%}
+            </th>
+        {% else %}
+            <th>
+                <b><a href="{{ url( modelname, { 'action': 'list', 'pricebookid':pricebook.id,'sort':key,'desc':1 } ) }}">{{value}}</a></b>
+                {% if params.sort==key%}
+                    &#9660;
+                {% endif %}
+            </th>
+        {% endif %}
+    {% endfor %}
+{% endblock sortUrlConstruction %}

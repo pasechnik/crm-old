@@ -1,0 +1,91 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('New ' ~ modelname)%}
+
+{% block script %}
+    <script>
+        $(function () {
+            $('select:visible').selectize({
+                dropdownParent: 'body'
+            });
+        });
+    </script>
+{% endblock script %}
+
+
+{% block title %}
+    {{ parent() }} - {{ title }}
+{% endblock title %}
+
+{% block content %}
+    <div class="tableTitle"><h1>{{ title }}</h1></div>
+    {% do form.setAttribute('class','validate') %}
+    {{ form().openTag(form)|raw }}
+
+    {% block upperform %}
+    {% endblock upperform %}
+
+    {% block formDetails %}
+        {% for fkey, fieldset in form %}
+            {% if fieldset.getAttribute('class')=='table' %}
+                <div class="table">
+                    <h2>{{ fieldset.getLabel }}</h2>
+
+                    <div class="form_info">* Required Field(s)</div>
+                    <div class="form">
+                        <div class="col">
+                            {% for ekey, element in fieldset %}
+                            {% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}
+                        </div>
+                        <div class="col">
+                            {% endif %}
+                            <div class="input">
+                                <label
+                                    for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}
+                                >
+                                {% if element.Label!=NULL %}
+                                    <span class="splabel">{{ element.getLabel }}:</span>
+                                {% endif %}
+                                </label>
+                                {% if element.getAttribute('type')=='checkbox' %}
+                                    <div class="checkbox">{{ formElement(element) }}</div>
+                                {% else %}
+                                    {{ formElement(element) }}
+                                {% endif %}
+                                <label for="id{{ element.getName }}" class="error"
+                                       style="display: {% if element.getMessages %}{%else%}none{% endif %};">{% for message in element.getMessages %}{{ message }}{% endfor %}</label>
+                                {#{ WepoElementErrors(element) }#}
+                            </div>
+                            {% endfor %}
+                            <div class="input">
+                                <label for="iderror" class="error">{{ message }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% elseif fieldset.getAttribute('class')=='buttons' %}
+                <div class="buttons clearfix {{ fieldset.getName }}">
+                    {% for ekey, element in fieldset %}
+                        <a href="#" class="green_but submitLink" style="">{{ element.getValue }}</a>
+                        <noscript>{{ formRow(element) }}</noscript>
+                    {% endfor %}
+                    {% if saurlback !='/' %}
+                        <a href="{{ saurlback }}">{{ translate('Cancel') }}</a>
+                    {% else %}
+                        <a href="{{ url( null, { 'action': 'list' } ) }}">{{ translate('Cancel') }}</a>
+                    {% endif %}
+                    <div class="success_msg" style="display:none;"><i class="imgTxt txtSuccess"></i>Profile has been saved successfully!</div>
+                </div>
+            {% elseif fieldset.getAttribute('class')=='additional' %}
+                {% block additionalFieldset %}
+                {% endblock additionalFieldset %}
+            {% else %}
+                <div class="form" style="display: none;">
+                    {% for ekey, element in fieldset %}
+                        {{ formElement(element) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endblock formDetails %}
+    {{ form().closeTag(form)|raw }}
+{% endblock content %}

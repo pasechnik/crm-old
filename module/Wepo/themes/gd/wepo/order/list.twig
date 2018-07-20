@@ -1,0 +1,18 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Orders') %}
+
+{% block rightlink %}
+    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">{{translate('Output fields')}}</a>
+{% endblock rightlink %}
+
+{% block data %}
+    {% include 'partial/order-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+    <a class="actionview" href="{{ url( 'orderdetail', { 'action': 'list','orderid':avalue.id() } )~saurl }}"><img src="/img/1.png" class="view"  alt="{{translate('Details')}}" /><span class="tooltip top">View</span></a>&nbsp;
+    <a class="actionview" href="{{ url( 'order', { 'action': 'edit','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="edit"  alt="{{translate('Edit')}}" /><span class="tooltip top">Edit</span></a>&nbsp;
+    <a class="actionview" href="{{ url( 'order', { 'action': 'delete','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="delete"  alt="{{translate('Delete')}}" /><span class="tooltip top">Delete</span></a>&nbsp;
+    <a class="actionview" href="{{ url( 'order', { 'action': 'invoice','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="convert"  alt="{{translate('Invoice')}}" /><span class="tooltip top">Convert to&nbsp;invoice</span></a>
+{% endblock action %}

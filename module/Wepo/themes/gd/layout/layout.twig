@@ -1,0 +1,185 @@
+{{ docType() }}
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta charset="utf-8">
+        <title>
+            {% block title %}WePO{% endblock title %}
+        </title>
+        <meta name="keywords" content="Wepo CRM"/>
+        <meta name="description" content="Wepo CRM"/>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    {% block meta %}{% endblock meta %}
+
+    <!-- Styles -->
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+    {#<link href="/css/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">#}
+
+    <link rel="stylesheet" type="text/css" href="/js/libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css"/>
+    <link href="/css/themes/gd/style.css" media="screen" rel="stylesheet" type="text/css"/>
+    <link href="/css/themes/gd/wepo.css" media="screen" rel="stylesheet" type="text/css"/>
+    {#<link href="/css/libs/select2/select2.css" media="screen" rel="stylesheet" type="text/css"/>#}
+
+    {#<link href="/css/selectize.bootstrap3.css" media="screen" rel="stylesheet" type="text/css"/>#}
+    <link href="/css/libs/selectize.css" media="screen" rel="stylesheet" type="text/css"/>
+
+
+    {# <link href="/css/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css"> #}
+    <link href="/img/wepo_logo_unicorn2.gif" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+    {#        {% block selectStyle %}{% endblock selectStyle %}#}
+{% block style %}{% endblock style %}
+<!-- /Styles -->
+
+<!-- Scripts -->
+{#<script type="text/javascript" src="/js/libs/jquery.min.js"></script>#}
+
+<script type="text/javascript" src="/js/libs/jquery-2.1.0.js"></script>
+
+<script type="text/javascript" src="/js/libs/jquery.cookie.js"></script>
+
+<script type="text/javascript" src="/js/libs/jquery.animate-shadow-min.js"></script>
+
+<script type="text/javascript" src="/js/libs/selectize.js"></script>
+
+{#<script type="text/javascript" src="/js/common.js"></script>#}
+{#<script type="text/javascript" src="/js/bootstrap.min.js"></script>#}
+{#<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>#}
+{#<script type="text/javascript" src="/js/libs/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>#}
+<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+{#<script type="text/javascript" src="/js/select2/select2.js"></script>#}
+{#<script type="text/javascript" src="/js/libs/jquery.selectBox.min.js"></script>#}
+<script type="text/javascript" src="/js/libs/custom_forms_elements.js"></script>
+<script type="text/javascript" src="/js/libs/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/js/themes/gd/common.js"></script>
+<!--[if lt IE 10]>
+<script type="text/javascript" src="/js/libs/pie.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/js/libs/html5.js"></script><![endif]-->
+
+<script>
+    $( document ).ready( function() {
+        $( '#search_form' ).keydown( function( event ) {
+            if ( event.keyCode == 13 ) {
+                $( '#main_search' ).submit();
+            }
+        }
+        );
+        $( '#search_button' ).mousedown( function( event ) {
+            $( '#main_search' ).submit();
+        }
+        );
+//                 var inp = $('#search_query')[0].selectize.on( "click", function() { alert( 'On click trigger' ) });
+//                 $('#search_query')[0].selectize.trigger('click');
+    } );
+</script>
+
+
+{% block script %}
+    <script>
+        $( document ).ready( function() {
+//            $( 'select.sb' ).selectBox();
+        } );
+    </script>
+{% endblock script %}
+<!-- /Scripts -->
+</head>
+<body>
+    {% block header %}
+        <div id="header" class="header">
+
+            <div id="headerBlock">
+                <div class="left_header">
+                    <div class="logo"><a href="/" class="imgTxt txtLogo"></a></div>
+                    <div class="search_form" id="search_form">
+                        <form action="{{ url( 'search', {'q':search_query} )~saurl }}" method="get" name="main_search" id="main_search">
+                            <div class="input">
+                                {#<label for="search_query">Search</label>#}
+                                <input class="form-control" type="text" name="q" id="search_query" value=""
+                                       placeholder="Global search {{ search_query ? 'for "'~search_query~'"': '' }}"/>
+                            </div>
+                            <div class="button" id="search_button" style="z-index:10">
+                                <a href="/" class="imgTxt txtSearch submitLink" title="Global search">Search</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="right_header">
+
+                    {% if user.id() %}
+                        <div class="login_block">
+                            {#                  <img src="/img/user.jpg" alt="{{ user.fname }} {{ user.lname }}"/>#}
+                            <img style="width: auto; max-width: 40px;  height: auto; max-height: 40px"
+                                 src="{{ WepoLink(mainuser.company_id, user, 'avatar') }}"
+                                 alt="{{ user.fname }} {{ user.lname }}"/>
+
+                            <div class="with_subLinks">
+                                {#<a href="{{ url( 'user', { 'action': 'view','id':user.id() } )~saurl }}">{{ user.fname }} {{ user.lname }} <span class="link_arr"></span></a>#}
+                                <a href="#">{{ user.fname }} {{ user.lname }} <span class="link_arr"></span></a>
+
+                                <div class="subLinks">
+                                    <span class="imgTxt txtArrow"></span>
+                                    <ul>
+                                        <li><a href="{{ url( 'user', { 'action': 'view','id':user.id() } )~saurl }}">{{ translate('View profile') }}</a></li>
+                                            {#<li><a href="{{ url( 'user', { 'action': 'edit','id':user.id() } )~saurl }}">{{ translate('Edit profile') }}</a></li>#}
+                                        <li><a href="{{ url( 'index', { 'action': 'signout' } ) }}">{{ translate('Exit') }}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endif %}
+
+                    <div class="header_links clearfix">
+                        <div class="with_subLinks">
+                            <a href="#">Help<span class="link_arr"></span></a>
+                            <div class="subLinks">
+                                <span class="imgTxt txtArrow"></span>
+                                <ul>
+                                    <li><a href="{{ url( 'help', { 'action': 'manual' } ) }}">Manual</a></li>
+                                    <li><a href="{{ url( 'help', { 'action': 'faq' } ) }}">FAQ</a></li>
+                                        {#<li><a href="#">Forum</a></li>#}
+                                        {#<li><a href="#">Blog</a></li>#}
+                                        {#<li><a href="#">Support</a></li>#}
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="{{ url( 'setup', { 'action': 'index'} )~saurl }}">{{translate('Setup')}}</a>
+                    </div>
+                </div>
+            </div>
+            <div id="mainMenu" class="menu">
+                {% autoescape false %}
+                    {{ navigation('Navigation').myMenu.setUlClass('clearfix').setMinDepth(0).escapeLabels(false).setAddClassToListItem( true ).render }}
+                {% endautoescape %}
+            </div>
+        </div>
+        <!-- /div#header.header -->
+    {% endblock header %}
+
+    <div class="content">
+        <!-- content|raw is required for phtml fallback -->
+        {# <h1>{{title}}</h1>
+        <div class="right_top_links">
+            <a href="#"><i class="imgTxt txtHelp"></i>Help fot this page</a>
+        </div>
+        #}
+        {% block content %}{{ content|raw }}{% endblock content %}
+
+    </div>
+    <!-- /content -->
+
+    {% block globalfooter %}
+        <footer>
+            <div class="footer">
+                {% block footer %}{% endblock footer %}
+                <p>&copy; 2014 by WepoCRM {#{{ translate('All rights reserved.') }}#}</p>
+                Zend Framework {{ constant('\\Zend\\Version\\Version::VERSION') }}
+            </div>
+        </footer>
+    {% endblock globalfooter %}
+{% block inline %}{% endblock inline %}
+</body>
+</html>

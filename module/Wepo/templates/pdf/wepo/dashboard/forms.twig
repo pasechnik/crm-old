@@ -1,0 +1,40 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Dashboard') %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<div>
+    {% for form in fclasses %}
+            {{loop.index}} <a href="{{ url( action, { 'action': 'forms' } )~'?c='~loop.index0 }}">{{form.class}}</a><br/>
+    {% endfor %}
+    </div>
+{% endblock content %}
+{% block style %}
+    <style type="text/css">
+            <!--
+            .mainMenu {
+                text-align: left;
+                display: block;
+                height: 300;
+                width: 210px;
+                padding-right: 0px;
+                padding-bottom: 0px;
+                padding-left: 0px;
+                position: relative;
+
+            }
+
+            .activity {
+                text-align: left;
+                display: block;
+                height: 100%;
+                width: 900px;
+                padding-right: 0px;
+                padding-bottom: 0px;
+                padding-left: 0px;
+                position: relative;
+                left: 220px;
+                top: -200px;
+            }
+            -->
+        </style>
+{% endblock style %}

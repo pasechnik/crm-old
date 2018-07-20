@@ -1,0 +1,41 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Client: ' ~ model.name %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block avatar %}
+    <img src="{{ WepoLink(mainuser.company_id, model, 'avatar', 'Clients') }}" alt="" style="max-width:120px;max-height:120px;">
+{% endblock avatar %}
+
+{% block otherinfo %}
+    <div class="lead_other_info" style="margin-right: 40px;">
+        <h3>Address Information</h3>
+        <table>
+            <tbody>
+            <tr>
+                <th>Country:</th>
+                <td>{{ model.country }}</td>
+            </tr>
+            <tr>
+                <th>ZIP:</th>
+                <td>{{ model.zip }}</td>
+            </tr>
+            <tr>
+                <th>State:</th>
+                <td>{{ model.state }}</td>
+            </tr>
+            <tr>
+                <th>City:</th>
+                <td>{{ model.city }}</td>
+            </tr>
+            <tr>
+                <th>Address:</th>
+                <td>{{ model.address }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <h3>Description:</h3>
+        <div class="info">
+            <p>{{ model.description }}</p>
+        </div>
+    </div>
+
+{% endblock otherinfo %}

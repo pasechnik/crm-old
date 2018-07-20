@@ -1,0 +1,37 @@
+{% extends 'partial/edit.twig' %}
+{% block script %}
+      {{parent()}}
+<script>
+
+            $( function(){
+            $('#client_id').change( PutAccount );
+            $('#client_id').ready( PutReady );
+          });
+          function PutReady()
+          {
+            var id = $('#client_id option:selected').val();
+            document.getElementById('account').disabled = true;
+            document.getElementById('account').value = $('#client_id')[0].selectize.getItem(id).text();
+
+          }
+          function PutAccount()
+          {
+              var id = $('#client_id option:selected').val();
+              if (id !== "rrrrrrrrrrrrrrrrrrrrrrrr" )
+              {
+                  document.getElementById('account').disabled = true;
+                  var value = $('#client_id option:selected').text();
+                  if ( value === '')
+                  {
+                      value = $('#client_id')[0].selectize.getItem(id).text();
+                  }
+                  document.getElementById('account').value = value;
+              }
+              else
+              {
+                  document.getElementById('account').disabled = false;
+                  document.getElementById('account').value ="";
+              }
+          }
+</script>
+{% endblock %}

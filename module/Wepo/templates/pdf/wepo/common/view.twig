@@ -1,0 +1,151 @@
+<div class="viewtable">
+    <div class="view_header">
+        {# <div class="buttons left">
+         {% if saurlback !='/' %}
+             <a href="{{ saurlback }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+                 {% else %}
+             <a href="{{ url( null, { 'action': 'list' } ) }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+                 {% endif %}
+         </div>#}
+        {% block headeractions %}
+
+            <div class="title"><h1>{{ title }}</h1></div>
+
+        {% endblock headeractions %}
+    </div>
+    <div class="view_block">
+
+        <div class="viewData" style="position: relative;">
+
+            {% set tabs = [] %}
+            {#{% for key, fieldset in fieldsets if fieldset.group != 'tabs' %}#}
+            {% for key, fieldset in fieldsets  %}
+                {% include [ 'partial/viewblocks/'~ key ~'.twig', 'partial/viewblocks/default.twig' ] %}
+            {% endfor %}
+            {#<div class="tab">#}
+                {#<ul class="tabs">#}
+                    {#{% for key, fieldset in fieldsets if fieldset.group == 'tabs' %}#}
+                        {#<li><a href="#">{{ fieldset.label }}</a></li>#}
+                    {#{% endfor %}#}
+                {#</ul>#}
+                {#<div class="tab_content">#}
+                    {#{% for key, fieldset in fieldsets if fieldset.group == 'tabs' %}#}
+                        {#{% include [ 'partial/viewblocks/'~ key ~'.twig', 'partial/viewblocks/default.twig' ] %}#}
+                    {#{% endfor %}#}
+                {#</div>#}
+            {#</div>#}
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        Reload_widgets();
+    });
+</script>
+<style>
+    .tab {
+        position: relative;
+        overflow: hidden;
+        min-width: 300px;
+        float: right;
+        width: 45%;
+        line-height: 1.5;
+        color: #888;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .tabs {
+        display: table;
+        position: relative;
+        overflow: hidden;
+        margin: 0;
+        width: 100%;
+    }
+
+    .tabs li {
+        float: right;
+        width: 100px;
+        text-align: center;
+        line-height: 20px;
+        overflow: hidden;
+        padding: 0;
+        position: relative;
+    }
+
+    .tabs a {
+        border-bottom: 1px solid #fff;
+        color: #888;
+        display: block;
+        letter-spacing: 0;
+        outline: none;
+        text-decoration: none;
+        -webkit-transition: all 0.2s ease-in-out;
+        -moz-transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out;
+        border-bottom: 2px solid #d0e4ed;
+    }
+
+    .tabs_item {
+        display: none;
+    }
+
+    .tabs_item:first-child {
+        display: block;
+    }
+
+    .current a {
+        color: #fff;
+        background: #2d5877;
+    }
+
+
+</style>
+<script>
+    function getDocHeight(doc) {
+        doc = doc || document;
+        // stackoverflow.com/questions/1145850/
+        var body = doc.body, html = doc.documentElement;
+        var height = Math.max( body.scrollHeight, body.offsetHeight,
+            html.clientHeight, html.scrollHeight, html.offsetHeight );
+        return height;
+    }
+
+    function setIframeHeight(id) {
+        var ifrm = document.getElementById(id);
+        var doc = ifrm.contentDocument? ifrm.contentDocument:
+            ifrm.contentWindow.document;
+        ifrm.style.visibility = 'hidden';
+        ifrm.style.height = "10px"; // reset to minimal height ...
+        // IE opt. for bing/msn needs a bit added or scrollbar appears
+        ifrm.style.height = getDocHeight( doc ) + 4 + "px";
+        ifrm.style.visibility = 'visible';
+    }
+
+    $(document).ready(function () {
+
+        (function ($) {
+            $('.tab ul.tabs').addClass('active').find('> li:eq(0)').addClass('current');
+
+            $('.tab ul.tabs li a').click(function (g) {
+                var tab = $(this).closest('.tab'),
+                    index = $(this).closest('li').index();
+
+                tab.find('ul.tabs > li').removeClass('current');
+                $(this).closest('li').addClass('current');
+
+                tab.find('.tab_content').find('div.tabs_item').not('div.tabs_item:eq(' + index + ')').slideUp();
+                tab.find('.tab_content').find('div.tabs_item:eq(' + index + ')').slideDown();
+
+                g.preventDefault();
+            });
+        })(jQuery);
+
+    });
+
+    $(function(){
+        $('#body').on("click", ".tooltip", function () {
+            return false;
+        });
+    });
+</script>

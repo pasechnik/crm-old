@@ -1,0 +1,852 @@
+{% block style %}
+    <style>
+
+        #data td.qty, td.discount, td.list_price, td.tax,td.description,#discount,#tax,#adjustment{
+            transition: 0.7s;
+        }
+
+        .td_editing {
+            background: #eee !important;
+            cursor: pointer !important;
+        }
+
+        .ui-dialog-content {
+            height: auto !important;
+        }
+
+        .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons {
+            height: auto !important;
+        }
+
+        .dialog-form > input{
+            width: 294px !important;
+            height: 30px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 5px !important;
+            display: block;
+            background: #fff;
+            border: none;
+            box-shadow: inset 0 1px 3px #ccc;
+        }
+
+        textarea.form_description{
+            resize: none;
+            width: 294px !important;
+            height: 60px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 5px !important;
+            padding-top: 6px;
+            background: #fff;
+            border: none;
+            box-shadow: inset 0 1px 3px #ccc;
+        }
+
+
+        .dialog-form > .select2{
+            margin-top: 9px !important;
+        }
+
+        .ui-button:first-of-type, .ui-button:last-of-type {
+            width: 73px !important;
+        }
+
+        .listtable > .buttons{
+            margin-top: 10px;
+        }
+
+        .index{
+            color: #1191d4;
+        }
+
+        #listTable{
+            margin-top: 70px;
+        }
+
+        #viewData,.priceValue{
+            float: right;
+        }
+
+        #viewData{
+            margin-right: 17px;
+            margin-top: 26px;
+            font-size: 16px;
+        }
+
+        #grand{
+            font-weight: 600;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+
+        $(function()
+        {
+            $(".dialog-form input").keydown(function(event){
+                if ( (event.keyCode =='188') || (event.keyCode=='110') ) {
+                    event.preventDefault();
+                }
+            });
+
+            $('#body').on("click", ".tooltip", function () {
+                return false;
+            });
+        });
+
+        $(function ()
+        {
+            $('select.select2_details').each(function (index)
+            {
+                var scope = $(this).attr('data-scope');
+
+                $(this).select2(
+                {
+                    placeholder: "Please select the Product",
+                    allowClear: true,
+                    ajax: {
+                        url: '/api/v2/data/'+scope,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            data = {
+                                q: params.term,
+                                p: params.page
+                            };
+
+                            if (window.Query) {
+                                data.pricebook = window.Query;
+                            }
+                            else {
+                                data.pricebook = 'a00000000000000000000001';
+                            }
+                            return data;
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.data,
+                                pagination: {
+                                    more: (params.page * 10) < data.count
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    templateResult: function (item) {
+                        if (item.loading) return item.text;
+
+                        if (item.list_price == ''){
+                            item.list_price = '0.00'
+                        }
+                        return $('<div />').text(item.title +' '+'$'+parseFloat(item.list_price).formatMoney(2, '.', ',')).html();
+                    },
+                    templateSelection: function (item)
+                    {
+                       $('input.form_listPrice').val(parseFloat(item.list_price).formatMoney(2, '.', ','));
+                          return $('<div />').text(item.title || item.text).html();
+                    }
+                });
+            });
+
+            $('select.select2_detailsPBook').each(function (index)
+            {
+                var scope = $(this).attr('data-scope');
+                var query = $(this).attr('data-query')||'';
+                $(this).select2(
+                {
+                    placeholder: "Please select the Pricebook",
+                    allowClear: true,
+                    ajax: {
+                        url: '/api/v2/data/'+scope,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            data = {
+                                q: params.term,
+                                p: params.page
+                            };
+
+                            if (query.length)
+                            {
+                                data.query = query;
+                            }
+                            return data;
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.data,
+                                pagination: {
+                                    more: (params.page * 10) < data.count
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    templateResult: function (item)
+                    {
+                        if (item.loading) return item.text;
+                        return $('<div />').text(item.title).html();
+                    },
+                    templateSelection: function (item)
+                    {
+                        return $('<div />').text(item.title || item.text).html();
+                    }
+                });
+            });
+
+            $('select.static-select2').select2(
+                    { minimumResultsForSearch: 5 }
+            );
+
+            $('.select2-selection').click(function()
+            {
+                $('.select2-search__field').focus();
+            });
+        });
+
+        function productIndex()
+        {
+            $('.DetailTable tr').each(function(index){
+                $(this).find('.index').text(parseInt(index+1));
+            });
+        }
+
+        function Total()
+        {
+            var sum = 0;
+
+            $('.DetailTable tr').each(function(index){
+               var price = $(this).find('.total').text();
+                   price = price.replace(/[$,]/g, '');
+                   price = parseFloat(price);
+                sum += price;
+            });
+
+            var discount = $('#discount').text();
+                discount = discount.replace(/[$,]/g, '');
+                discount = parseFloat(discount);
+
+            var tax = $('#tax').text();
+                tax = tax.replace(/[$,]/g, '');
+                tax = parseFloat(tax);
+
+            var adjustment = $('#adjustment').text();
+                adjustment = adjustment.replace(/[$,]/g, '');
+                adjustment = parseFloat(adjustment);
+
+            $('#subPrice').text('$'+sum.formatMoney(2, '.', ','));
+
+            sum = sum + tax + adjustment - discount;
+
+            $('#grandPrice').text('$'+sum.formatMoney(2, '.', ','));
+        }
+
+        Number.prototype.formatMoney = function (c, d, t) {
+            var n = this,
+                c = isNaN(c = Math.abs(c)) ? 2 : c,
+                d = d == undefined ? "." : d,
+                t = t == undefined ? "," : t,
+                s = n < 0 ? "-" : "",
+                i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+
+        function QuoteProducts()
+        {
+            var id = $("select[name='fields[quote_id]'] option:last").val();
+
+            apiList('QuoteDetail', {'quote': id,'query':'QuoteDetail.forapi','rows':0}, function (item)
+            {
+                if ($('tr#No_record').length && item.data.length) {
+                    $('tr#No_record').remove();
+                }
+
+                $.each(item.data, function (index)
+                {
+                    var datas = item.data[index];
+
+                    var name                =   datas.pricebook_detail_title;
+                    var pricebook_id        =   datas.pricebook_detail_id;
+                    var form_description    =   datas.description;
+                    var form_list_price     =   datas.list_price;
+                    var form_qty            =   datas.qty;
+                    var amount              =   datas.amount;
+                    var form_discount       =   datas.discount;
+                    var form_tax            =   datas.tax;
+                    var total               =   datas.total;
+
+                      // format money
+                    var  format_list_price  = parseFloat(form_list_price).formatMoney(2, '.', ',');
+                    var  format_discount    = parseFloat(form_discount).formatMoney(2, '.', ',');
+                    var  format_tax         = parseFloat(form_tax).formatMoney(2, '.', ',');
+                    var  format_amount      = parseFloat(amount).formatMoney(2, '.', ',');
+                    var  format_total       = parseFloat(total).formatMoney(2, '.', ',');
+                    var  format_qty         = parseInt(form_qty);
+                  // end format money
+
+                    $('.DetailTable').append
+                    (
+                            '<tr>' +
+                              '<td class="index"></td>'+
+                              '<td>'                       + name               + '<input type = "hidden" class="currentProd" name = "pricebook_detail_id" value="' + pricebook_id + '">'     + '</td>' +
+                              '<td class = "description">' + form_description   + '<input type = "hidden" class="currentProd" name = "description"         value="' + form_description + '">' + '</td>' +
+                              '<td class = "list_price">$' + format_list_price  + '<input type = "hidden" class="currentProd" name = "list_price"          value="' + form_list_price + '">'  + '</td>' +
+                              '<td class = "qty">'         + format_qty         + '<input type = "hidden" class="currentProd" name = "qty"                 value="' + format_qty + '">'       + '</td>' +
+                              '<td class = "amount">$'     + format_amount                                                                                                                    + '</td>' +
+                              '<td class = "discount">'    + format_discount    + '<input type = "hidden" class="currentProd" name = "discount"            value="' + form_discount + '">'    + '</td>' +
+                              '<td class = "tax">'         + format_tax         + '<input type = "hidden" class="currentProd" name = "tax"                 value="' + form_tax + '">'         + '</td>' +
+                              '<td class = "total">$'      + format_total                                                                                                                     + '</td>' +
+                              '<td>' +
+                                 '<a class="actionview deleteDetail" index="'+window.index+'">' +
+                                      '<img src="/img/1.png" class="delete" alt="Delete" />' +
+                                         '<span class="tooltip top">Delete</span>' +
+                                 '</a>&nbsp; ' +
+                              '</td>' +
+                            '</tr>'
+                    );
+
+                    window.index ++;
+                    productIndex();
+                    Total();
+
+                    var dataProduct = {};
+                    dataProduct['status_id'] = '5295fdf7c5b9f222acd3c74b';
+
+                    $('.currentProd').each(function ()
+                    {
+                        if (!$(this).hasClass('seen')) {
+                            dataProduct[$(this).attr('name')] = $(this).val();
+                            $(this).addClass('seen');
+                        }
+                    });
+
+                    window.arrayObject.push(dataProduct);
+                });
+
+            });
+        }
+
+        $(function ()
+        {
+            window.data  = {};
+            window.arrayObject = [];
+            window.index = 0;
+
+            $(document).on("click",'a.insert',function (e)
+            {
+                stoploader();
+                e.preventDefault();
+                var formUrl = $(this).attr('href');
+
+                $('.dialog-form').removeClass('hidden');
+                $('.dialog-form').dialog(
+                {
+                    open: function ()
+                    {
+                        $('.dialog-form input').val('');
+
+                        $(window).on('scroll resize',function() {
+                            $('.dialog-form').dialog("option", "position", $('.dialog-form').dialog("option", "position"));
+                        });
+                    },
+                    close: function () {
+                    },
+
+                    show: {effect: '', duration: 600, my: "top", at: "center", of: window},
+                    hide: {effect: '', duration: 400},
+                    title: " Do you want to add new product ? ",
+                    modal: false,
+                    width: '355',
+                    resizable: false,
+                    draggable: false,
+                    closeOnEscape: false,
+                    buttons: {
+                        Save: function ()
+                        {
+                            var form_list_price = $('input.form_listPrice').val();
+                                form_list_price = form_list_price.replace(/[$,]/g, '');
+
+                            var form_qty = $('input.form_qty').val();
+                                form_qty = form_qty.replace(/[$,]/g, '');
+                                form_qty = parseInt(form_qty);
+
+                            var form_discount = $('input.form_discount').val();
+                                form_discount = form_discount.replace(/[$,]/g, '');
+                                form_discount = parseFloat(form_discount);
+
+                            var form_tax = $('input.form_tax').val();
+                                form_tax = form_tax.replace(/[$,]/g, '');
+                                form_tax = parseFloat(form_tax);
+
+                            var form_description = $('textarea.form_description').val();
+
+                            var pricebook_id = $('.select2_details option:last').attr('value');
+
+                            var name = $('.select2_details').next('.select2').find('span.select2-selection__rendered').text();
+                                name = name.substr(0,name.length-1);
+
+
+                            if (form_qty == ''      || !(form_qty))      { form_qty = 1; }
+                            if (form_tax == ''      || !(form_tax))      { form_tax = 0; }
+                            if (form_discount == '' || !(form_discount)) { form_discount = 0; }
+
+                            var amount = parseFloat(parseFloat(form_list_price)*form_qty);
+                            var total  = amount + form_tax - form_discount;
+                                amount = amount.formatMoney(2, '.', ',');
+                                total  = total.formatMoney(2, '.', ',');
+
+                            if ($('tr#No_record').length ){
+                                $('tr#No_record').remove();
+                            }
+
+                            // format money
+                            var  format_list_price  = parseFloat(form_list_price).formatMoney(2, '.', ',');
+                            var  format_discount    = parseFloat(form_discount).formatMoney(2, '.', ',');
+                            var  format_tax         = parseFloat(form_tax).formatMoney(2, '.', ',');
+                            // end format money
+
+                            $('.DetailTable').append(
+                            '<tr>' +
+                                  '<td class="index"></td>'+
+                                  '<td>'                         + name                + '<input type = "hidden" class="currentProd" name = "pricebook_detail_id"  value="'+pricebook_id+'">'          +'</td>'+
+                                  '<td class = "description">'   + form_description    + '<input type = "hidden" class="currentProd" name = "description"          value="'+form_description+'">'      +'</td>'+
+                                  '<td class = "list_price">$'   + format_list_price   + '<input type = "hidden" class="currentProd" name = "list_price"           value="'+form_list_price+'">'       +'</td>'+
+                                  '<td class = "qty">'           + form_qty            + '<input type = "hidden" class="currentProd" name = "qty"                  value="'+form_qty+'">'              +'</td>'+
+                                  '<td class = "amount">$'       + amount                                                                                                                              +'</td>'+
+                                  '<td class = "discount">'      + format_discount     + '<input type = "hidden" class="currentProd" name = "discount"             value="'+form_discount+'">'         +'</td>'+
+                                  '<td class = "tax">'           + format_tax          + '<input type = "hidden" class="currentProd" name = "tax"                  value="'+form_tax+'">'              +'</td>'+
+                                  '<td class = "total">$'        + total                                                                                                                               +'</td>'+
+                                  '<td>' +
+                                    '<a class="actionview deleteDetail" index="'+window.index+'">' +
+                                        '<img src="/img/1.png" class="delete" alt="Delete" />' +
+                                            '<span class="tooltip top">Delete</span>' +
+                                    '</a>&nbsp; ' +
+                                  '</td>' +
+                            '</tr>'
+                            );
+
+                            window.index ++;
+                            productIndex();
+                            Total();
+
+                            var dataProduct = {};
+                                dataProduct['status_id'] = '5295fdf7c5b9f222acd3c74b';
+
+                                $('.currentProd').each(function()
+                                {
+                                    if ( !$(this).hasClass('seen') ) {
+                                        dataProduct[$(this).attr('name')] = $(this).val();
+                                        $(this).addClass('seen');
+                                    }
+                                });
+
+                             window.arrayObject.push(dataProduct);
+
+                            $(this).dialog("close");
+                            $('.select2_details,.select2_detailsPBook').val(null).trigger('change');
+                            $('div.dialog-form input,div.dialog-form textarea').val('');
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                            $('.select2_details,.select2_detailsPBook').val(null).trigger('change');
+                            $('div.dialog-form input,div.dialog-form textarea').val('');
+
+                            $('.select2_details option,.select2_detailsPBook option').each(function(){
+                                $(this).remove();
+                            });
+                        }
+                    }
+                });
+            });
+
+
+            $('#body').on('click','a.deleteDetail',function(index)
+            {
+               delete window.arrayObject[$(this).attr('index')];
+                $(this).closest('tr').remove();
+                 productIndex();
+                  Total();
+
+                if ( $('#tbody').children().length == 0 )
+                {
+                    $("#tbody").append("<tr id='No_record' align='center'>\n\
+                                <h2><td colspan = 20 style = 'font-size:20px; vertical-align: bottom; font-style: italic; color: #999999; '>\n\
+                                    No records\n\
+                                </td></h2>\n\
+                            </tr>");
+                }
+
+                setInterval(function () {
+                    if ($(window).scrollTop() < $('#header').height() - $('#mainMenu').height()) {
+                        fixedMenu();
+                        window.clearTimeout();
+                    }
+                }, 1);
+            });
+
+            $('body').on('mouseenter', ".DetailTable td.qty,td.discount,td.list_price,td.tax,td.description,#discount,#tax,#adjustment", function () {
+                $(this).addClass('td_editing');
+            });
+
+            $('body').on('mouseleave', ".DetailTable td.qty,td.discount,td.list_price,td.tax,td.description,#discount,#tax,#adjustment", function () {
+                $(this).removeClass('td_editing');
+            });
+
+            $('body').on("click", ".DetailTable td.qty,td.discount,td.list_price,td.tax,td.description,#discount,#tax,#adjustment", function () {
+                $(this).attr('contentEditable', true).focus();
+                $(this).css({'background': '#eee '});
+            });
+
+            $(document).on("blur", ".DetailTable td.qty,td.discount,td.list_price,td.tax,td.description", function (event)
+            {
+                var value = $(this).text();
+                    value = value.replace(/[$,]/g, '');
+                $(this).css({'background': 'none'}).children('input:hidden').val(value);
+
+                var amount = $(this).closest('tr').find('td.amount');
+                var total = $(this).closest('tr').find('td.total');
+
+                var qty = $(this).closest('tr').find('td.qty').text();
+                    qty = qty.replace(/[$,]/g, '');
+
+                var lPrice = $(this).closest('tr').find('td.list_price').text();
+                    lPrice = lPrice.replace(/[$,]/g, '');
+
+                var tax = $(this).closest('tr').find('td.tax').text();
+                    tax = tax.replace(/[$,]/g, '');
+
+                var discount = $(this).closest('tr').find('td.discount').text();
+                    discount = discount.replace(/[$,]/g, '');
+
+                var amountPrice = (parseInt(qty) * parseFloat(lPrice));
+                amount.text('$' + amountPrice.formatMoney(2, '.', ','));
+
+                var totalPrice = (parseInt(qty) * parseFloat(lPrice) + parseFloat(tax) - parseFloat(discount));
+                total.text('$' + totalPrice.formatMoney(2, '.', ','));
+
+                var target = $(event.target).attr('class');
+                var  field = $(event.target).closest('tr').find('.' + target).text();
+                     field = field.replace(/[$,]/g, '');
+
+                var data = {};
+
+                $(this).closest('tr').find('.currentProd').each(function(){
+                    data[$(this).attr('name')] = $(this).val();
+                });
+
+                window.arrayObject[$(this).closest('tr').find('a.deleteDetail').attr('index')] = data;
+                Total();
+            });
+
+            $(document).on("blur", "#discount,#tax,#adjustment", function (event)
+            {
+               $(this).css({'background': 'none'});
+
+                var discount = 0; var tax  = 0;
+                var adjustment = 0; var current = 0;
+
+                var value = $(this).text();
+                    value = value.replace(/[$,]/g, '');
+                window.data[$(this).attr('id')] = value;
+
+                discount = $('#discount').text();
+                discount = discount.replace(/[$,]/g, '');
+                discount = parseFloat(discount);
+
+                tax = $('#tax').text();
+                tax = tax.replace(/[$,]/g, '');
+                tax = parseFloat(tax);
+
+                adjustment = $('#adjustment').text();
+                adjustment = adjustment.replace(/[$,]/g, '');
+                adjustment = parseFloat(adjustment);
+
+                current = $('#subPrice').text();
+                current = current.replace(/[$,]/g, '');
+                current = parseFloat(current);
+
+                $('#grandPrice').text('$'+(current+tax+adjustment-discount).formatMoney(2, '.', ','));
+            });
+        });
+
+    </script>
+
+    <script>
+
+        $(function()
+        {
+            var  model = $('form.apiform').attr('data-scope');
+
+            $('select[name="fields[quote_id]"]').change(function ()
+            {
+                if ( $(this).val() != '' ){
+                    QuoteProducts();
+                }
+            });
+
+            $('.select2_detailsPBook').change(function()
+            {
+                $('.select2_details').val(null).trigger('change');
+                $('div.dialog-form .form_listPrice').val('');
+                window.Query = $(this).val();
+            });
+
+            $('.apiform').submit(function(){
+                return false;
+            });
+
+            //Clone details
+            if ( window.location.href.indexOf('clone') >= 0 )
+            {
+                startloader();
+
+                var model       = $('.apiform').attr('data-scope');
+                var modelDetail = $('.details').attr('id');
+
+                apiList(modelDetail,
+                {
+                  'order' : window.location.href.substr(window.location.href.indexOf('clone') + 6,window.location.href.indexOf('index.html') - 38 ),
+                  'quote' : window.location.href.substr(window.location.href.indexOf('clone') + 6,window.location.href.indexOf('index.html') - 38 ),
+                  'query' : modelDetail+'.forapi',
+                  'rows'  : 0
+                },
+                function (item)
+                {
+                    if ($('tr#No_record').length && item.data.length) {
+                        $('tr#No_record').remove();
+                    }
+
+                    $.each(item.data, function (index)
+                    {
+                        var datas = item.data[index];
+
+                        var name                =   datas.pricebook_detail_title;
+                        var pricebook_id        =   datas.pricebook_detail_id;
+                        var form_description    =   datas.description;
+                        var form_list_price     =   datas.list_price;
+                        var form_qty            =   datas.qty;
+                        var amount              =   datas.amount;
+                        var form_discount       =   datas.discount;
+                        var form_tax            =   datas.tax;
+                        var total               =   datas.total;
+
+                        // format money
+                        var  format_list_price  = parseFloat(form_list_price).formatMoney(2, '.', ',');
+                        var  format_discount    = parseFloat(form_discount).formatMoney(2, '.', ',');
+                        var  format_tax         = parseFloat(form_tax).formatMoney(2, '.', ',');
+                        var  format_amount      = parseFloat(amount).formatMoney(2, '.', ',');
+                        var  format_total       = parseFloat(total).formatMoney(2, '.', ',');
+                        var  format_qty         = parseInt(form_qty);
+                        // end format money
+
+                        $('.DetailTable').append
+                        (
+                                '<tr>' +
+                                '<td class="index"></td>'+
+                                '<td>'                       + name               + '<input type = "hidden" class="currentProd" name = "pricebook_detail_id" value="' + pricebook_id + '">'     + '</td>' +
+                                '<td class = "description">' + form_description   + '<input type = "hidden" class="currentProd" name = "description"         value="' + form_description + '">' + '</td>' +
+                                '<td class = "list_price">$' + format_list_price  + '<input type = "hidden" class="currentProd" name = "list_price"          value="' + form_list_price + '">'  + '</td>' +
+                                '<td class = "qty">'         + format_qty         + '<input type = "hidden" class="currentProd" name = "qty"                 value="' + format_qty + '">'       + '</td>' +
+                                '<td class = "amount">$'     + format_amount                                                                                                                    + '</td>' +
+                                '<td class = "discount">'    + format_discount    + '<input type = "hidden" class="currentProd" name = "discount"            value="' + form_discount + '">'    + '</td>' +
+                                '<td class = "tax">'         + format_tax         + '<input type = "hidden" class="currentProd" name = "tax"                 value="' + form_tax + '">'         + '</td>' +
+                                '<td class = "total">$'      + format_total                                                                                                                     + '</td>' +
+                                '<td>' +
+                                '<a class="actionview deleteDetail" index="'+window.index+'">' +
+                                '<img src="/img/1.png" class="delete" alt="Delete" />' +
+                                '<span class="tooltip top">Delete</span>' +
+                                '</a>&nbsp; ' +
+                                '</td>' +
+                                '</tr>'
+                        );
+
+                        window.index ++;
+                        productIndex();
+                        Total();
+
+                        var dataProduct = {};
+                        dataProduct['status_id'] = '5295fdf7c5b9f222acd3c74b';
+
+                        $('.currentProd').each(function ()
+                        {
+                            if (!$(this).hasClass('seen')) {
+                                dataProduct[$(this).attr('name')] = $(this).val();
+                                $(this).addClass('seen');
+                            }
+                        });
+
+                        window.arrayObject.push(dataProduct);
+                    });
+                });
+                stoploader();
+            }
+
+            // Save Order and Quote
+            $('.save[type = submit]').click(function()
+            {
+                var ObjID = {};  var flag  = true;
+
+                startloader();
+                $('#body').css('pointer-events','none');
+
+                $('.fieldset .input input,select,textarea').each(function()
+                {
+                    var  name  = $(this).attr('name');
+
+                    if (typeof(name) != 'undefined') {
+                        name = name.substr(name.indexOf('[')+ 1,name.indexOf(']')- name.indexOf('[') - 1);
+                        window.data[name] = $(this).val();
+                    }
+                });
+
+                apiPost(model,window.data);
+
+                $(document).ajaxComplete(function()
+                {
+                    if (flag)
+                    {
+                        window.MainID = window.ID;
+                        ObjID[$('form.apiform').attr('data-scope')+'_id']  = window.MainID;
+
+                        for ( var i=0; i < window.arrayObject.length ;i++ ){
+                            $.extend(window.arrayObject[i],ObjID);
+                        }
+
+                        if (window.arrayObject.length && $('.DetailTable td').find('.deleteDetail').length)
+                        {
+                            apiListPost($('.details').attr('id'),window.arrayObject);
+
+                            $(document).ajaxComplete(function(){
+                                stoploader();
+                                 window.location.href = '/common/'+model+'/view/'+window.MainID+'/index.html';
+                            });
+                        }
+                        else{
+                          stoploader();
+                            window.location.href = '/common/'+model+'/view/'+window.MainID+'/index.html';
+                        }
+
+                        flag = false;
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock script %}
+
+<div id="progress">Loading...</div>
+
+<div class="listtable">
+    <div class="title">
+
+        <div class="listtitle">
+            <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/product.png)"></span>
+            <h1 class="{{ title|lower|replace(' ', '_') }}">{{ title }}</h1>
+        </div>
+
+        <div class="buttons">
+            {% if links %}
+                {% for icon_key, link in links %}
+                    <a class="btn-icon {{ icon_key }}"
+                       href="{{ url( link.route, link.routeparams, { 'query': link.queryparams|merge( { 'back': saurlhash } ) } ) }}">{{ translate( link.label ) }}</a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+    <div id="tableBody">
+        <div data-scope={{ modelname }}>
+            <table id="data" class="data">
+                <thead>
+                <tr class="tableHeader">
+                    {% block sortUrlConstruction %}
+                        <th class="index">#</th>
+                        {% for value in fields %}
+                            <th class="{% if column.sort == value %}checked{% endif %}">
+                                <a href="{{ url( null, viewboxparams|merge({ 'sort':value, 'desc':column.desc==0?1:0 }), { 'query': queryparams } ) }}">{{ attribute( labels, value ) }}</a>
+                                {% if column.sort == value %}
+                                    <span class="{{ column.desc != 0 ? 'down':'up' }}"></span>
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                        <th class="width_4p">
+                            Actions
+                        </th>
+                    {% endblock sortUrlConstruction %}
+                </tr>
+                </thead>
+                   <tbody id="tbody" class="DetailTable">
+
+                   </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="viewData" class="viewData">
+
+        <p> Sub Total :
+            <span class="priceValue" id="subPrice">$0.00</span>
+        </p>
+
+        <p> Discount :
+            <span contenteditable="true" class="priceValue" id="discount">$0.00</span>
+        </p>
+
+        <p> Tax :
+            <span contenteditable="true" class="priceValue" id="tax">$0.00</span>
+        </p>
+
+        <p> Adjustment :
+            <span contenteditable="true" class="priceValue" id="adjustment">$0.00</span>
+        </p>
+
+        <hr/>
+
+        <p id="grand"> Grand Total :
+            <span class="priceValue" id="grandPrice">$0.00</span>
+        </p>
+    </div>
+
+</div>
+
+<div id="listTable" class="listtable">
+    <div class="buttons clearfix">
+
+            <a href="#" class="submitLink btn-icon save" type='submit' title='Save'>
+                {{ translate("Save") }}
+            </a>
+
+            <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+              class="btn-icon cancel"
+              title="Cancel">{{ translate("Cancel") }}
+            </a>
+
+        <div class="success_msg hidden"><i class="imgTxt txtError"></i>
+            <div>some global error message</div>
+        </div>
+    </div>
+</div>
+
+<div class="dialog-message"></div>
+
+<div class="dialog-form hidden">
+    <select class="select2_detailsPBook" data-scope="pricebook"></select>
+    <select class="select2_details" data-scope="pricebookdetail"></select>
+    <input type="text" class="form_listPrice long_placehldr"   placeholder="List Price"/>
+    <input type="text" class="form_qty long_placehldr"         placeholder="Quantity"/>
+    <input type="text" class="form_discount long_placehldr"    placeholder="Discount"/>
+    <input type="text" class="form_tax long_placehldr"         placeholder="Tax"/>
+    <textarea          class="form_description long_placehldr" placeholder="Description"/></textarea>
+</div>

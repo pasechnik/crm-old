@@ -1,0 +1,21 @@
+<div class="{% if fieldset.base %}  lead_info
+            {#{% else %}  lead_other_info#}
+            {#{% elseif iteration is divisible by(2) %}  lead_other_info_right#}
+            {#{% elseif iteration is divisible by(2) %}  lead_other_info_left#}
+            {% else %}  lead_other_info
+            {% endif %} ">
+    <h3>{{ translate( fieldset.label ) }}</h3>
+    <div class="info">
+        {% for key, label in attribute(fieldsets, key).elements %}
+            <pre class="description_edit">{{ attribute(model, key ) }}</pre>
+        {% endfor %}
+    </div>
+</div>
+
+{% block style %}
+    <style>
+        .description_edit{
+            white-space: pre-wrap !important;
+        }
+    </style>
+{% endblock style %}

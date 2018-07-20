@@ -1,0 +1,29 @@
+<div class="{% if fieldset.base %}  lead_info
+            {#{% elseif fieldset.group == 'tabs' %}   tabs_item#}
+            {#{% else %}  lead_other_info#}
+            {#{% elseif iteration is divisible by(2) %}  lead_other_info_right#}
+            {#{% elseif iteration is divisible by(2) %}  lead_other_info_left#}
+            {% else %}  lead_other_info
+            {% endif %} ">
+    <h3>{{ translate( fieldset.label ) }}</h3>
+    <table>
+        <tbody>
+        {% for key, label in attribute(fieldsets, key).elements %}
+            <tr>
+                <th>{{ label }}</th>
+                {#{% if attribute(model, key) is not empty %}#}
+                <td class="{{key}}_Price">
+                        {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] with { 'avalue': model } %}
+                    {#{{ attribute(model, fieldname) }}#}
+                </td>
+                {#{% else %}#}
+                    {#<td class="empty_field">&nbsp;</td>#}
+                {#{% endif %}#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if i is divisible by(3) %}
+    <div class="clear"></div>
+{% endif %}

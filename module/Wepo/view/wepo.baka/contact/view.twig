@@ -1,0 +1,24 @@
+{% extends 'partial/view.twig' %}
+
+{% set title = 'Contact: ' ~ model.fname ~ ' ' ~model.lname %}
+
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+{% block avatar %}
+    <img src="{{ WepoLink(mainuser.company_id, model, 'avatar', 'Leads') }}" alt="" style="max-width:120px;max-height:120px;">
+{% endblock avatar %}
+{% block actions %}
+    {#{% if model.status != 'deleted' %}#}
+        {#<a href="{{ url( 'activity', { 'action': 'add', 'activity': 'call', 'id':model.id(),'tableid':table_id } )~saurl }}" class="call"><span class="small icon"></span>{{ translate('Call') }}</a> &nbsp;#}
+        {#<a href="{{ url( 'activity', { 'action': 'add', 'activity': 'task', 'id':model.id(),'tableid':table_id } )~saurl }}" class="task"><span class="small icon"></span>{{ translate('Task') }}</a> &nbsp;#}
+        {#<a href="{{ url( 'activity', { 'action': 'add', 'activity': 'event', 'id':model.id(),'tableid':table_id } )~saurl }}" class="event"><span class="small icon"></span>{{ translate('Event') }}</a> &nbsp;#}
+        {#<a href="{{ url( 'document', { 'action': 'add',  'id':''~model.id(),'tableid':table_id } )~saurl }}" class="attach"><span class="small icon"></span>{{translate('Attach')}}</a> &nbsp;#}
+        {#<a href="{{ url( 'contact', { 'action': 'delete', 'id':model.id() } )~saurl }}" class="delete"><span class="small icon"></span>{{ translate('Delete') }}</a> &nbsp;#}
+    {#{% elseif model.status == 'deleted' %}#}
+        {#<a class="green_but submitLink"#}
+           {#href="{{ url( 'contact', { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}" class="delete"><span class="small icon"></span>{{ translate('Restore') }}</a> &nbsp;#}
+        {#{% if permission == 1 %}#}
+            <a class="red_but submitLink"
+               href="{{ url( 'contact', { 'action': 'clean', 'id':'' ~model.id()} )~delsaurl }}" class="clean"><span class="small icon"></span>{{ translate('Clean') }}</a> &nbsp;
+        {#{% endif %}#}
+    {#{% endif %}#}
+{% endblock actions %}

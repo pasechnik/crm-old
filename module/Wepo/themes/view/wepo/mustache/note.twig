@@ -1,0 +1,392 @@
+<div  class="widget {{ name|lower|replace(' ','_') }}">
+
+    <div class="title">
+        <div class="listtitle">
+            <span class="small icon" style="background-image: url(/css/img/icons/32x32-icons/{{ widget.model }}.png); margin-left: 9px;"></span>
+            <h2>{{ name }}</h2>
+        </div>
+
+{% block style %}
+    <style>
+        #add_note, #cancel_note,#save_note{
+            cursor:pointer;
+        }
+        #note_title{
+            width: 570px;
+        }
+        .note_textarea{
+             resize: none;
+             width: 570px;
+             margin-top: 15px;
+             height: 40px;
+             margin-top: 4px;
+        }
+        .notes_list{
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: 155px;
+            height: 100%;
+        }
+        .delete_note{
+            font-size: 13px;
+        }
+        .delete_note:hover{
+            color:red;
+        }
+
+        .edit_note{
+            font-size: 13px;
+        }
+        .edit_note:hover{
+            color:#80bd57;
+        }
+        .ui-dialog-content{
+            font-size: 16px;
+            text-align: left;
+        }
+        .note_hide{
+            height: 20%;
+        }
+        .minibutton{
+            cursor: pointer;
+        }
+    </style>
+{% endblock style %}
+        <div class="buttons controls">
+            {% if widget.model_link %}
+                {% block tableLinks %}
+                    {% for icon_key, link in widget.model_link %}
+                        <a  class="btn-icon {{ icon_key }}"
+                            href="{{ url( link.route, link.params )~saurl }}">{{ translate(link.label) }}</a>
+                    {% endfor %}
+                {% endblock tableLinks %}
+            {% endif %}
+            <div class="buttons">
+                <a id="add_note" class="btn-icon add" title='Add note'>Add note</a>
+            </div>
+        </div>
+
+        <div class="buttons right controls">
+{#            <a  class="minibutton resize_button not_full"></a>#}
+            <a  class="minibutton minimize_button "></a>
+        </div>
+
+        <div class="clear"></div>
+
+    </div>
+
+
+    <div id="widget_content" class="widget_content">
+       <div id="notes_list" class="notes_list">
+            {{ form().openTag(form)|raw }}
+            {% set element = form.getBaseFieldset.get('reg')%}
+                <div id="note_Form">
+                    <div class="text" >
+                        <input type="hidden" name="for_id"/>
+                        <input name="fields[title]" type="text" placeholder="Write a title" id="note_title" />
+                        <textarea  name="fields[content]" rows="5" class="note_textarea" name="" placeholder="Write a note" id="note_input" ></textarea>
+                    </div>
+
+                    <div class="buttons">
+                        <a class="btn-notes save" style='height:15px' value = 'Save' id="save_note" title='Save'>Save</a>
+                        <a class="btn-notes no"   style='height:15px' value = 'Cancel' id="cancel_note" title='Cancel'>Cancel</a>
+                    </div>
+                </div>
+             {{ form().closeTag(form)|raw }}
+
+            <ul id='contento'>
+                {% for datarow in widget.data %}
+
+                        <li id="note_hide" class="note_hide">
+
+                            {%if datarow.title is not empty%}
+                                <h3 style='font-size:16px'>{{datarow.title}}</h3>
+                            {% endif %}
+
+                            {%if datarow.content is not empty%}
+                                 <p style='font-size:15px' class="note_p" id="{{datarow._id}}">{{datarow.content}}</p>
+                            {% endif %}
+
+                            <div class="info">
+                                <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(datarow, 'owner_id')} )~saurl }}">{{datarow.owner}}</a>,
+                                {{ datarow.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+                            </div>
+
+                            <div class="links">
+                                {% for action, conf in widget.action %}
+                                        {% if action == 'edit' %}
+                                            <a id="{{datarow._id}}" class="{{action}}_note">{{action|capitalize}}</a>
+                                        {% else %}
+                                            <a class="{{action}}_note">{{action|capitalize}}</a>
+                                        {% endif %}
+                                {% endfor %}
+                            </div>
+                        </li>
+                {% endfor %}
+            </ul>
+    </div>
+
+    {% if widget.paginator.count > 1 %}
+        <div class="tableBottomToolbar">
+            <div class="buttons clearfix">
+                {% include 'partial/pagination.twig' with {'pages':widget.paginator.getPages, 'route': 'search', 'params':widget.params} %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+        <div class="note-dialog"></div>
+
+</div>
+{% block script %}
+<script>
+  $(function(){
+
+     var count = $("#contento li").size();
+      if ( count == 0 )
+      {
+         $('.notes_list li').css('background','none');
+      }
+
+      if ( count <= 1 ){
+       $('.notes_list').unbind(twoscrolls());
+      }
+
+      else{
+            twoscrolls('.notes_list');
+      }
+
+  $('#note_Form').hide();
+  $('#body').on("click", "#add_note", function(){
+      $('#notes').removeClass('minimized');
+         $('#add_note').addClass('disabled');
+         $('#note_Form').removeClass('hidden');
+         $('#add_note').css('background-image','url(/css/img/icons/other-icons/plus_gray.png)');
+         $('#note_Form').show({effect: 'slow', duration: 600});
+         $('#contento').hide({effect: 'slow', duration: 600});
+    });
+
+       $('#cancel_note').click(function()
+       {
+           setInterval(function()
+           {
+              if ($(window).scrollTop() < $('#header').height() - $('#mainMenu').height() )
+                 {
+                   fixedMenu();
+                   window.clearTimeout();
+                 }
+           },1);
+           $('#add_note').css('background-image','url(/css/img/icons/other-icons/plus_green.png)');
+           $('#note_title').val('');
+           $('#note_input').val('');
+           $( "input[name='for_id']").val('');
+           $('#add_note').removeClass('disabled');
+           $('#note_Form').hide({effect: 'slow', duration: 600});
+           setTimeout(function(){$('#contento').show({effect: 'clip', duration: 600});},600);
+       });
+
+         $('#notes').on('click', '.delete_note', function(){
+
+             deleteurl = "{{ url( 'note', { 'action': 'delete','parentid':model.id(),'tableid':table_id }) }}";
+             title = $(this).closest('li').find('h3').text();
+             content = $(this).closest('li').find('p').text();
+             id = $(this).closest('li').find('p').attr('id');
+
+             if (content.length > 50)
+             {
+                 content = jQuery.trim(content).substring(0, 42);
+                 content = content + "...";
+             }
+
+             if (title.length > 50)
+             {
+                 title = jQuery.trim(title).substring(0, 42);
+                 title = title + "...";
+             }
+
+              $(window).scroll(function()
+               {
+                 $('.note-dialog').dialog("option", "position", $('.note-dialog').dialog("option", "position"));
+               });
+
+                    $(window).resize(function ()
+                    {
+                       $('.note-dialog').dialog("option", "position", $('.note-dialog').dialog("option", "position"));
+                    });
+
+
+             $('.note-dialog').dialog({
+
+                open: function ()
+                {
+                   if (title.length !==0 )
+                   {
+                     $('.note-dialog').text('"'+title+'"');
+                   }
+                   else
+                   {
+                     $('.note-dialog').text('"'+content+'"');
+                   }
+                  $('.ui-widget-overlay').addClass('custom-overlay');
+                },
+
+                close: function()
+                {
+                    $( '.ui-widget-overlay' ).removeClass( 'custom-overlay' );
+                },
+
+                show: { effect: '', duration: 600, my: "top", at: "center", of: window },
+                hide: { effect: '', duration: 400 },
+                title: "Do you want to delete selected note ?",
+                modal: true,
+                width: '400',
+                height: '505',
+                resizable: false,
+                draggable: false,
+                closeOnEscape: false,
+                buttons: {
+                    Yes: function () {
+
+                      $.ajax({
+                            url:deleteurl ,
+                            type: 'POST',
+                            traditional: true,
+
+                            data: { 'checkedid[]': id, delyes: 1 },
+                            success: function (result) {
+                                if (result.ok)
+                                {
+                                  $("#contento").html('<li align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader1.gif> </li>');
+
+                                   loadurl = "http://" + window.location.hostname + "/" + "{{widget.target_model|lower}}" + "/view/" + "{{model.id()}}" + "/index.html #contento";
+                                   $('#contento').load(loadurl);
+
+                                   $('.notes_list li').css('background','none');
+                                }
+                            }
+                        });
+
+                     $(document).ajaxStop(function()
+                     {
+                         var count = $("#contento li").size();
+                         if (count == 0)
+                         {
+                            $('.notes_list li').css('background','none');
+                         }
+                             if ( count <= 1 )
+                             {
+                                $('.notes_list').unbind(twoscrolls());
+                             }
+                      });
+
+                       $('#note_Form').hide();
+
+                       $(document).ajaxStop(function(){
+                          if ( $(window).scrollTop() < $('#header').height() )
+                            {
+                                $('#mainMenu').css('position','relative'); // drag&drop menu fix
+                            }
+                        });
+
+                        $(this).dialog("close");
+                    },
+                    No: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+         });
+
+         $('#notes').on('click','.edit_note', function()
+           {
+             $('#add_note').addClass('disabled');
+             id = $(this).closest('li').find('p').attr('id');
+             title = $(this).closest('li').find('h3').text();
+             content = $(this).closest('li').find('p').text();
+
+
+             setTimeout(function(){$('#note_Form').show({effect: 'slow', duration: 600});},600);
+             $('#contento').hide({effect: 'slow', duration: 600});
+             $('#add_note').css('background-image','url(/css/img/icons/other-icons/plus_gray.png)');
+
+             $( "input[name='for_id']").val(id);
+             $( "input[name='fields[title]']").val(title);
+             $( "textarea[name='fields[content]']").val(content);
+           });
+
+         $('#notes').on('click','#save_note', function()
+           {
+            title = $('#note_title').val();
+            content = $('#note_input').val();
+            id = $( "input[name='for_id']").val();
+            $( "input[name='for_id']").val('');
+
+             if ( id === '' )
+             {
+                url = "{{ url( 'note', { 'action': 'add','parentid':model.id(),'tableid':table_id }) }}";
+             }
+                else
+                {
+                  parent='{{model.id()}}';
+                   table = '{{table_id}}';
+                    url = "/note/edit/"+id+"/tableid/"+table+"/parentid/"+parent+"/index.html";
+                }
+
+                if ( ( content.length >= 3) )
+                {
+                    if ( ( content.length < 300 )&&( title.length < 100 ) )
+                    {
+                        $.ajax({
+                        url:url ,
+                        type: 'POST',
+                        traditional: true,
+
+                        data: { 'fields[title]':title,'fields[content]':content},
+                        beforeSend: function(){
+                            $("#contento").html('<li align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader1.gif> </li>');
+                            $('.notes_list li').css('background','none');
+                        },
+                        success: function ()
+                        {
+                           $("#contento").html('<li align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader1.gif> </li>');
+
+                           loadurl = "http://" + window.location.hostname + "/" + "{{widget.target_model|lower}}" + "/view/" + "{{model.id()}}" + "/index.html #contento";
+                           $('#contento').load(loadurl);
+
+                           $('.notes_list li').css('background','none');
+                        },
+
+                        error:function ()
+                        {
+                           alert('ERROR!');
+                        }
+                    });
+
+                     $(document).ajaxStop(function(){
+                       var count = $("#contento li").size();
+
+                         if ( count >= 2 )
+                          {
+                           twoscrolls('.notes_list');
+                          }
+                     });
+
+                      $('#contento').show();
+                      $('#note_Form').hide();
+                      $('#add_note').removeClass('disabled');
+                      $('#add_note').css('background-image','url(/css/img/icons/other-icons/plus_green.png)');
+                      $('#note_title').val('');
+                      $('#note_input').val('');
+                    }
+                    else{
+                      alert('Data is too long');
+                    }
+                }
+                else{
+                    alert('Length of the text should be at least 3 characters');
+                }
+            });
+  });
+</script>
+{% endblock script %}

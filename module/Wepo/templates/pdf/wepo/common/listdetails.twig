@@ -1,0 +1,117 @@
+{% block style %}
+    <style>
+        #data td.qty, td.discount, td.list_price, td.tax,td.description {
+            transition: 0.7s;
+        }
+
+        .td_editing {
+            background: #eee !important;
+            cursor: pointer !important;
+        }
+
+        .ui-dialog-content {
+            height: auto !important;
+        }
+
+        .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons {
+            height: auto !important;
+        }
+
+        .dialog-form > input{
+            width: 290px !important;
+            height: 30px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 5px !important;
+            display: block;
+        }
+
+
+        textarea.form_description{
+            resize: none;
+            width: 292px !important;
+            height: 60px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 3px !important;
+        }
+
+        .ui-button:first-of-type, .ui-button:last-of-type {
+            width: 73px !important;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+{% endblock script %}
+
+
+<div class="listtable">
+    <div id="tableBody">
+        <form id="deleteForm" action="{{ url( null, { 'data': modelname, 'view': 'delete' } )~saurl }}"
+              method="post"
+              name="checked">
+            <table id="data" class="data">
+                <thead>
+                <tr class="tableHeader">
+                    {% block sortUrlConstruction %}
+                        {% for value in fields %}
+                            <th class="{% if column.sort == value %}checked{% endif %}">
+                                {{ attribute( labels, value ) }}
+                            </th>
+                        {% endfor %}
+                    {% endblock sortUrlConstruction %}
+                </tr>
+                </thead>
+                <tbody id="tbody">
+                {% for akey,avalue in paginator.getCurrentItems %}
+                    {% set record_acl = [] %}
+                    {% for aclByType in avalue._acl %}
+                        {% for item in aclByType.data %}
+                            {% if item not in record_acl %}
+                                {% set record_acl = record_acl|merge([item]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {#{{ dump(aclByType) }}#}
+                    {% endfor %}
+                    <tr>
+                        {% for key in fields %}
+                            <td class="{% if column.sort == value %}checked{% endif %}{{ key }}">
+                                {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="tableBottomToolbar">
+
+
+                <div class="buttons">
+
+                    {% if paginator.getTotalItemCount > 5 %}
+                        <div class="selectRows" id="selectRows">
+                            <div class="msg"><span>Rows on the page:</span>
+                            </div>
+                            {% for i in rows %}
+                                <a href="{{ url( null, viewboxparams, { 'query': queryparams | merge({ 'rowcount': i }) } ) }}"
+                                   class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <div style="float: right; padding-top: 2px;" class="msg" id="total_count">
+                    {% if paginator.getTotalItemCount > 0 %}
+                        Total count {{ paginator.getTotalItemCount }}
+                    {% endif %}
+                </div>
+
+
+            </div>
+        </form>
+    </div>
+</div>
+

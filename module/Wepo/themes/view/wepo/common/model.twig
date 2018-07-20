@@ -1,0 +1,32 @@
+{% extends 'layout/layout.twig' %}
+
+<script id="row-template" type="text/x-tmpl-handlebars">
+    {{ '{{#each users}}' }}
+    <tr>
+        <td class="first_td">
+            <div class="checkbox">
+                <input title="" type="checkbox" name="checkedid[]" id="{{ '{{' }}
+    id{{ '}}' }}"
+               value="{{ '{{' }}id{{ '}}' }}"
+               class="check"/>
+            </div>
+        </td>
+        {% for key in fields %}
+            <td>
+                {% include 'handlebars/'~ modelname ~'-list.twig' %}
+            </td>
+        {% endfor %}
+        <td class="width_10p">
+            ACTIONS
+        </td>
+    </tr>
+    {{ '{{/each}}' }}
+</script>
+
+<script>
+    
+</script>
+
+{% block content %}
+    <div id="modellist"></div>
+{% endblock content %}

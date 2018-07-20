@@ -1,0 +1,97 @@
+{#{% block content %}
+    <h1>{{ title }}</h1>
+    <form action="{{ url( null, { 'data':modelname, 'view': view } ) }}" method="post">
+        <div>
+            <input type="hidden" name="eventtype" value="{{ eventtype }}"/>
+            {% for id in ids %}
+                <input type="hidden" name="checkedid[]" value="{{ id }}"/>
+            {% endfor %}
+            <input type="hidden" name="delyes" value="{{ translate('Yes') }}"/>
+        </div>
+
+        <div class="clearfix">
+            <div class="table">
+                <h2>{% block message %}{{ translate('Do you want to '~view~' '~modelname~'(s)?') }}{% endblock message %}</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th width="20px">№</th>
+                        <th>{{ modelname|capitalize~'(s)' }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <th width="20px">
+                                {{ loop.index }}
+                            </th>
+                            <th>
+                               {{ item.title }}
+                            </th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttons clearfix">
+                <a href="" class="green_but submitLink">{{ translate('Yes') }}</a>
+                {% if saurlback !='/' %}
+                    <a href="{{ saurlback }}">{{ translate('No') }}</a>
+                {% else %}
+                    <a href="{{ url( null, { 'data' : modelname,
+                    'view': 'list' } ) }}">{{ translate('No') }}</a>
+                {% endif %}
+            </div>
+            <input name="saurl[back]" type="hidden" value={{ saurlback }}>
+        </div>
+    </form>
+{% endblock content %}#}
+
+{% block content %}
+<div class="viewtable">
+    <form action="{{ url( null, { 'data':modelname, 'view': view } ) }}" method="post">
+       <div class="view_header">
+
+                <div class="buttons">
+                    <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data' : modelname, 'view': 'list' } )  }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+                </div>
+
+                <div class="title">
+                    <h1 class="{{ title|lower|replace(' ', '_') }}">
+                        {{ title }}
+                    </h1>
+                </div>
+        </div>
+        <div class="view_block" style="margin: 0 auto;">
+            <div class="viewData">
+                    <input type="hidden" name="eventtype" value="{{ eventtype }}"/>
+                    {% for id in ids %}
+                        <input type="hidden" name="checkedid[]" value="{{ id }}"/>
+                    {% endfor %}
+                    <input type="hidden" name="delyes" value="{{ translate('Yes') }}"/>
+
+                <div class="viewlist">
+                        {% for item in items %}
+                          <h3 style="text-align: center;"> {{ translate('Are you sure that you want to '~view~' '~modelname~' ') }}"{{item.title }}" ?</h3>
+                        {% endfor %}
+
+                        <div class="buttons" style="text-align: center;">
+                            <a  style="float:none;" href="" class="green_but submitLink yes btn-icon" title="Yes">{{ translate('Yes') }}</a>
+
+                            {% if saurlback !='/' %}
+                                 <a  style="float:none;" href="{{ saurlback }}" class="btn-icon no" title="No">{{ translate("No") }}</a>
+                            {% else %}
+                                 <a  style="float:none;" href="{{ url( null, { 'data' : modelname, 'view': 'list' } ) }}" class="btn-icon no" title="No">{{ translate("No") }}</a>
+                            {% endif %}
+
+                        </div>
+                    <input name="saurl[back]" type="hidden" value={{ saurlback }}>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block style %}
+{% endblock style %}

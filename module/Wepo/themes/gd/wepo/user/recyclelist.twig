@@ -1,0 +1,7 @@
+{% extends 'partial/recyclelist.twig' %}
+
+{% set title = translate('Users') %}
+
+{% block data %}
+    {% include 'partial/user-list.twig' %}
+{% endblock data %}

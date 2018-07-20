@@ -1,0 +1,113 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Sales Order: ' ~ model.subject %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block PreviousNext %}
+{% endblock PreviousNext %}
+{% block actions %}
+    <a class="edit btn-icon" href="{{ url( 'order', { 'action': 'edit','id':model.id } )~saurl }}">{{translate('Edit main info')}}</a>
+    <a class="edit btn-icon" href="{{ url( 'orderdetail', { 'action': 'list','orderid':model.id } )~saurl }}">{{translate('Edit details')}}</a>
+{% endblock actions %}
+{% block detailinfo %}
+    <form action="{{ url( route, { 'action': 'convert' } ) }}" method="post">
+        <div class="clearfix">
+            <div class="table">
+                <h2 style="margin-top: 10px;">Detail information</h2>
+                <div class="buttons" style="padding: 10px;">
+                   <a id="details_button" class="show btn-icon">Show</a>
+                    <input type="hidden" name="id" value="{{ model.id }}" />
+                    <a href="#" class="yes btn-icon green_but submitLink">{{ translate('Create invoice') }}</a>
+                </div>
+                <div id="details" class="hide">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="30"><b>№</b></th>
+                                {% for key, value in details|first.toView %}
+                                {% if (key == 'product') %}
+                                    <th><b>&nbsp;&nbsp;{{translate('Product')}}</b></th>
+                                {% elseif key == 'order'%}
+                                    <th><b>&nbsp;&nbsp;{{translate('Subject')}}</b></th>
+                                {% elseif key == 'pricebook'%}
+                                    <th><b>&nbsp;&nbsp;{{translate('Pricebook')}}</b></th>
+                                {% elseif key == 'title'%}
+                                {% else %}
+                                <th><b>&nbsp;&nbsp;{{translate(detail_labels[key])}}</b></th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for detail in details %}
+                               <tr>
+                               <td width=30>{{loop.index}}</td>
+                                   {% for key, value in detail.toView %}
+
+                                       {% if key == 'product_price' or key == 'final_price' %}
+                                            <td>&nbsp;&nbsp;${{value}}</td>
+
+                                        {% elseif key == 'discount' %}
+
+                                           {% if detail.toView.discount_type == '% of Price' %}
+                                                <td>&nbsp;&nbsp;{{value|number_format(2, '.', ',')}} %</td>
+                                           {% elseif value !='0' %}
+                                                <td>&nbsp;&nbsp;- ${{value|number_format(2, '.', ',')}} </td>
+                                           {% else %}
+                                                <td>&nbsp;&nbsp;${{value|number_format(2, '.', ',')}} </td>
+                                           {% endif %}
+
+                                       {% elseif key!= 'order_id'%}
+                                           {% if (key != 'order_id') and (key != 'invoice') and (key != 'title')%}
+                                               <td class="{{key}}">&nbsp;&nbsp;{{value}}</td>
+                                           {% endif %}
+
+                                       {% endif %}
+                                   {% endfor %}
+                               </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock detailinfo %}
+{% block script %}
+    <script>
+        $(function(){
+           $('#details').hide();
+
+           $('#details_button').click(function()
+           {
+              if ($(this).text() === 'Hide')
+              {
+                $('#details').hide({duration:600,effect:'blind'});
+                $(this).text('Show');
+                $(this).switchClass('hide','show');
+                setInterval(function(){
+                    if ($(window).scrollTop() < $('#header').height() - $('#mainMenu').height() )
+                    {
+                      fixedMenu();
+                      window.clearTimeout();
+                    }
+                },1);
+              }
+              else{
+                $('#details').show({duration:600,effect:'blind'});
+                $(this).text('Hide');
+                $(this).switchClass('show','hide');
+              }
+           });
+        });
+    </script>
+{% endblock script %}
+
+{% block style %}
+    <style>
+        #details_button{
+            cursor: pointer;
+            width: 30px;
+        }
+    </style>
+{% endblock style %}

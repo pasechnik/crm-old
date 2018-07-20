@@ -1,0 +1,26 @@
+{%if pricebook%}
+<table>
+    <thead>
+        <tr>
+            <th>Pricebook name</th>
+            <th>Description</th>
+            <th>Add date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+            {% for akey,avalue in pricebook %}
+        <tr>
+            <th><a href="{{ url( 'pricebook', { 'action': 'view','id':avalue.id } ) }}"> {{avalue.pricebook}}</a></th>
+            <td>{{ avalue.description }}</td>
+            <td>{{avalue.created_dtm}}</td>
+            <td>
+                <a href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':avalue.id } )~saurl }}"><img src="/img/1.png" class="view" /></a>&nbsp;
+                <a href="{{ url( 'pricebook', { 'action': 'edit','id':avalue.id } )~saurl }}"><img src="/img/1.png" class="edit" /></a>&nbsp;
+                <a href="{{ url( 'pricebook', { 'action': 'delete','id':avalue.id } )~saurl }}"><img src="/img/1.png" class="delete" /></a>
+            </td>
+        </tr>
+            {% endfor%}
+    </tbody>
+</table>
+{%endif%}

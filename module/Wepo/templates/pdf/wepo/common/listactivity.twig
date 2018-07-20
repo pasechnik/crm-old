@@ -1,0 +1,335 @@
+    <script>
+
+        _thisurl = location.href;
+
+        $(function()
+        {
+            $('#activity_select').selectBox();
+
+            $('#activity_select').closest('.selectBox').change(function()
+            {
+              var url = '';
+                  url = $('#activity_select').find('option:selected').val();
+
+                if (url.length)
+                {
+                    window.location.href = url;
+                    $('a.selectBox').addClass('disabled');
+                }
+            });
+
+                $('#body').on("click", "#c_all", function () {
+                    if ($('div.checked', this).size()) {
+                        $('input.check').prop('checked', true);
+                        $('div.checkboxArea').addClass('checked');
+                        $('tr', "#tbody").addClass('checked');
+                        $('#deletebtn').removeClass('disabled');
+                        $('#restorebtn').removeClass('disabled');
+                        $('#clearbtn').removeClass('disabled');
+                    }
+                    else {
+                        $('input.check').prop('checked', false);
+                        $('div.checkboxArea').removeClass('checked');
+                        $('tr', "#tbody").removeClass('checked');
+                        $('#deletebtn').addClass('disabled');
+                        $('#restorebtn').addClass('disabled');
+                        $('#clearbtn').addClass('disabled');
+                    }
+                });
+
+                // search input animation
+                $('#titleSearchIcon').click(function () {
+                    if ($('#titleSearch').is(':visible')) {
+                        $('#titleSearch').stop().animate({width: '0px', height: '0px', opacity: 0}, 200, function () {
+                                $(this).hide();
+                            }
+                        );
+                    }
+                    else {
+                        $('#titleSearch').show(200,
+                            function () {
+                                $('#titleSearch').stop().animate({width: '220px', height: '31px', opacity: 1}, 200);
+                            }
+                        );
+                    }
+                    return false;
+                });
+            });
+
+        restoreurl = "{{ url( null, { 'data':modelname, 'view': 'restore' } ) }}";
+        cleanurl =   "{{ url( null, { 'data':modelname, 'view': 'clean' } ) }}";
+        deleteurl =  "{{ url( null, { 'data':modelname, 'view': 'delete' } ) }}";
+
+        $(function()
+        {
+            $('.selectBox-dropdown-menu li:first').remove(); // FOR SELECTBOX
+
+            $('#body').on("click", "div.alphabet a.ajax", function () {
+                $('div.alphabet a.ajax').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            $('#body').on("click", "a.ajax", function () {
+                var _target = $(this).attr('ajax-target');
+                var _src = $(this).attr('ajax-src');
+                var _location = $(this).attr('href');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+
+                startloader();
+
+                $(_target).load(_location + _src, null, function () {
+                    setCheckboxes();
+                    stoploader();
+
+                    $('img.delete').each(function()
+                    {
+                        $(this).addClass('single_del'); //FOR DIALOG DELETING. REFRESH KNOKS DIALOGUE DELETE CLASS
+                    });
+                });
+                _thisurl = _location;
+
+                return false;
+            });
+
+            $('#refresh').click(function () {
+                var _target = $('a.ajax.active').attr('ajax-target');
+                var _location = $('a.ajax.active').attr('href');
+                var _src = $('a.ajax.active').attr('ajax-src');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+
+                startloader();
+
+                $(_target).load(_thisurl + _src, null, function () {
+                    setCheckboxes();
+                    stoploader();
+
+                    $('img.delete').each(function()
+                    {
+                        $(this).addClass('single_del'); //FOR DIALOG DELETING. REFRESH KNOKS DIALOGUE DELETE CLASS
+                    });
+                });
+
+                return false;
+            });
+
+            $('#body').on("click", "#deletebtn", function () {
+                dialogfnct('delete');
+            });
+
+            $('#body').on("click", ".single_del", function () {
+                single_action = true;
+                title = $(this).closest('tr').find('.d_title').text();
+                id = $(this).closest('tr').find('.check').val();
+                dialogfnct('delete');
+                return false;
+            });
+
+            $('#body').on("click", ".tooltip", function () {
+                return false;
+            });
+
+           $('img.delete').each(function(){
+             $(this).addClass('single_del');
+           });
+
+        });
+    </script>
+
+
+<div class="listtable">
+    <div class="title">
+        <div class="listtitle">
+
+            {% if 'detail' in modelname %}
+                 <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/product.png)"></span>
+            {% else %}
+                 <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/{{ modelname }}.png)"></span>
+            {% endif %}
+
+            <h1 class="{{ title|lower|replace(' ', '_') }}">
+                {{ title }}
+            </h1>
+        </div>
+        <div class="buttons">
+            {% if links %}
+                <select id="activity_select">
+                    <option value="">Add new</option>
+
+                {% for icon_key, link in links %}
+                     <option value="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">
+                        {{ translate(link.label) }}
+                    </option>
+                    {% endfor %}
+
+                 </select>
+            {% endif %}
+
+            <div id="titleSearch" class="titleSearch" style="">
+                <form class="search_form" action="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}"
+                      method="get" name="list_search">
+
+                    <input class="long_placehldr" type="text" name="q" value="{{ search_query }}"
+                           placeholder="Search in &quot;{{ title }}&quot;"/>
+
+                    <div class="searchico"></div>
+                </form>
+            </div>
+        </div>
+        {% if search_query %}
+            <div class="buttons" style="padding-left: 8px;">
+                <a href="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}">Show all records</a>
+            </div>
+        {% endif %}
+        <div style='display: inline; font-size: larger; font-style: italic;color:#999999; vertical-align: super;'
+             id="letter"></div>
+        <div class="buttons right">
+            <a id="refresh" class="refresh btn-icon" href="">
+                {{ translate('Refresh') }}
+            </a>
+            <a class="choose btn-icon" href="{{ url( 'common', { 'action': 'field', 'data':modelname, 'view':params.view }, { 'query': queryparams|merge({ 'back':saurlhash }) } ) }}">
+                {{ translate('Output fields') }}
+            </a>
+            {#{% if 'recyclelistAction' in actions_list %}#}
+            <a href="{{ url( null, { 'data': modelname, 'view': 'recyclelist' } )~saurl }}"
+               class="delete btn-icon">
+                {{ translate('Recycle') }}
+            </a>
+            {#{% endif %}#}
+        </div>
+    </div>
+    <div id="tableBody">
+        <form id="deleteForm" action="{{ url( null, { 'data': modelname, 'view': 'delete' } )~saurl }}"
+              method="post"
+              name="checked">
+                <table id="data" class="data">
+                    <thead>
+                    <tr class="tableHeader">
+                        <th class="width_4p">
+                            <div id="c_all" class="checkbox">
+                                <input type="checkbox" name="c_all_input" value=""/>
+                            </div>
+                        </th>
+                        {% block sortUrlConstruction %}
+                            {% for value in fields %}
+                                <th class="{% if column.sort == value %}checked{% endif %}">
+                                    <a href="{{ url( null, params|merge({ 'sort':value, 'desc':column.desc==0?1:0 }), { 'query': queryparams|merge({ 'back':saurlhash }) } )}}">{{ attribute( labels, value ) }}</a>
+                                    {#{ 'data': modelname, 'view': 'list','sort':value, 'desc':column.desc==0?1:0 } ) }}">{{ attribute( labels, value ) }}</a>#}
+                                    {% if column.sort == value %}
+                                        <span class="{{ column.desc!=0 ? 'down':'up' }}"></span>
+                                    {% endif %}
+                                </th>
+                            {% endfor %}
+                        {% endblock sortUrlConstruction %}
+                        {% block actiontitle %}
+                            <th class="width_10p">Actions</th>
+                        {% endblock actiontitle %}
+                    </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    {% for akey,avalue in paginator.getCurrentItems %}
+                        <tr>
+                            <td class="first_td">
+                                <div class="checkbox">
+                                    <input title="" type="checkbox" name="checkedid[]" id="{{ avalue.id() }}"
+                                           value="{{ avalue.id() }}" class="check"/>
+                                </div>
+                            </td>
+                            {% for key in fields %}
+                                <td class="{% if column.sort == key %}checked{% endif %}">
+                                    {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                                </td>
+                            {% endfor %}
+                            <td class="width_10p">
+                                {% for action, conf in actions %}
+                                    <a class="actionview"
+                                       href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(avalue, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                            src="/img/1.png" class="{{ action }}" alt="{{ action }}"/><span
+                                            class="tooltip top">{{ action|capitalize }}</span></a>&nbsp;
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            <div class="tableBottomToolbar">
+                {% block downButtons %}
+                    <div class="buttons left">
+                        <a id="deletebtn" class="delete btn-icon disabled">{{ translate('Delete selected') }}</a>
+                    </div>
+                    <div class="buttons right">
+                        {% if paginator.count > 1 %}
+                            {% include 'partial/pagination.twig' with { 'pages':paginator.getPages, 'route': null, 'params':params } %}
+                        {% endif %}
+                    </div>
+                    <div class="buttons">
+                        <noscript>
+                            <input type="submit" name="delete" value="{{ translate('Delete selected') }}"/>
+                        </noscript>
+                        {% if paginator.getTotalItemCount > 5 %}
+                            <div class="selectRows" id="selectRows">
+                                <div class="msg"><span>Rows on the page:</span>
+                                </div>
+                                {% for i in rows %}
+                                    <a href="{{ url( null, { 'data': modelname, 'view': 'list' }, { 'query': queryparams | merge({ 'rowcount': i }) } ) }}"
+                                       class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                                    {#<a onclick="changeRow({{ i }})" class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>#}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div style="float: right; padding-top: 2px;" class="msg">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td id="total_count">
+                                    {% if paginator.getTotalItemCount > 0 %}
+                                        Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="alphabet">
+                        <a id="#All" ajax-src="#tableBody" ajax-target="#tableBody"
+                           class="ajax {% if not letter %}active{% endif %}"
+                           href="{{ url( null, params, { 'query': { 'back': back, 'q': search_query } } ) }}">All</a>
+                        {% for _letter in 'A'..'Z' %}
+                            <a id="#{{ _letter }}" ajax-src="#tableBody" ajax-target="#tableBody"
+                               class="ajax {% if letter == _letter %}active{% endif %}"
+                               href="{{ url( null, params, { 'query': { 'letter':_letter, 'back': back, 'q': search_query } } ) }}">{{ _letter }}</a>
+                        {% endfor %}
+                    </div>
+                {% endblock downButtons %}
+            </div>
+        </form>
+    </div>
+</div>
+
+
+ <div class="dialog-message"></div>
+
+    <a align="center" id="scrollTop" href="#" onclick="top.goTop();return false;"></a>
+
+<style>
+    #activity_select + .selectBox {
+       width: 160px !important;
+       height: 19px !important;
+    }
+    #activity_select + .selectBox > .selectBox-label {
+       padding: 2px !important;
+        font-size: 14px;
+        margin-top: -7px;
+    }
+
+    .selectBox-dropdown-menu{
+        overflow: hidden !important;
+    }
+
+</style>

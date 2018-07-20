@@ -1,0 +1,3 @@
+{% extends 'partial/edit.twig' %}
+{% set title = 'Product: ' ~ model.name %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}

@@ -1,0 +1,23 @@
+{% extends 'partial/add.twig' %}
+{% block upperform %}
+    <div class="table" >
+        <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b>0 $</b></span></h2>
+    </div>
+{% endblock upperform %}
+
+{% block script %}
+    {{ parent() }}
+    <script>
+        var prices = {{ prices|json_encode|raw }};
+    </script>
+{% endblock script %}
+
+{% block style %}
+    {{ parent() }}
+    <style type="text/css">
+        .hide {
+            overflow: hidden;
+            display: none;
+        }
+    </style>
+{% endblock style %}

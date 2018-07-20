@@ -1,0 +1,63 @@
+{% extends 'layout/layout.twig' %}
+
+{% block style %}
+    <style>
+
+        div#detailPrices{
+            float: right;
+            padding-bottom: 100px;
+            padding-right: 27px;
+            margin-top: -34px;
+        }
+
+        div#detailPrices tr th{
+            color: black;
+            float: left;
+        }
+
+        div#detailPrices tr td{
+            color: black;
+            float: right;
+            padding-left: 2px;
+        }
+
+        div#detailPrices h3{
+            display: none;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+        $(function ()
+        {
+            $('div#detailPrices tr th').each(function(){
+                $(this).text($(this).text()+' '+':'+' ');
+            });
+
+            $('div#detailPrices th:last,div#detailPrices td:last').css({'color':'black','font-weight': '600'});
+            $('div#detailPrices tr:last').prepend('<hr/>');
+        });
+    </script>
+{% endblock script %}
+
+{% block content %}
+
+    {% for dash in data.view %}
+        {% include dash.template with dash %}
+    {% endfor %}
+
+    {% for list in data.details %}
+        {% include list.template with list %}
+    {% endfor %}
+
+    <div id="detailPrices">
+       {% for prices in data.viewPrices %}
+            {% include prices.template with prices %}
+       {% endfor %}
+    </div>
+
+    <a align="center" id="scrollTop" href="#" onclick="top.goTop();return false;"></a>
+
+{% endblock content %}

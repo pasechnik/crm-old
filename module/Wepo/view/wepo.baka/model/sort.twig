@@ -1,0 +1,155 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Model Admin') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+
+{% block style %}
+    {{ parent() }}
+    <style>
+        .ui-sortable-helper {
+            border: 0;
+            height: 15px !important;
+        }
+
+        .sortable ul.header{
+            background-color: inherit;
+            height: 57px;
+            border-bottom: #e0e0e0 1px solid;
+            font-weight: bold;
+        }
+
+        .sortable ul.header li{
+            margin: 18px;
+            color:#1191d4;
+            text-decoration: none;
+            float: left;
+            width: 48%;
+        }
+
+        .sortable .body ul{
+            float: left;
+            width: 50%;
+        }
+
+        .sortable .body ul .cell{
+            border-top:1px solid #f0f0f0;
+            height: 15px;
+            /*padding: 3%;*/
+            padding: 20px;
+        }
+
+        .placeholder{
+            background-color: lightyellow;
+        }
+
+        .sortable .body ul .cell:hover{
+            background-color: #e1f5fe;
+            border-left: #b3e5fc 1px solid;
+            border-right: #b3e5fc 1px solid;
+        }
+
+        .sortable .body ul li{
+            float: left;
+        }
+        .remove{
+            float: right;
+            color: #cd5c5c;
+        }
+
+        .remove:hover{
+            color: #ff0000;
+            cursor: pointer;
+        }
+    </style>
+{% endblock style %}
+{% block script %}
+    <script>
+        var group1, group2;
+        $(function(){
+            group1 = $("ul.serialization1").sortable({
+                cursor: "move",
+                axis: "y",
+                placeholder: "cell placeholder"
+            });
+            group2 = $("ul.serialization2").sortable({
+                cursor: "move",
+                axis: "y",
+                placeholder: "cell placeholder"
+            });
+
+            $(group1).on('sortstop',function (event, ui) {
+                $('#output1').val(group1.sortable('toArray'));
+            }).trigger('sortstop');
+
+            $(group2).on('sortstop',function (event, ui) {
+                $('#output2').val(group2.sortable('toArray'));
+            }).trigger('sortstop');
+
+
+            $(".remove").click(function(){
+                var element = $(this).parent();
+                var group = element.parent().hasClass('serialization1')?group2:group1;
+                var parallelElement = $(group).find("div[id$='+']")[0];
+                if(parallelElement == undefined)
+                {
+                    element.attr('id',element.attr('id').split('+')[0]+'+');
+                    element.empty();
+                }
+                else
+                {
+                    element.remove();
+                    parallelElement.remove();
+                }
+                $(group1).trigger('sortstop');
+                $(group2).trigger('sortstop');
+            })
+        });
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <form action="{{ url( null, { 'action': action, 'db': db } )~back }}" method="post" name="cheked">
+        <div class="view_header">
+            <div class="title"><h1>{{translate(test)}}</h1></div>
+            <a href="#" class="titleSubmit submitLink" title="Save"></a>
+            <noscript><input type="submit" name="save" /></noscript>
+        </div>
+        <div class="table mainTable">
+            <div class="tableGrid">
+                <div class="sortable">
+                    <ul class="header">
+                        <li>WepoCRM</li>
+                        <li>ZohoCRM</li>
+                    </ul>
+                    {% set rowcount = max(zoho|length, wepo|length)  %}
+                    <div class="body">
+                        <ul class = "serialization1">
+                            {% for key,value in 1..rowcount %}
+                                <div id="{{ [value,'+',wepo[key]]|join }}" class="cell">
+                                    {% if wepo[key] is defined  %}
+                                        <li>{{ wepo[key] }}</li>
+                                        <div class="remove">remove</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </ul>
+                        <ul class = "serialization2">
+                            {% for key,value in 1..rowcount %}
+                                <div  id="{{ [value,'+',zoho[key]]|join }}" class="cell">
+                                    {% if zoho[key] is defined  %}
+                                        <li>{{ zoho[key] }}</li>
+                                        <div class="remove">remove</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+            </div>
+        </div>
+        <input name="from" value="{{ from }}" type="hidden">
+        <input name="to" value="{{ to }}" type="hidden">
+        <input name="LocStack" value="" id="output1" type="hidden">
+        <input name="ExtStack" value="" id="output2" type="hidden">
+    </form>
+{% endblock content %}

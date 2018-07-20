@@ -1,0 +1,360 @@
+{% extends 'layout/layout.twig' %}
+
+{% block script %}
+    <script>
+        $(
+            function () {
+//                $('select').selectBox();
+                $('#c_all').click(
+                    function () {
+                        if ($('div.checked', this).size()) {
+                            $('input.check').prop('checked', true);
+                            $('div.checkboxArea').addClass('checked');
+                        }
+                        else {
+                            $('input.check').prop('checked', false);
+                            $('div.checkboxArea').removeClass('checked');
+                        }
+                    });
+            }
+        );
+    </script>
+    <script src="/js/upper.js"></script>
+    <script>
+        $(
+            function () {
+//                $('select').selectBox();
+                $('#c_all').click(
+                    function () {
+                        if ($('div.checked', this).size()) {
+                            $('input.check').prop('checked', true);
+                            $('div.checkboxArea').addClass('checked');
+                        }
+                        else {
+                            $('input.check').prop('checked', false);
+                            $('div.checkboxArea').removeClass('checked');
+                        }
+                    });
+
+                // search input animation
+                $('#titleSearchIcon').click(function () {
+                    if ($('#titleSearch').is(':visible')) {
+                        console.log('hide');
+                        $('#titleSearch').stop().animate({ width: '0px', height: '0px', opacity: 0 }, 200
+                            , function () {
+                                $(this).hide();
+                            }
+
+                        );
+//                        $('titleSearch').hide();
+                    }
+                    else {
+                        console.log('show');
+                        $('#titleSearch').show(200,
+                            function () {
+                                $('#titleSearch').stop().animate({ width: '220px', height: '31px', opacity: 1}, 200);
+                            }
+                        );
+
+//                        $('titleSearch').show();
+                    }
+                    return false;
+                });
+            }
+
+        );
+    </script>
+{% endblock script %}
+
+{% block style %}
+    <style type="text/css">
+        #scrollTop {
+            background: url(/img/totop.png) 0 0 no-repeat;
+            display: block;
+            width: 30px;
+            height: 30px;
+            position: fixed;
+            bottom: 10px;
+            right: 2%;
+            z-index: 2000;
+        }
+    </style>
+{% endblock style %}
+
+{% block content %}
+    <div class="view_header">
+        {% if saurlback !='/' %}
+            <a href="{{ saurlback }}" class="titleBack" title="Back"></a>
+        {% else %}
+            <a href="{{ url( masterRoute, { 'action': 'list' } ) }}" class="titleBack" title="Back"></a>
+        {% endif %}
+    <div class="title"><h1>{{ title }}</h1></div>
+   <span class="edited">
+        {% if master.toView["changer"] is defined %}
+            Last Update: {{master.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT'))}} by {{master.changerfname}} {{master.changerlname}}
+        {% else %}
+        {% endif %}
+    </span>
+    {% block detailedit %}
+        <a href="{{ url( masterRoute, { 'action': 'edit','id':''~master.id() } )~saurl }}" class="titleEdit" title="Edit"></a>
+    {% endblock detailedit %}
+        <a href="#" class="titleNext" title="Next"> </a>
+        <a href="#" class="titlePrevious" title="Previous"> </a>
+    </div>
+
+
+    <div class="view_block clearfix">
+        <div class="lead_info" style="width: 45%;">
+            <h3 style="min-height: 10px;">{{ translate(MasterName ~ ' information') }}</h3>
+            <table>
+                <tbody>
+                {% block output %}
+                {% for key, value in master.toArray  %}
+                <tr>
+                    <th>{{ field_labels[key] }}</th>
+                    {% if key == 'owner_id' and master.owner_id is not empty %}
+                        <td>
+                            <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(master, 'owner_id')} )~saurl }}" >
+                                {{ master.ownerfname}}
+                                {{ master.ownerlname}}
+                            </a>
+                        </td>
+                    {% elseif key == 'changer_id' and master.changer_id is not empty %}
+                        <td>
+                             <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(master, 'changer_id')} )~saurl }}" >
+                                {{ master.changerfname}}
+                                {{ master.changerlname}}
+                            </a>
+                        </td>
+                    {% elseif key[-6:] == '_price' %}
+                        <td> ${{ value|number_format(2, '.', ',') }} </td>
+                    {% elseif key == 'contact_id' %}
+                        <td>{{master.contact}}</td>
+                    {% elseif key == 'status_id' %}
+                        <td>{{master.status}}</td>
+                    {% elseif key == 'quote_id'%}
+                        <td>{{master.quote}}</td>
+                    {% elseif key == 'order_id'%}
+                        <td>{{master.order}}</td>
+                    {% else %}
+                        <td>{{ value }}</td>
+                    {% endif %}
+                </tr>
+                {% if loop.index0 == loop.length//2 and loop.length >3 %}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="lead_other_info" style="width: 45%;">
+            <h3 style="min-height: 10px;">{{ translate('Other information') }}</h3>
+            <table>
+                <tbody>
+                {% endif %}
+                {% endfor %}
+                {% endblock output %}
+                </tbody>
+            </table>
+            {% if master.toView|length < 4 %}
+                <div class="buttons">
+                    {{ block('actions') }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+    <div class="table mainTable">
+
+
+        <div class="tableTitle">
+        <h2>{{ translate(detailsName) }}</h2>
+
+            {% block link %}
+             <div class="title_links">
+                <a class="titleAddIcon" href="{{ url( null, { 'action': 'add', (masterName~'id'): master.id()} )~saurl }}" title="Add"></a>
+             </div>
+            <div class="title_links_right">
+                <div id="titleMenu" class="titleMenu" style="display:none; ">
+                    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">
+                        {{ translate('Output fields') }}
+                    </a>
+                </div>
+                <a id="titleMenuIcon" class="titleMenuIcon" href="#" title="{{ translate('Menu') }}">
+                </a>
+                <a id="titleSearchIcon" class="titleSearchIcon" href="#" title="{{ translate('Search') }}">
+                </a>
+                <div id="titleSearch" class="titleSearch" style="display: none ; opacity: 0; width: 0px; height: 0px;">
+                    <form class="search_form"
+                          action="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}"
+                          method="get" name="list_search">
+                        <input type="text" name="q" value="{{ search_query }}"
+                               placeholder="Search in &quot;{{ title }}&quot;"/>
+                    </form>
+                </div>
+                <script>
+                    $(function () {
+                        $('#titleMenuIcon').click(
+                            function (e) {
+                                e.stopPropagation();
+                                if ($("#titleMenu").is(':visible')) {
+                                    e.stopPropagation();
+                                    $("#titleMenu").stop().animate( { width: 0, height:0, opacity:0}, 200,
+                                        function(){
+                                            $("#titleMenu").removeClass('visible');
+                                        }
+                                    );
+                                }
+                                else {
+                                    $("#titleMenu").addClass('visible');
+                                    $("#titleMenu").stop().animate( { width: 141, opacity:1, height: 50}, 200 );
+                                }
+                            }
+                        );
+                    });
+                </script>
+
+        </div>
+{#                <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">{{ translate('Choose output fields') }}</a>#}
+            {% endblock link %}
+            {#<form class="search_form"
+                  action="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}"
+                  method="get" style="display: inline-block;" name="list_search">
+                <input type="text" name="q" value="{{ search_query }}"
+                       style="display: inline; background: #fff; border:none; display: block; width: 258px; padding: 7px 8px 8px; height: 15px; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px;"
+                       placeholder="Search in &quot;{{ title }}&quot;"/>
+            </form>#}
+
+
+        <div class="left_buttons" style="margin: 7px 10px;">
+            {% if search_query %}
+                <span style="font-style: italic; color: #999999; ">
+                        (
+                    {% if  paginator.getTotalItemCount == 0 %}
+                        nothing
+                    {% elseif paginator.getTotalItemCount == 1 %}
+                        {{ paginator.getTotalItemCount }} match
+                    {% else %}
+                        {{ paginator.getTotalItemCount }} matches
+                    {% endif %}
+                    )
+                        </span>
+            {% endif %}
+        </div>
+
+        <div class="right_buttons">
+            &nbsp;
+
+        </div>
+    </div>
+        {% block uppertable %}{% endblock uppertable %}
+
+        {% if paginator.getTotalItemCount %}
+            <form id="mainForm" action="{{ url( modelname, { 'action': 'delete' } )~saurl }}" method="post"
+                  name="cheked">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>
+                            <div id="c_all" class="checkbox">
+                                <input type="checkbox" name="c_all_input" value=""/>
+                            </div>
+                        </th>
+                        {% block sortUrlConstruction %}
+                            {% for key,value in labels %}
+                                {% if (params.desc!=0) %}
+                                    <th>
+                                        <b><a href="{{ url( modelname, { 'action': 'list', (masterName~'id'):master.id(),'sort':key,'desc':0} ) }}">{{ value }}</a></b>
+                                        {% if params.sort==key %}
+                                            &#9650;
+                                        {% endif %}
+                                    </th>
+                                {% else %}
+                                    <th>
+                                        <b><a href="{{ url( modelname, { 'action': 'list', (masterName~'id'):master.id(),'sort':key,'desc':1 } ) }}">{{ value }}</a></b>
+                                        {% if params.sort==key %}
+                                            &#9660;
+                                        {% endif %}
+                                    </th>
+                                {% endif %}
+                            {% endfor %}
+                        {% endblock sortUrlConstruction %}
+                        <th><b>Actions</b></th>
+                    </tr>
+                    </thead>
+                    {% for akey,avalue in paginator.getCurrentItems %}
+                        <tr>
+                            <td>
+                                <div class="checkbox">
+                                    <input type="checkbox" name="checkedid[]" id="{{ avalue.id() }}"
+                                           value="{{ avalue.id() }}" class="check"/>
+                                </div>
+                            </td>
+                            {% for key,value in labels %}
+                                {% if loop.index0 %}<td style="vertical-align: middle;">{% else %}<th style="vertical-align: middle;">{% endif %}
+                                {% block data %}
+                                    {% if key == 'product' and attribute(avalue, 'product_id') is not empty %}
+                                        <a href="{{ url( 'product', { 'action': 'view','id':''~attribute(avalue, 'product_id')} )~saurl }}">{{ attribute(avalue, key) }}</a>
+                                    {% else %}
+                                        {{ attribute(avalue, key) }}
+                                    {% endif %}
+                                {% endblock data %}
+                                {% if loop.index0 %}</td>{% else %}</th>{% endif %}
+                            {% endfor %}
+                            <td>
+                                {% block action %}
+                                    <a class="actionview" href="{{ url( null, { 'action': 'view', (masterName~'id'):master.id(),'id':avalue.id() } )~saurl }}"><img
+                                            src="/img/1.png" class="view"/><span class="tooltip top">View</span></a>&nbsp;
+                                    <a class="actionview" href="{{ url( null, { 'action': 'edit', (masterName~'id'):master.id(),'id':avalue.id() } )~saurl }}"><img
+                                            src="/img/1.png" class="edit"/><span class="tooltip top">Edit</span></a>&nbsp;
+                                    <a class="actionview" href="{{ url( null, { 'action': 'delete', (masterName~'id'):master.id(),'id':avalue.id() } )~saurl }}"><img
+                                            src="/img/1.png" class="delete"/><span class="tooltip top">Delete</span></a>
+                                {% endblock action %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <br/><div class="tableBottomToolbar">
+                    {% block downButtons %}
+
+                        <div class="buttons left">
+                            <a href="#" class="delete submitLink">
+                                <span class="small icon"></span>{{ translate('Delete selected') }}
+                            </a>
+                        </div>
+                        <div class="buttons right">
+                            {% if paginator.count > 1 %}
+                                {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+                            {% endif %}
+                        </div>
+                        <div class="buttons">
+
+                            {# <div class="success_msg"><i class="imgTxt txtSuccess"></i>Profile has been saved successfully!</div> #}
+                            {#<noscript><input type="submit" name="delete"#}
+                                             {#value="{{ translate('Delete selected') }}"/>#}
+                            {#</noscript>#}
+
+                            <div class="selectRows">
+                                <div class="msg">Rows on the page:</div>
+                                {% for i in rows %}
+                                    <a href="{{ url( null, { 'action': 'rowscount' } )~saurl }}&rows={{ i }}"
+                                       class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+                        <div class="alphabet" style="display: inline-block;">
+                            <a class="active" href="#">All</a>
+                            {% for letter in 'A'..'Z' %}
+                                {#  class="{% if letter == 'K' %}active{% endif %}" #}
+                                <a href="#">{{ letter }}</a>
+                            {% endfor %}
+                        </div>
+
+                    {% endblock downButtons %}
+                </div>
+                <a align="center" id="scrollTop" href="#" onclick="top.goTop(); return false;"></a>
+            </form>
+        {% endif %}
+    </div>
+{% endblock content %}

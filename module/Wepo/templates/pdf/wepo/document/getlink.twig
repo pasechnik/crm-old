@@ -1,0 +1,22 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Document link') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+{% block content %}
+
+    <h1>Your {{ name }} document link</h1>
+    <div class="form">
+        <div class="success_msg">
+                {{ WepoLink(mainuser.company_id, filename, access) }}
+        </div>
+    </div>
+    <div class="buttons clearfix">
+        <a href="#" onclick="copyToClipboard('{{ WepoLink(mainuser.company_id, filename, access) }}')">{{translate('Copy to clipboard')}}</a>
+        <a href="{{ url( null, { 'action': 'list' } ) }}">{{translate('Back')}}</a>
+    </div>
+
+<script>
+    function copyToClipboard (text) {
+        window.prompt ("To copy link to the clipboard, press Ctrl+C and Enter", text);
+    }
+</script>
+{% endblock content %}

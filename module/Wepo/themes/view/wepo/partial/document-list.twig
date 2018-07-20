@@ -1,0 +1,71 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'common', { 'data':'document', 'view':'view',  'id':avalue.id() }, { 'query': { 'back':saurlhash } } ) }}"><span class="d_title">{{attribute(avalue, key)}}</span></a>
+
+{% elseif key == 'changer_title' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.changer_title }}
+    </a>
+
+{% elseif key == 'creator_title' and attribute(avalue, 'creator_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'creator_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.creator_title }}
+    </a>
+
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+{% elseif key == 'lead_title' and attribute(avalue, 'lead_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'lead', 'view':'view',  'id':''~attribute(avalue, 'lead_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.lead_title }}
+    </a>
+{% elseif key == 'patient_title' and attribute(avalue, 'patient_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'patient', 'view':'view',  'id':''~attribute(avalue, 'patient_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.patient_title }}
+    </a>
+
+{% elseif key == 'status_id' %}
+    {{ attribute(avalue, "status") }}
+
+{% elseif key == 'target' and attribute(avalue, 'target_id') is not empty %}
+    <a href="{{ url( avalue.table|lower[:length], { 'action': 'view','id':''~attribute(avalue, 'target_id')} )~saurl }}">{{attribute(avalue, key)}}</a>
+
+{% elseif key == 'attach_to_names' %}
+    {% set count = 0 %}
+    {% set person = "" %}
+    <div class="targets_hide" id="targets{{avalue._id}}" style="overflow-x: hidden">
+        {% for target, ids in attribute(avalue, key) %}
+            {% set tar = (avalue.attach_to|keys[loop.index0]) %}
+            {% if ids is not empty %}
+            <div style="overflow: hidden; width: 200px; padding-right: 10px;">
+                <div style="display:inline; float: left; width: 35%;  margin-bottom: 5px; padding-bottom: 5px;">
+                    <span>{{target}}s:</span>
+                </div>
+                <div style="float: right; width: 60%; margin-bottom: 10px;">
+                    {% for  key , id in ids%}
+                        {% set person%}
+                          <a id="person{{avalue._id}}" class="person" href="{{ url( tar|lower, { 'action': 'view','id':avalue.attach_to[tar][key]} )~saurl }}">{{id}}</a>
+                        {% endset %}
+                        {% set count  = count+1 %}
+                        <span style="padding-left: 10px; display: block">
+                            <a id="person{{avalue._id}}" href="{{ url( tar|lower, { 'action': 'view','id':avalue.attach_to[tar][key]} )~saurl }}">{{id}}</a>
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% if count > 1 %}
+        {{ person }}
+        <a class="showhide" id="show_btn{{avalue._id}}" data-id="{{avalue._id}}" href="" onClick="show(this); return false;">&nbsp;...</a>
+    {% elseif count == 1%}
+        {{ person }}
+    {% endif %}
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% else %}
+    {{attribute(avalue, key)}}
+{% endif %}

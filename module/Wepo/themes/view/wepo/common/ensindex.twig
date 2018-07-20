@@ -1,0 +1,75 @@
+{% block style %}
+    <style>
+        li {
+            margin: 4px 0px;
+        }
+
+        li > a {
+        }
+    </style>
+{% endblock style %}
+
+
+{% block script %}
+    <script type="text/javascript">
+        <!--
+        $(function () {
+            $('#aall').click(function () {
+                $('#all').prop('checked', !$('#all').prop('checked'));
+                $('li input[type=checkbox]').prop('checked', $('#all').prop('checked'));
+                if ($('#all').prop('checked')) {
+                    $('#sub').removeAttr('disabled');
+                } else {
+                    $('#sub').attr('disabled', 'disabled');
+                }
+                return false;
+            });
+            $('#all').change(function () {
+                $('li input[type=checkbox]').prop('checked', $('#all').prop('checked'));
+                if ($('#all').prop('checked')) {
+                    $('#sub').removeAttr('disabled');
+                } else {
+                    $('#sub').attr('disabled', 'disabled');
+                }
+            });
+            $('li input[type=checkbox]').change(function () {
+                if ($(this).prop('checked')) {
+                    $('#sub').removeAttr('disabled');
+                } else {
+                    $('#sub').attr('disabled', 'disabled');
+                }
+            });
+        });
+        //-->
+    </script>
+{% endblock script %}
+
+{% block content %}
+
+    <h1><a href="{{ url('common', {'action':'setup'}) }}">{{ title }}</a></h1>
+
+    <div class="view">
+        <input id="all" type="checkbox" value="All" {% if all %}checked{% endif %} />
+        <a id="aall" href="{{ url('common', {'action':'setup', 'data':'All' }) }}">all</a>
+        <br/>
+        <br/>
+
+        <form action="{{ url('common', {'action':'setup', 'data':'checked' }) }}">
+            <ol>
+                {% for model in models %}
+                    <li>
+                        <input type="checkbox" name="checked[]" value="{{ model.name }}"
+                               {% if all or model.checked %}checked{% endif %} />
+                        <a href="{{ url('common', {'action':'setup', 'data':model.name }) }}">{{ model.name }}</a>
+                    </li>
+                {% endfor %}
+            </ol>
+            <div style="padding: 10px 10px;">
+                <input id="sub" type="submit" value="Send" {% if not (all or count) %}disabled="disabled"{% endif %}/>
+            </div>
+        </form>
+
+    </div>
+
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

@@ -1,0 +1,264 @@
+{% extends 'layout/layout.twig' %}
+
+{% set title = translate('Leads') %}
+
+{% block script %}
+    <script>
+        $(
+            function () {
+//              $('select').selectBox();
+                $('#c_all').click(
+                    function () {
+                        if ($('div.checked', this).size()) {
+                            $('input.check').prop('checked', true);
+                            $('div.checkboxArea').addClass('checked');
+                        }
+                        else {
+                            $('input.check').prop('checked', false);
+                            $('div.checkboxArea').removeClass('checked');
+                        }
+                    });
+
+                // search input animation
+                $('#titleSearchIcon').click(function () {
+                    if ($('#titleSearch').is(':visible')) {
+                        console.log('hide');
+                        $('#titleSearch').stop().animate({width: '0px', height: '0px', opacity: 0}, 200, function () {
+                                $(this).hide();
+                            }
+                        );
+//                        $('titleSearch').hide();
+                    }
+                    else {
+                        console.log('show');
+                        $('#titleSearch').show(200,
+                            function () {
+                                $('#titleSearch').stop().animate({width: '220px', height: '31px', opacity: 1}, 200);
+                            }
+                        );
+
+//                        $('titleSearch').show();
+                    }
+                    return false;
+                });
+            }
+        );
+    </script>
+    <script src="/js/upper.js"></script>
+{% endblock script %}
+
+{% block style %}
+    <style type="text/css">
+        #scrollTop {
+            background: url(/img/totop.png) 0 0 no-repeat;
+            display: block;
+            width: 30px;
+            height: 30px;
+            position: fixed;
+            bottom: 10px;
+            right: 2%;
+            z-index: 2000;
+        }
+    </style>
+{% endblock style %}
+
+{% block content %}
+    <div class="paperTable">
+        <div class="tableTitle">
+            <h1 class="{{ title|lower|replace(' ', '_') }}">
+                {#<span class="icon" style="background-image: url(/css/img/icons/32x32-icons/{{ modelname }}.png)"></span>#}
+                {{ title }}
+            </h1>
+            <div class="title_links">
+                {% block titleLinks %}
+                    <a class="titleAddIcon" href="{{ url( null, { 'action': 'add' } ) }}" title="{{ translate('Add') }}">
+                        {#<img src="/css/img/icons/toolbar-icons/plus.png" alt="{{ translate('Add') }}">#}
+                    </a>
+                {% endblock titleLinks %}
+            </div>
+            <div class="title_links_right">
+                <div id="titleMenu" class="titleMenu" style="display:none;">
+                    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">
+                        {{ translate('Output fields') }}
+                    </a>
+
+                    <a href="{{ url( null, { 'action': 'recyclelist' } ) }}" class="delete">
+                        {{ translate('Recycle') }}
+                    </a>
+                </div>
+                <a id="titleMenuIcon" class="titleMenuIcon" href="#" title="{{ translate('Menu') }}">
+                    {#<img src="/css/img/icons/toolbar-icons/plus.png" alt="{{ translate('Add') }}">#}
+                </a>
+                <a id="titleSearchIcon" class="titleSearchIcon" href="#" title="{{ translate('Search') }}">
+                    {#<img src="/css/img/icons/toolbar-icons/plus.png" alt="{{ translate('Add') }}">#}
+                </a>
+
+                <div id="titleSearch" class="titleSearch" style="display: none ; opacity: 0; width: 0px; height: 0px;">
+                    {#<pre>{{ dump('hello',params) }}</pre>#}
+                    <form class="search_form"
+                          action="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}"
+                          method="get" name="list_search">
+                        <input type="text" name="q" value="{{ search_query }}"
+                               placeholder="Search in &quot;{{ title }}&quot;"/>
+                    </form>
+                </div>
+                <script>
+                    $(function () {
+                        $('#titleMenuIcon').click(
+                            function (e) {
+                                e.stopPropagation();
+                                if ($("#titleMenu").is(':visible')) {
+                                    console.log('visible');
+
+                                    e.stopPropagation();
+    //                                $("#titleMenu").fadeOut().position({
+    //                                    my: "right top",
+    ////                                    at: "right bottom+14px",
+    //                                    at: "right bottom",
+    //                                    of: "#titleMenuIcon"
+    //                                });
+    //                                $("#titleMenu").fadeOut().css( { 'right':'0px', 'top':'0px' });
+                                    console.log($("#titleMenu").width(), $("#titleMenu").height());
+                                    $("#titleMenu").stop().animate({width: 0, height: 0, opacity: 0}, 200,
+                                        function () {
+                                            $("#titleMenu").removeClass('visible');
+                                        }
+                                    );
+
+    //
+                                }
+                                else {
+                                    console.log('not visible');
+                                    $("#titleMenu").addClass('visible');
+                                    $("#titleMenu").stop().animate({width: 141, height: 100, opacity: 1}, 200);
+
+    //                                $("#titleMenu").addClass('visible');
+    //                                $("#titleMenu").css( { 'right':'0px', 'top':'0px' });
+    ////                                e.stopPropagation();
+    //                                $("#titleMenu").position({
+    //                                    my: "right top",
+    //                                    at: "right bottom+14px",
+    //                                    at: "right bottom",
+    //                                    of: "#titleMenuIcon"
+    //                                }).fadeIn();
+                                }
+                            }
+                        );
+                    });
+                </script>
+            </div>
+        </div>
+        <div class="table mainTable">
+            {% if paginator.getTotalItemCount %}
+                <form id="mainForm" action="{{ url( modelname, { 'action': 'delete' } )~saurl }}" method="post"
+                      name="cheked">
+                    <div class="tableGrid">
+                        <table>
+                            <thead>
+                            <tr class="tableHeader">
+                                <th class="width_4p">
+                                    <div id="c_all" class="checkbox">
+                                        <input type="checkbox" name="c_all_input" value=""/>
+                                    </div>
+                                </th>
+                                {% block sortUrlConstruction %}
+                                    {% for value in fields %}
+                                        <th class="{% if params.sort==value %}checked{% endif %}">
+                                            {% if (params.desc!=0) %}
+                                                <a href="{{ url( modelname, { 'action': 'list','sort':value, 'desc':0 } ) }}"> {{ attribute(labels, value) }}</a>
+                                                {% if params.sort==value %}
+                                                    <span class="up"></span>
+                                                {% endif %}
+                                            {% else %}
+                                                <a href="{{ url( modelname, { 'action': 'list','sort':value,'desc':1 } ) }}"> {{ attribute(labels, value) }}</a>
+                                                {% if params.sort==value %}
+                                                    <span class="down"></span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </th>
+                                    {% endfor %}
+                                {% endblock sortUrlConstruction %}
+                                <th class="width_10p"><b>Actions</b></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for akey,avalue in paginator.getCurrentItems %}
+                                <tr>
+                                    <td>
+                                        <div class="checkbox">
+                                            <input type="checkbox" name="checkedid[]" id="{{ avalue.id() }}"
+                                                   value="{{ avalue.id() }}" class="check"/>
+                                        </div>
+                                    </td>
+                                    {% for value in fields %}
+                                        <td class="{% if params.sort==value %}checked{% endif %}">
+                                            {% block data %}
+                                                {{ attribute(avalue, value) }}
+                                            {% endblock data %}
+                                        </td>
+                                    {% endfor %}
+                                    <td class="width_10p">
+                                        {% block action %}
+                                            <a class="actionview"
+                                               href="{{ url( null, { 'action': 'view','id':''~avalue.id() } )~saurl }}">
+                                                <img src="/img/1.png" class="view" alt="{{ translate('View') }}"/>
+                                                <span class="tooltip top">View</span>
+                                            </a>&nbsp;
+                                            <a class="actionview"
+                                               href="{{ url( null, { 'action': 'edit','id':''~avalue.id() } )~saurl }}">
+                                                <img src="/img/1.png" class="edit" alt="{{ translate('Edit') }}"/>
+                                                <span class="tooltip top">Edit</span>
+                                            </a>&nbsp;
+                                            <a class="actionview"
+                                               href="{{ url( null, { 'action': 'delete','id':''~avalue.id() } )~saurl }}">
+                                                <img
+                                                    src="/img/1.png" class="delete"
+                                                    alt="{{ translate('Delete') }}"/>
+                                                <span class="tooltip top">Delete</span>
+                                            </a>
+                                        {% endblock action %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tableBottomToolbar">
+                        {% block downButtons %}
+                            <div class="buttons left">
+                                <a href="#" class="delete submitLink">
+                                    <span class="small icon"></span>{{ translate('Delete checked') }}
+                                </a>
+                            </div>
+                            <div class="buttons right">
+                                {% if paginator.count > 1 %}
+                                    {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+                                {% endif %}
+                            </div>
+                            <div class="buttons">
+                                <noscript><input type="submit" name="delete"
+                                                 value="{{ translate('Delete selected') }}"/>
+                                </noscript>
+                                <div class="selectRows">
+                                    <div class="msg">Rows on the page:</div>
+                                    {% for i in rows %}
+                                        <a href="{{ url( null, { 'action': 'rowscount' } )~saurl }}&rows={{ i }}"
+                                           class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="alphabet" style="display: inline-block;">
+                                <a class="active" href="#">All</a>
+                                {% for letter in 'A'..'Z' %}
+                                    {#  class="{% if letter == 'K' %}active{% endif %}" #}
+                                    <a href="#">{{ letter }}</a>
+                                {% endfor %}
+                            </div>
+                        {% endblock downButtons %}
+                    </div>
+                    <a align="center" id="scrollTop" href="#" onclick="top.goTop(); return false;"></a>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

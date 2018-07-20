@@ -1,0 +1,77 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Mail: ' ~ model.title %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block edit %}
+{% endblock edit %}
+{% block actions %}
+<a href="{{ url( null, { 'action': 'delete','id':''~model.id() } )~saurl }}">{{translate('Delete')}}</a> &nbsp;
+<a href="{{ url( null, { 'action': 'add','inReplyTo':''~model.id(),'email':model.from } )~saurl }}">{{translate('Answer')}}</a> &nbsp;
+{% endblock actions %}
+{%block output%}
+    {% for key, value in model.toArray if key != 'main_id' and key != 'id' and key != 'email_link' and key != 'avatar' and key!='protocol_ids' and key != 'password' and key != "company_id" and key != "email_id" and key!= 'flink' and key!= 'tlink' and key!= 'llink'  and key!= 'glink'%}
+        <tr>
+            <th>{{ field_labels[key] }}</th>
+            <td>
+                {% if key=='email' %}
+                    <a href="{{ url( 'mail', { 'action': 'add','to':''~attribute(model, 'email_id')} )~saurl }}" >{{ value }}</a>
+                {% elseif key=='mobile' %}
+                    <span class="phone">{{ value }}</span>
+                {% elseif key=='phone' %}
+                    <span class="phone">{{ value }}</span>
+                {% elseif key=='user' %}
+                    <span class="phone"><a
+                                href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'user_id') } )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='client' %}
+                    <span class="phone"><a
+                                href="{{ url( 'client', { 'action': 'view','id':''~attribute(model, 'client_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='status_id' %}
+                    {{model.status}}
+                {% elseif key=='contact' %}
+                    <span class="phone"><a
+                                href="{{ url( 'contact', { 'action': 'view','id':''~attribute(model, 'contact_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='order' %}
+                    <span class="phone"><a
+                                href="{{ url( 'orderdetail', { 'action': 'list','orderid':''~attribute(model, 'order_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='quote_id' %}
+                    <span class="phone"><a
+                                href="{{ url( 'quotedetail', { 'action': 'list','quoteid':''~attribute(model, 'quote_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='pricebook' %}
+                    <span class="phone"><a
+                                href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~attribute(model, 'pricebook_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='product' %}
+                    <span class="phone"><a
+                                href="{{ url( 'product', { 'action': 'view','id':''~attribute(model, 'product_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='invoice' %}
+                    <span class="phone"><a
+                                href="{{ url( 'invoice', { 'action': 'view','id':''~attribute(model, 'invoice_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='target_id' %}
+                    <span class="phone"><a
+                                href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='target' %}
+                    <span class="phone"><a
+                                href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a></span>
+                {% elseif key=='text' %}
+                    {{ value|raw }}
+                {% elseif key[-4:] == '_dtm' %}
+                    {{ value|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+                {% elseif key[-5:] == '_date' %}
+                    {{ value|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+                {% elseif key == 'changer_id' and attribute(model, 'changer_id') is not empty %}
+                    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(model, 'changer_id')} )~saurl }}" >
+                        {{ model.changerfname}}
+                        {{ model.changerlname}}
+                    </a>
+                {% elseif key == 'owner_id' and attribute(model, 'owner_id') is not empty %}
+                    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(model, 'owner_id')} )~saurl }}" >
+                        {{ model.ownerfname}}
+                        {{ model.ownerlname}}
+                    </a>
+                {% else %}
+                    {{ value }}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+{%endblock output%}

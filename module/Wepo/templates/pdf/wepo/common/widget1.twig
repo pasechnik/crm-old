@@ -1,0 +1,94 @@
+<div class="widget {{ model }} ">
+    <div class="title">
+        <div class="listtitle">
+            <span class="small icon"
+                  style="background-image: url(/css/img/icons/32x32-icons/{{ model }}.png)"></span>
+            <h2>{{ title }}</h2>
+        </div>
+
+        <div class="buttons controls">
+            {% if links %}
+                {% block tableLinks %}
+                    {% for icon_key, link in links %}
+                        <a class="btn-icon {{ icon_key }}"
+                           href="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">{{ translate(link.label) }}</a>
+                    {% endfor %}
+                {% endblock tableLinks %}
+            {% endif %}
+        </div>
+
+        <div class="buttons right controls">
+{#        <a style="cursor: pointer;" class="minibutton resize_button "></a>#}
+          <a style="cursor: pointer;" class="minibutton minimize_button "></a>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+
+    <div class="widget_content">
+
+        <table class="data">
+            <thead>
+            <tr class="tableHeader">
+                {% for avalue in fieldsLabels %}
+                    <th>{{ avalue }}</th>
+                {% endfor %}
+                {% if actions %}
+                    <th class="action">Actions</th>
+                {% endif %}
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for datarow in data %}
+                <tr>
+                    {% for key, value in fields %}
+                        <td style="max-width: 186px;">
+                            {% include 'partial/'~model~'-list.twig'  with {'avalue':datarow, 'key':key } %}
+                        </td>
+                    {% endfor %}
+                    {% if actions %}
+                        {% block action %}
+                            <td class="action">
+                                {% for action, conf in actions %}
+                                        <a class="actionview"
+                                           href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(datarow, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                                src="/img/1.png" class="{{ action }}" alt="{{ action }}"/><span
+                                                class="tooltip top">{{ action|capitalize }}</span></a>&nbsp;
+                                {% endfor %}
+                            </td>
+                        {% endblock action %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+            <img src="/css/img/icons/other-icons/corner.png" class="corner"/>
+    </div>
+
+    {% if paginator.count > 1 %}
+        <div class="tableBottomToolbar">
+            <div class="buttons clearfix">
+                {% include 'partial/pagination.twig' with {'pages':widget.paginator.getPages, 'route': 'search', 'params':widget.params} %}
+            </div>
+        </div>
+    {% endif %}
+    </div>
+
+{% block script %}
+   <script>
+        $(function(){
+             Reload_widgets();
+        });
+   </script>
+{% endblock script %}
+
+{% block style %}
+<style>
+    .corner{
+     float: right;
+     margin-top: 4px;
+     margin-right: -12px;
+    }
+</style>
+{% endblock style %}

@@ -1,0 +1,57 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate(action|capitalize~' '~modelname~'(s)') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form action="{{ url( modelname, { 'action': action } ) }}" method="post">
+        <div>
+            <input type="hidden" name="eventtype" value="{{ eventtype }}"/>
+            {% for id in ids %}
+                <input type="hidden" name="checkedid[]" value="{{ id }}"/>
+            {% endfor %}
+            <input type="hidden" name="delyes" value="{{ translate('Yes') }}"/>
+        </div>
+        <div class="buttons right">
+            <a href="" class="green_but submitLink">{{ translate('Yes') }}</a>
+            {% if saurlback !='/' %}
+                <a href="{{ saurlback }}">{{ translate('No') }}</a>
+            {% else %}
+                <a href="{{ url( null, { 'action': 'list' } ) }}">{{ translate('No') }}</a>
+            {% endif %}
+        </div>
+        <div class="clearfix">
+            <div class="table">
+                <h2>{% block message %}{{ translate('Are you sure that you want to '~action~' '~modelname~'(s)?') }}{% endblock message %}</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th width="20px">№</th>
+                        <th>{{ modelname|capitalize~'(s)' }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <th width="20px">
+                                {{ loop.index }}
+                            </th>
+                            <th>
+                                {{ item.title }}
+                            </th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttons clearfix">
+                <a href="" class="green_but submitLink">{{ translate('Yes') }}</a>
+                {% if saurlback !='/' %}
+                    <a href="{{ saurlback }}">{{ translate('No') }}</a>
+                {% else %}
+                    <a href="{{ url( null, { 'action': 'list' } ) }}">{{ translate('No') }}</a>
+                {% endif %}
+            </div>
+            <input name="saurl[back]" type="hidden" value={{ saurlback }}>
+        </div>
+    </form>
+{% endblock content %}

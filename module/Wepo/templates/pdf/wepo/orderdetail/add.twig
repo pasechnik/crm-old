@@ -1,0 +1,105 @@
+{% extends 'partial/add.twig' %}
+{% block upperform %}
+    <div class="table" {#onKeyUp="updateTotalPrice();" onKeyPress="PutToPrice();" onClick="PutToPrice();"#}>
+        <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b>0 $</b></span></h2>
+        {#<div class="hide">
+            <select name="prices"  id="prices">
+                {% for key,value in prices %}
+                    <option value={{key}}>{{value}}</option>
+                {% endfor %}
+            </select>
+        </div>#}
+    </div>
+{% endblock upperform %}
+{% block script %}
+    <script>
+        var prices = null;
+        var select_product, select_pricebook;
+        $(function(){
+            var xhr;
+            var $select_pricebook;
+            var $select_product;
+
+
+            $select_product = $('#product_id').selectize({
+                valueField: 'id',
+                labelField: 'name',
+                searchField: ['name'],
+                sortField: 'id',
+                dropdownParent:'body'
+            });
+
+
+            select_product  = $select_product[0].selectize;
+
+            $select_pricebook = $('#pricebook_id').selectize({
+                onInitialize: function() {
+                    var value = $('#pricebook_id').val();
+                    select_product.disable();
+                    select_product.clearOptions();
+                    select_product.load(function(callback) {
+                        xhr && xhr.abort();
+                        xhr = $.ajax({
+                            url: window.location.pathname,
+                            type: 'post',
+                            data: {
+                                'fields[pricebook_id]':value,
+                                'action':'selectize'
+                            },
+                            success: function(results) {
+                                select_product.enable();
+                                callback(results.names);
+                                prices = results.prices;
+                                select_product.setValue(0);
+                            },
+                            error: function() {
+                                callback();
+                            }
+                        })
+                    });
+                },
+                onChange: function(value) {
+                    if (!value.length) return;
+                    select_product.disable();
+                    select_product.clearOptions();
+                    select_product.load(function(callback) {
+                        xhr && xhr.abort();
+                        xhr = $.ajax({
+                            url: window.location.pathname,
+                            type: 'post',
+                            data: {
+                                'fields[pricebook_id]':value,
+                                'action':'selectize'
+                            },
+                            success: function(results) {
+                                select_product.enable();
+                                console.log(results.names);
+                                callback(results.names);
+                                prices = results.prices;
+                                select_product.setValue(0);
+                            },
+                            error: function() {
+                                callback();
+                            }
+                        })
+                    });
+                }
+            });
+
+
+
+            select_pricebook = $select_pricebook[0].selectize;
+        });
+    </script>
+    {{ parent() }}
+{% endblock script %}
+{% block style %}
+      {{parent()}}
+    <style type="text/css">
+        <!--
+        .hide {
+            overflow:hidden;
+            display: none;
+        }
+    </style>
+{% endblock style %}

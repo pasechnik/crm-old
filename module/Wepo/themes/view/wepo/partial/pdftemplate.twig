@@ -1,0 +1,54 @@
+{% block script %}
+    <script>
+        $(function()
+        {
+            $('#pdf_select').selectBox();
+
+            $('#pdf_select').closest('.selectBox').change(function()
+            {
+                var url = '';
+                url = $('#pdf_select').find('option:selected').val();
+
+                if (url.length)
+                {
+                    window.location.href = url;
+                    $('a.selectBox').addClass('disabled');
+                }
+            });
+        });
+    </script>
+{% endblock script %}
+
+{% if  selectlinks %}
+
+    <select id="pdf_select" class="pdf btn-icon">
+
+        <option value="">Create PDF</option>
+
+        {% for icon_key, link in selectlinks %}
+                <option value="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">
+                    {{ translate(link.label) }}
+                </option>
+        {% endfor %}
+    </select>
+
+{% endif %}
+
+{% block style %}
+    <style>
+        #pdf_select + .selectBox {
+            width: 230px !important;
+            height: 19px !important;
+        }
+        #pdf_select + .selectBox > .selectBox-label {
+            padding: 2px !important;
+            font-size: 14px;
+            margin-top: -7px;
+        }
+
+        .selectBox-dropdown{
+            color: #1191d4 !important;
+        }
+
+    </style>
+{% endblock style %}

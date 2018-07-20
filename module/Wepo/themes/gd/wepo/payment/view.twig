@@ -1,0 +1,9 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Payment: ' ~ model.description %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block actions %}
+    <a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}">{{translate('Edit')}}</a>
+    <a href="{{ url( null, { 'action': 'delete','id':''~model.id() } )~delsaurl }}">{{translate('Delete')}}</a> &nbsp;
+{% endblock actions %}

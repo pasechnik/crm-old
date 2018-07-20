@@ -1,0 +1,7 @@
+{% extends 'partial/view.twig' %}
+
+{% set title = 'Product: ' ~ model.name %}
+
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block photo %}{% endblock photo %}

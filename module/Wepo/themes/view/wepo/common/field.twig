@@ -1,0 +1,213 @@
+{% block style %}
+    <style>
+        .footer, .forfooter {
+            display: none;
+        }
+
+        .container > div {
+            position: absolute;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        .title {
+            display: inline-block;
+            font-size: 18px;
+            color: #e32b06;
+            vertical-align: bottom;
+            padding-left: 48px;
+            padding-top: 42px;
+        }
+
+        .border{
+            border: 3px dotted #f3f3f3;
+        }
+
+        .field{
+            font-size: 15px;
+            padding: 5px;
+            box-shadow: 1px 1px 3px 0px #bfbfbf;
+            background: #fafafa;
+            padding: 5px;
+        }
+
+        .my_drag_class:hover{
+            cursor: -webkit-grab;
+        }
+
+        .field_name{
+            float: left;
+            color: #1191d4;
+            padding-left: 2px;
+        }
+
+        .hidden_type_div{
+            width:170px;
+            height: 5px;
+        }
+
+        #available{
+            left: 220px;
+            margin-right: 220px;
+        }
+
+        #visible{
+            width:206px;
+            float: left;
+            transition: 0.35s;
+        }
+
+        #title_table{
+            width: 100%;
+        }
+    </style>
+{% endblock style %}
+
+{% block script %}
+
+    <script type="text/javascript" src="/js/libs/shapeshift.js"></script>
+
+    <script>
+
+        function visible_field_counter()
+        {
+            var i = 1;
+
+            $('.field_count').each(function(){
+                $(this).text('');
+            });
+
+            $('#visible .field_count').each(function () {
+                $(this).text(i + '.');
+                i++;
+            });
+        }
+
+        $(function()
+        {
+            visible_field_counter();
+
+            $(document).ready(function(){
+                $('#available').css('minHeight',$('#visible').height());
+                $('#no_available_div').css('display','none');
+            });
+
+            $('.my_drag_class').mousedown(function()
+            {
+                $(this).css({'cursor':'-webkit-grabbing'});
+                $('#available').css('transition','0.35s');
+            }).mouseup(function(){
+                $(this).css({'cursor':'-webkit-grab'});
+            });
+
+            $(".container").shapeshift({
+                align: "left", gutterY: 20,  paddingY: 20
+            });
+
+            $('.container div').mouseup(function ()
+            {
+                visible_field_counter();
+                $('#available').css('minHeight',$('#visible').height());
+
+                if ($('#visible > div').length == 0){
+                    $('a[title = Save]').addClass('disabled');
+                }
+                 else{
+                    $('a[title = Save]').removeClass('disabled');
+                 }
+            });
+        });
+
+        $(function()
+        {
+           $('.container div').mousedown(function()
+           {
+             var  minHeight = $('#header').offset().top + $('#header').height();
+             var  maxHeight = $('#available').offset().top + $('#available').height() ;
+
+               $(window).mousemove(function(e)
+               {
+                   var x = e.pageX;
+                   var y = e.pageY;
+
+                   if ( ( x > screen.width - 30 ) || ( y > maxHeight + 30 ) ||( y < minHeight  ) ) {
+                       $('.my_drag_class').trigger("mouseup");
+                   }
+               });
+
+               $('body').mouseup(function(){
+                   $(window).off('mousemove');
+               });
+           });
+        });
+
+    </script>
+{% endblock script %}
+
+{% block content %}
+
+    <h1>{{ title }}</h1>
+
+    <div class="viewtable">
+        <form action="{{ url( 'common', { 'action': 'field', 'data':params.data, 'view':params.view }, { 'query': queryparams|merge({ 'back':saurlhash }) } ) }}" method="post" name="cheked">
+            <div class="form_header">
+                <div class="buttons">
+                    <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}"
+                    class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+                    <a href="#" class="btn-icon task submitLink" title="Save">{{ translate("Save") }}</a>
+                </div>
+                <noscript><input type="submit" name="save"/></noscript>
+            </div>
+
+
+            <table id="title_table">
+                <tr>
+                    <td><h2 class="title"> Visible Fields</h2></td>
+                    <td><h2 class="title"> Available Fields</h2></td>
+                </tr>
+            </table>
+
+
+            <div id="visible" class="container visible border">
+
+                {% for field, visible in fieldconfigs.fields if visible %}
+                    <div class="field my_drag_class" id="order{{ count }}">
+
+                        <div class="hidden_type_div">
+                            <input type="hidden" name="row[{{ field }}][id]" value="{{ field }}"/>
+                            <input type="hidden" name="row[{{ field }}][visible]" value="1"/>
+                        </div>
+
+                        <span class="field_count field_name"></span>
+                        <span class="field_name">  {{ attribute( fieldconfigs.labels, field ) }} </span>
+
+                    </div>
+                {% endfor %}
+            </div>
+        </form>
+
+
+        <div id="available" class="container border">
+            {% for field, visible in fieldconfigs.fields %}
+                <div style="{% if visible %} display:none; {% endif %}" class="field my_drag_class" id="order{{ count }}">
+
+                    <div class="hidden_type_div">
+                        <input type="hidden" name="row[{{ field }}][id]" value="{{ field }}"/>
+                        <input type="hidden" name="row[{{ field }}][visible]" value="1"/>
+                    </div>
+
+                    <span class="field_count field_name"></span>
+                    <span class="field_name">  {{ attribute( fieldconfigs.labels, field ) }} </span>
+
+                </div>
+            {% endfor %}
+            <div id="no_available_div" style='height: 5px;width: 180px;'></div>
+        </div>
+
+    </div>
+</div>
+
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

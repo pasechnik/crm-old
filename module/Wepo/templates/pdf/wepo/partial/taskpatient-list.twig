@@ -1,0 +1,39 @@
+{% if key == 'changer_title' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.changer_title }}
+    </a>
+{% elseif key == 'title' %}
+    <a href="{{ url( 'common', { 'data':(attribute(avalue, 'type_title')|lower)|replace({' ':'', 'to':'' } ), 'view':'view',  'id':avalue.id() }, { 'query': { 'back':saurlhash } } ) }}"><span class="d_title">{{attribute(avalue, key)}}</span></a>
+
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+{% elseif key == 'target_title' and attribute(avalue, 'target_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'patient', 'view':'view',  'id':''~attribute(avalue, 'target_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.target_title }}
+    </a>
+
+{% elseif key == 'owner' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+
+{% elseif key == 'phone' or key == 'mobile' %}
+    <span class="phone">{{ attribute(avalue, key) }}</span>
+
+{% elseif key == 'email' %}
+    <a href="{{ url( 'common', { 'data': 'mail','view':'send','to':''~attribute(avalue, 'email_id')} )~saurl }}">
+        {{ attribute(avalue, key) }}
+    </a>
+
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+
+{% else %}
+    {{ attribute(avalue, key) }}
+
+{% endif %}

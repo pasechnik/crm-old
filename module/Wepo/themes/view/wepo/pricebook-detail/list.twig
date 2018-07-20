@@ -1,0 +1,15 @@
+{% extends 'partial/detaillist.twig' %}
+
+{% set masterName = master.getModelName|lower %}
+{% set MasterName = master.getModelName %}
+{% set title = translate(MasterName) ~ ': '~ master.getName %}
+{% set detailName = details %}
+{% set detailsName = details ~ 's' %}
+
+{% block data %}
+    {% include 'partial/pricebookdetail-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+    {{ parent() }}
+{% endblock action %}

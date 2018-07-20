@@ -1,0 +1,127 @@
+{% extends 'layout/PDFLayout.twig' %}
+
+{% block title %}{{parent()}}{% endblock title %}
+
+{% block content %}
+    <div class="viewtable">
+        <div class="view_header">
+                <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+
+        <div class="view_block">
+            <div class="viewToolbar">
+                <div class="buttons">
+                </div>
+            </div>
+            <div class="viewData">
+                <div class="lead_info">
+                    <h3>{{ translate( model.getModelName~' information' ) }}</h3>
+                    <table>
+                        <tbody>
+                        {% block output %}
+                            {% for key, value in model.toArray if key != 'main_id' and key != 'id' and key != 'avatar' and key != 'password' and key != "company_id" and key != "email_id" and key!= 'flink' and key!= 'tlink' and key!= 'llink'  and key!= 'glink' and key in infoFields%}
+                                <tr>
+                                    <th>{{ field_labels[key] }}</th>
+                                    {#<th>{{ key }}</th>#}
+                                    <td>
+                                        {% if key=='email' %}
+                                            <a href="mailto:{{ value }}">{{ value }}</a>
+                                        {% elseif key=='mobile' %}
+                                            <span class="phone">{{ value }}</span>
+                                        {% elseif key=='phone' %}
+                                            <span class="phone">{{ value }}</span>
+                                            {#{% elseif key=='owner' %}
+                                                <span class="phone"><a
+                                                        href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'owner_id') } )~saurl }}">{{ value }}</a></span>#}
+                                        {% elseif key=='user_id' %}
+                                            <span class="phone">{{ model.user }}</span>
+                                            {#{% elseif key=='changer' %}
+                                                <span class="phone"><a
+                                                        href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'changer_id') } )~saurl }}">{{ value }}</a></span>#}
+                                        {% elseif key=='client_id' %}
+                                            <span class="phone">{{ model.client }}</span>
+                                        {% elseif key=='status_id' %}
+                                            {{model.status}}
+                                        {% elseif key=='type_id' %}
+                                            {{model.type}}
+                                        {% elseif key=='table_id' %}
+                                            {{model.table}}
+                                        {% elseif key=='target_id' %}
+                                            {{model.target}}
+                                        {% elseif key=='role_id' %}
+                                            {{model.role}}
+                                        {% elseif key=='order_id' %}
+                                            {{model.order}}
+                                        {% elseif key=='invoice_id' %}
+                                            {{model.invoice}}
+                                        {% elseif key=='contact_id' %}
+                                            <span class="phone">
+                                                {{ model.contact }}
+                                            </span>
+                                        {% elseif key=='order' %}
+                                            <span class="phone">
+                                                {{ value }}
+                                            </span>
+                                        {% elseif key=='quote_id' %}
+                                            <span class="phone">
+                                                {{ value }}
+                                            </span>
+                                        {% elseif key=='pricebook' %}
+                                            <span class="phone">
+                                                {{ value }}
+                                            </span>
+                                        {% elseif key=='product' %}
+                                            <span class="phone">
+                                                {{ value }}
+                                            </span>
+                                        {% elseif key=='invoice' %}
+                                            <span class="phone">
+                                                {{ value }}
+                                            </span>
+                                        {% elseif key=='target_id' %}
+                                            <span class="phone">
+                                                {{ value }}
+                                            </span>
+                                        {% elseif key=='target' %}
+                                            <span class="phone">
+                                                {{ value }}
+                                            </span>
+                                        {% elseif key[-4:] == '_dtm' %}
+                                            {{ value|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+                                        {% elseif key[-5:] == '_date' %}
+                                            {{ value|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+                                        {% elseif key[-5:] == 'price' %}
+                                            ${{ value|number_format(2, '.', ',') }}
+                                        {% elseif key == 'changer_id' and attribute(model, 'changer_id') is not empty %}
+                                            {{ model.changerfname}}
+                                            {{ model.changerlname}}
+                                        {% elseif key == 'owner_id' and attribute(model, 'owner_id') is not empty %}
+                                            {{ model.ownerfname}}
+                                            {{ model.ownerlname}}
+                                        {% elseif key == 'pricebook_id' and attribute(model, 'pricebook_id') is not empty %}
+                                            {{ model.pricebook}}
+                                        {% elseif key == 'product_id' and attribute(model, 'product_id') is not empty %}
+                                            {{ model.product}}
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endblock output %}
+                        </tbody>
+                    </table>
+
+                </div>
+
+                {% block otherinfo %}
+                {% endblock otherinfo %}
+
+            </div>
+        </div>
+    </div>
+
+    {% block detailinfo %}
+    {% endblock detailinfo %}
+
+{% endblock content %}

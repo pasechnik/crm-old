@@ -1,0 +1,51 @@
+{{ docType() }}
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <title>
+        {#{% block title %}WePO{% endblock title %}#}
+        {% block title %}WePO - {{ title }}{% endblock title %}
+    </title>
+    <meta name="keywords" content="Wepo CRM"/>
+    <meta name="description" content="Wepo CRM"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    {% block meta %}{% endblock meta %}
+
+
+    <!-- Styles -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <link href="/js/select2/css/select2.css" media="screen" rel="stylesheet" type="text/css"/>
+
+    {% block style %}{% endblock style %}
+    <!-- /Styles -->
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="/js/libs/jquery-2.1.0.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    {#<script type="text/javascript" src="/js/libs/jquery-ui/jquery-ui.min.js"></script>#}
+    <script type="text/javascript" src="/js/select2/js/select2.js"></script>
+    {% block script %}
+    {% endblock script %}
+
+
+    <!-- Latest compiled and minified JavaScript -->
+    <!-- /Scripts -->
+</head>
+<body>
+
+{% block header %}{% endblock header %}
+
+<div class="content" id="body">
+    {% block content %}{{ content|raw }}{% endblock content %}
+</div>
+<!-- /content -->
+
+{% block inline %}{% endblock inline %}
+</body>
+</html>

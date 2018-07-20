@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <title>WePO </title>
+    <meta name="keywords" content="Wepo CRM"/>
+    <meta name="description" content="Wepo CRM"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    {#<!-- Styles -->#}
+    <link rel="stylesheet" type="text/css" href="/js/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css"/>
+    <link href="/css/style.css" media="screen" rel="stylesheet" type="text/css"/>
+    <link href="/css/wepo.css" media="screen" rel="stylesheet" type="text/css"/>
+    {#<link href="/css/select2/select2.css" media="screen" rel="stylesheet" type="text/css"/>#}
+
+    <link href="/css/selectize.bootstrap3.css" media="screen" rel="stylesheet" type="text/css"/>
+
+    {#<link href="/img/wepo_logo_unicorn2.gif" rel="shortcut icon" type="image/vnd.microsoft.icon"/>#}
+    {#<!-- /Styles -->#}
+
+    {#<!-- Scripts -->#}
+    {#<script type="text/javascript" src="/js/jquery.min.js"></script>#}
+    <script type="text/javascript" src="/js/jquery-2.1.0.js"></script>
+    {#<script type="text/javascript" src="/js/typeahead.bundle.js"></script>#}
+
+    {#<script type="text/javascript" src="/js/selectize.js"></script>#}
+
+    {#<script type="text/javascript" src="/js/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>#}
+    {#<script type="text/javascript" src="/js/select2/select2.js"></script>#}
+    {#<script type="text/javascript" src="/js/jquery.selectBox.min.js"></script>#}
+    {#<script type="text/javascript" src="/js/custom_forms_elements.js"></script>#}
+    {#<script type="text/javascript" src="/js/jquery.validate.min.js"></script>#}
+    {#<script type="text/javascript" src="/js/common.js"></script>#}
+
+    <!--[if lt IE 10]>
+    <script type="text/javascript" src="js/pie.js"></script>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="/js/html5.js"></script>
+    <![endif]-->
+
+    <script>
+        //        var substringMatcher = function (strs) {
+        //            return function findMatches(q, cb) {
+        //                var matches, substringRegex;
+        //
+        //                // an array that will be populated with substring matches
+        //                matches = [];
+        //
+        //                // regex used to determine if a string contains the substring `q`
+        //                substrRegex = new RegExp(q, 'i');
+        //
+        //                // iterate through the pool of strings and for any string that
+        //                // contains the substring `q`, add it to the `matches` array
+        //                $.each(strs, function (i, str) {
+        //                    if (substrRegex.test(str)) {
+        //                        // the typeahead jQuery plugin expects suggestions to a
+        //                        // JavaScript object, refer to typeahead docs for more info
+        //                        matches.push({ value: str });
+        //                    }
+        //                });
+        //
+        //                cb(matches);
+        //            };
+        //        };
+        //
+        //        var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
+        //            'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
+        //            'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+        //            'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+        //            'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+        //            'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
+        //            'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+        //            'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+        //            'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+        //        ];
+        //
+        //        $(function () {
+        //            // Handler for .ready() called.
+        //            $('#the-basics .typeahead').typeahead({
+        //                    hint: true,
+        //                    highlight: true,
+        //                    minLength: 1
+        //                },
+        //                {
+        //                    name: 'states',
+        //                    displayKey: 'value',
+        //                    source: substringMatcher(states)
+        //                });
+        //        });
+        $(function () {
+//            $('select.s2').select2({});
+            $('select.sz').selectize({});
+//            $('input.sz').selectize({});
+//            $('input.sz').select2({});
+        });
+    </script>
+    <!-- /Scripts -->
+</head>
+<body>
+<div id="header" class="header">
+    <div id="headerBlock">
+        <div class="left_header">
+            <div class="logo"><a href="/" class="imgTxt txtLogo"></a></div>
+            <div class="search_form" id="search_form">
+                <form action="/search/index.html" method="get" name="main_search">
+                    <div class="input">
+                        <input type="text" name="q" id="search_query" value="" placeholder="Global search "/>
+                    </div>
+                    <div class="button">
+                        <a href="/" class="imgTxt txtSearch submitLink" title="Global search">Search</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="right_header">
+
+
+            <div class="header_links clearfix">
+                <a href="/setup/">Setup</a>
+            </div>
+        </div>
+    </div>
+    <div id="mainMenu" class="menu">
+        <ul class="clearfix">
+            <li class="active">
+                <a id="menu-home" href="&#x2F;dashboard&#x2F;">Home</a>
+            </li>
+            <li>
+                <a id="menu-mail" href="&#x2F;mail&#x2F;index.html">Mails</a>
+            </li>
+            <li>
+                <a id="menu-leads" href="&#x2F;lead&#x2F;index.html">Leads</a>
+            </li>
+            <li>
+                <a id="menu-contacts" href="&#x2F;contact&#x2F;index.html">Contacts</a>
+            </li>
+            <li>
+                <a id="menu-clients" href="&#x2F;client&#x2F;index.html">Clients</a>
+            </li>
+            <li>
+                <a href="&#x2F;document&#x2F;index.html">Documents</a>
+            </li>
+            <li>
+                <a id="menu-products" href="&#x2F;product&#x2F;index.html">Products</a>
+            </li>
+            <li>
+                <a id="menu-pricebook" href="&#x2F;pricebook&#x2F;index.html">Pricebooks</a>
+                <ul>
+                    <li>
+                        <a href="&#x2F;pricebookdetail&#x2F;index.html">Detail</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a id="menu-activities" href="&#x2F;activity&#x2F;index.html">Activities</a>
+            </li>
+            <li>
+                <a id="menu-quotes" href="&#x2F;quote&#x2F;index.html">Quotes</a>
+                <ul>
+                    <li>
+                        <a href="&#x2F;quotedetail&#x2F;index.html">Detail</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a id="menu-orders" href="&#x2F;order&#x2F;index.html">Orders</a>
+                <ul>
+                    <li>
+                        <a href="&#x2F;orderdetail&#x2F;index.html">Detail</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a id="menu-invoices" href="&#x2F;invoice&#x2F;index.html">Invoices</a>
+            </li>
+            <li>
+                <a id="menu-payment" href="&#x2F;payment&#x2F;index.html">Payments</a>
+            </li>
+            <li>
+                <a id="menu-logout" href="&#x2F;signout&#x2F;">Exit</a>
+            </li>
+        </ul>
+
+    </div>
+</div>
+<!-- /div#header.header -->
+
+<div class="content">
+    <!-- content|raw is required for phtml fallback -->
+    <br/>
+<img src="{{s3Link('img/CatMan.jpg', 'wepo')}}"/>
+
+    <br/>
+    <br/>
+
+    <select class="s2">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="mercedes">Mercedes</option>
+        <option value="audi">Audi</option>
+    </select>
+
+    <select class="sz">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="mercedes">Mercedes</option>
+        <option value="audi">Audi</option>
+    </select>
+    <input type="text" class="sz"/>
+
+
+    <div class="selectize-control single">
+        <div class="selectize-input items has-options full has-items" style="width: 300px">
+            <div data-value="5295fdf7c5b9f222acd3c767" class="item">m2@m.mmm</div>
+            <input type="text" autocomplete="off" tabindex=""
+                   style="width: 4px; opacity: 0; position: absolute; left: -10000px;"></div>
+        <div class="selectize-dropdown single"
+             style="display: block; width: 300px; top: 34px; left: 140px; visibility: visible;">
+            <div class="selectize-dropdown-content">
+                <div data-value="0" data-selectable="" class="option">Please select ...</div>
+                <div data-value="5295fdf7c5b9f222acd3c766" data-selectable="" class="option">m2@m.mm</div>
+                <div data-value="5295fdf7c5b9f222acd3c767" data-selectable="" class="option selected">m2@m.mmm</div>
+                <div data-value="5295fdf7c5b9f222acd3c768" data-selectable="" class="option">m4@m.mm</div>
+                <div data-value="5295fdf7c5b9f222acd3c769" data-selectable="" class="option">m5@m.mm</div>
+                <div data-value="5295fdf7c5b9f222acd3c76a" data-selectable="" class="option">an6@an.an</div>
+                <div data-value="5295fdf7c5b9f222acd3c76b" data-selectable="" class="option">maswhjudh@m.mm</div>
+                <div data-value="5295fdf7c5b9f222acd3c76c" data-selectable="" class="option">Fruit@punch.ch</div>
+                <div data-value="5295fdf7c5b9f222acd3c76d" data-selectable="" class="option">login@ll.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c76e" data-selectable="" class="option">Ghol@lol.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c76f" data-selectable="" class="option">vo@v.n</div>
+                <div data-value="5295fdf7c5b9f222acd3c770" data-selectable="" class="option">cat@cat.admin</div>
+                <div data-value="5295fdf7c5b9f222acd3c771" data-selectable="" class="option">stas@31.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c772" data-selectable="" class="option">NewAdmin@nn.nn</div>
+                <div data-value="5295fdf7c5b9f222acd3c773" data-selectable="" class="option">cat1@cat.cat</div>
+                <div data-value="5295fdf7c5b9f222acd3c774" data-selectable="" class="option">cat2@cat.cat</div>
+                <div data-value="5295fdf7c5b9f222acd3c775" data-selectable="" class="option">cat5@cf.fg</div>
+                <div data-value="5295fdf7c5b9f222acd3c778" data-selectable="" class="option">cat@cat.user</div>
+                <div data-value="5295fdf7c5b9f222acd3c77b" data-selectable="" class="option">cat2@cat.admin</div>
+                <div data-value="5295fdf7c5b9f222acd3c77c" data-selectable="" class="option">cat@cat.new</div>
+                <div data-value="5295fdf7c5b9f222acd3c77d" data-selectable="" class="option">cat@cat.gato</div>
+                <div data-value="5295fdf7c5b9f222acd3c77e" data-selectable="" class="option">stas33@3133.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c77f" data-selectable="" class="option">cat@cat.newtest</div>
+                <div data-value="5295fdf7c5b9f222acd3c780" data-selectable="" class="option">&lt;vlad@wepo.com&gt;</div>
+                <div data-value="5295fdf7c5b9f222acd3c782" data-selectable="" class="option">234234@ggs.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c783" data-selectable="" class="option">Manager1@re.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c784" data-selectable="" class="option">test@mail.user</div>
+                <div data-value="5295fdf7c5b9f222acd3c786" data-selectable="" class="option">lol@69.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c787" data-selectable="" class="option">s.burikhin@wepo.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c789" data-selectable="" class="option">vlad@lesnoy.name</div>
+                <div data-value="5295fdf7c5b9f222acd3c78a" data-selectable="" class="option">stas@66.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c78b" data-selectable="" class="option">stas@77.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c78c" data-selectable="" class="option">stas@8810.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c78d" data-selectable="" class="option">stas@99.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c78e" data-selectable="" class="option">stas@test.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c78f" data-selectable="" class="option">stas@65test.com</div>
+                <div data-value="52fca40b3d1f389c17000029" data-selectable="" class="option">mongo1@test.com</div>
+                <div data-value="52fdd4153d1f386005000031" data-selectable="" class="option">mongo123@test.com</div>
+                <div data-value="52fdd44a3d1f38600400002c" data-selectable="" class="option">mongo1234@test.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c77a" data-selectable="" class="option">stas@33.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c779" data-selectable="" class="option">cat@cat.senior</div>
+                <div data-value="5295fdf7c5b9f222acd3c777" data-selectable="" class="option">stas@32.com</div>
+                <div data-value="5295fdf7c5b9f222acd3c765" data-selectable="" class="option">m@m.mm</div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="wepo"/>
+
+</div>
+<!-- /content -->
+
+<footer>
+    <div class="footer">
+        <p>&copy; 2014 by Cron Agency Inc. All rights reserved.</p>
+        Zend Framework 2.3.1
+    </div>
+</footer>
+</body>
+</html>

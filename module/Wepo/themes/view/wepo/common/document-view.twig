@@ -1,0 +1,40 @@
+{% set title = 'Document "' ~ model.document_name ~ '" attached to' %}
+{% block output %}
+    <div class="viewtable">
+        <div class="view_header">
+        </div>
+
+        <div class="view_block">
+            <div class="viewData" style="position: relative;">
+                <div class="lead_info">
+                    <h3>{{ title }}</h3>
+                    {% for value in model %}
+                        <h3>{{ value }}</h3>
+                    {% endfor %}
+                    {% set value = model.toArray['attach_to_names'] %}
+                    <tr>
+                        <td>
+                            <table>
+                                {% for target, ids in value %}
+                                    {% if ids is not empty %}
+                                        <tr>
+                                            <th>{{ target }}s:</th>
+                                            <td>
+                                                {% for  key , id in ids %}
+                                                    {% set targetid = model.toArray['attach_to'][target][key] %}
+                                                    <a href="{{ url( 'common', { 'data':target|lower,'view': 'view','id':''~targetid} )~saurl }}">{{ id }}</a>
+                                                    {% if not loop.last %}, {% endif %}
+                                                {% endfor %} </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock output %}
+
+

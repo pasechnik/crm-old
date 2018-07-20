@@ -1,0 +1,227 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'common', { 'data':'mail', 'view':'view', 'id': avalue.id() } )~saurl }}" >
+        <span class="d_title">{{ attribute(avalue, key) }}</span>
+    </a>
+{% elseif key == 'changer_title' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.changer_title }}
+    </a>
+
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+
+{% elseif key == 'owner' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+
+{% elseif key == 'status_id' %}
+    {{ attribute(avalue, "status_title") }}
+
+{% elseif key == 'from' %}
+    {% if avalue.type == 'outbox' %}
+        <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'to_id') }, { 'query': { 'back':saurlhash } } ) }}">
+            {{ avalue.owner_title }}
+        </a>
+    {% else %}
+        <pre>{{ avalue.from_to_title }}</pre>
+    {% endif %}
+{% elseif key == 'to' %}
+    {% if avalue.type == 'inbox' %}
+        <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'to_id') }, { 'query': { 'back':saurlhash } } ) }}">
+            {{ avalue.owner_title }}
+        </a>
+    {% else %}
+        <pre>{{ avalue.from_to_title }}</pre>
+    {% endif %}
+
+{% elseif key == 'last_mail' %}
+    <div style="position:relative">
+        <iframe
+            width="100%"
+            id="last_mail{{ attribute(avalue, key) }}"
+            allowTransparency="true"
+            scrolling="no"
+            align="middle"
+            style="width:100%"
+            onload="setIframeHeight(this.id)"
+            src="{{ url('common', {'data':'mailDetail','id':attribute(avalue, key),'view':'text' }) }}"
+            sandbox="allow-same-origin"
+            >
+        </iframe>
+    </div>
+    {#<div class="nostyle">#}
+        {#{{ attribute(avalue, key) | raw }}#}
+    {#</div>#}
+{#{% elseif key == 'contact_id' and attribute(avalue, 'contact_id') is not empty %}#}
+    {#<a href="{{ url( 'contact', { 'action': 'view','id':''~attribute(avalue, 'contact_id')} )~saurl }}" >{{ attribute(avalue, "contact") }}</a>#}
+{#{% elseif key == 'from' %}#}
+                {#{% set count = 0 %}#}
+                {#{% set person = "" %}#}
+                {#&#123;&#35;{% for target, ids in attribute(avalue, key) %}#}
+                    {#{% if ids is not empty %}#}
+                    {#{% endif %}#}
+                {#{% endfor %}   &#35;&#125;#}
+                {#<div class="targets_hide" id="targets{{avalue._id}}"  style="overflow-x: hidden">#}
+                    {#{% for target, ids in attribute(avalue,'view_from') %}#}
+                        {#{% if ids is not empty %}#}
+                            {#<div style="overflow: hidden; width: 400px; padding-right: 5px;">#}
+                                {#&#123;&#35;<div><span style="display: block">{{target}}s:</span>&#35;&#125;#}
+                                {#<div style="display:inline; float: left; width: 35%;  margin-bottom: 5px; padding-bottom: 5px;">#}
+                                    {#{% if target=='Other' %}#}
+                                        {#<span>{{target}}s:</span>#}
+                                    {#{% else %}#}
+                                        {#<span>{{tables_data.labels[target]}}:</span>#}
+                                    {#{% endif %}#}
+                                {#</div>#}
+                                {#<div style="float: right; width: 65%; margin-bottom: 10px;">#}
+                                    {#{% for  id, name  in ids%}#}
+                                        {#<span style="padding-left: 10px; display: block">#}
+                                                        {#&#123;&#35;{{ dump(target) }}&#35;&#125;#}
+                                            {#{% if target=='Other' %}#}
+                                                {#{% if count==0 %}#}
+                                                    {#{% set person %}#}
+                                                    {#<div id="person{{avalue._id}}" class="person">{{name}}</div>#}
+                                                    {#{% endset %}#}
+                                                {#{% endif %}#}
+                                                                {#<div id="person{{avalue._id}}" >{{name}}</div>#}
+                                                        {#{% else %}#}
+                                                {#{% if count==0 %}#}
+                                                    {#{% set person%}#}
+                                                    {#<a id="person{{avalue._id}}" class="person" href="{{ url( tableHandler.getTransportName(target)|lower, { 'action': 'view','id':id} )~saurl }}">{{name}}</a>#}
+                                                    {#{% endset %}#}
+                                                {#{% endif %}#}
+                                                                {#<a id="person{{avalue._id}}" href="{{ url( tableHandler.getTransportName(target)|lower, { 'action': 'view','id':id} )~saurl }}">{{name}}</a>#}
+                                            {#{% endif %}#}
+                                            {#{% set count  = count+1 %}#}
+                                                    {#</span>#}
+                                    {#{% endfor %}#}
+                                {#</div>#}
+                            {#</div>#}
+                        {#{% endif %}#}
+                    {#{% endfor %}#}
+                {#</div>#}
+                {#{% if count > 1 %}#}
+                    {#{{person}}#}
+                    {#<a class="showhide" id="show_btn{{avalue._id}}" data-id="{{avalue._id}}" href="" onClick="show(this); return false;">&nbsp;...</a>#}
+                {#{% elseif count == 1%}#}
+                    {#{{person}}#}
+                {#{% endif %}#}
+{#{% elseif key == 'to' %}#}
+    {#&#123;&#35;<pre>{{ dump(attribute(to_field_links,akey)) }}</pre>&#35;&#125;#}
+                {#{% set count = 0 %}#}
+                {#{% set person = "" %}#}
+                {#&#123;&#35;{% for target, ids in attribute(avalue, key) %}#}
+                    {#{% if ids is not empty %}#}
+                    {#{% endif %}#}
+                {#{% endfor %}   &#35;&#125;#}
+                {#<div class="targets_hide" id="targets{{avalue._id}}"  style="overflow-x: hidden">#}
+                    {#{% for target, ids in attribute(avalue,'view_to') %}#}
+                        {#{% if ids is not empty %}#}
+                        {#<div style="overflow: hidden; width: 400px; padding-right: 5px;">#}
+                    {#&#123;&#35;<div><span style="display: block">{{target}}s:</span>&#35;&#125;#}
+                            {#<div style="display:inline; float: left; width: 35%;  margin-bottom: 5px; padding-bottom: 5px;">#}
+                            {#{% if target=='Other' %}#}
+                                {#<span>{{target}}s:</span>#}
+                            {#{% else %}#}
+                                {#<span>{{tables_data.labels[target]}}:</span>#}
+                            {#{% endif %}#}
+                            {#</div>#}
+                            {#<div style="float: right; width: 65%; margin-bottom: 10px;">#}
+                                {#{% for  id, name  in ids%}#}
+                                    {#<span style="padding-left: 10px; display: block">#}
+                                        {#&#123;&#35;{{ dump(target) }}&#35;&#125;#}
+                                        {#{% if target=='Other' %}#}
+                                            {#{% if count==0 %}#}
+                                                {#{% set person %}#}
+                                                {#<div id="person{{avalue._id}}" class="person">{{name}}</div>#}
+                                                {#{% endset %}#}
+                                            {#{% endif %}#}
+                                                {#<div id="person{{avalue._id}}" >{{name}}</div>#}
+                                        {#{% else %}#}
+                                            {#{% if count==0 %}#}
+                                                {#{% set person%}#}
+                                                {#<a id="person{{avalue._id}}" class="person" href="{{ url( tableHandler.getTransportName(target)|lower, { 'action': 'view','id':id} )~saurl }}">{{name}}</a>#}
+                                                {#{% endset %}#}
+                                            {#{% endif %}#}
+                                                {#<a id="person{{avalue._id}}" href="{{ url( tableHandler.getTransportName(target)|lower, { 'action': 'view','id':id} )~saurl }}">{{name}}</a>#}
+                                        {#{% endif %}#}
+                                        {#{% set count  = count+1 %}#}
+                                    {#</span>#}
+                                {#{% endfor %}#}
+                            {#</div>#}
+                        {#</div>#}
+                        {#{% endif %}#}
+                    {#{% endfor %}#}
+                {#</div>#}
+                {#{% if count > 1 %}#}
+                    {#{{person}}#}
+                    {#<a class="showhide" id="show_btn{{avalue._id}}" data-id="{{avalue._id}}" href="">&nbsp;...</a>#}
+                {#{% elseif count == 1%}#}
+                    {#{{person}}#}
+                {#{% endif %}#}
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% elseif key == 'date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}
+
+<style type="text/css">
+    <!--
+    .hide {
+        position: absolute;
+        display: none;
+        margin-top: -15px;
+        padding: 15px;
+        background-color: white;
+        border:solid 1px rgba(0, 0, 0, 0.06);
+        -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.24);
+        max-height: 150px;
+        overflow: auto;
+    }
+    .showhide {
+        color: green;
+    }
+</style>
+
+<script>
+    $('.showhide').on( "mouseenter", function() {
+        var id = $(this).parent().find('a.showhide').attr('data-id');
+        $(this).parent().find('#targets'+id).show();
+        {#            $(this).parent().find('#person'+id).show();#}
+        {#            $(this).parent().find('#show_btn'+id).text('...');#}
+    });
+
+    $('.hide').on( "mouseleave", function() {
+        var id = $(this).parent().find('a.showhide').attr('data-id');
+        $(this).parent().find('#targets'+id).hide();
+        {#            $(this).parent().find('#person'+id).show();#}
+        $(this).parent().find('#show_btn'+id).text('\u00A0...');
+    });
+    {#        var flag = true;#}
+    function show(self)
+    {
+        var id = $(self).attr('data-id');
+        if($(self).text()==='\u00A0...')
+        {
+            document.getElementById('targets'+id).style.display='block';
+            {#                document.getElementById('person'+id).style.display='none';#}
+            {#                $('#show_btn'+id).text('Hide');#}
+            {#                flag = false;#}
+        }
+        {#else
+        {
+            document.getElementById('targets'+id).style.display='none';
+{#                document.getElementById('person'+id).style.display='';#}
+        {#                $('#show_btn'+id).text('...');#}
+        {#                flag = true;#}
+        {#            }#}
+    }
+</script>

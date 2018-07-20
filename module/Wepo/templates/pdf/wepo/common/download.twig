@@ -1,0 +1,15 @@
+{% block content %}
+    <div class="viewtable">
+        <div class="form_header">
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+        <div>
+            <p> File does not exist on server </p>
+        </div>
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

@@ -1,0 +1,35 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Activity: ' ~ model.getModelName %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block headeractions %}
+
+
+    <div class="buttons left">
+        <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+    </div>
+
+    <div class="title"><h1>{{ title }}</h1></div>
+    <div class="editedBy">
+        {% if model.toView["changer"] is defined %}
+            Last Update: {{ model.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }} by {{ model.changerfname }} {{model.changerlname}}
+        {% endif %}
+    </div>
+
+    <div class="buttons">
+        <a href="{{ url( null, { 'action': 'edit','activity':model.getModelName|lower,'id':''~model.id() } )~saurl }}" class="edit btn-icon">
+            {{ translate('Edit') }}
+        </a>
+    </div>
+
+    <div class="buttons right">
+        <a href="#" class="btn-small previous" title="Previous"></a>
+        <a href="#" class="btn-small next" title="Next"></a>
+    </div>
+
+{% endblock headeractions %}
+{% block actions %}
+    {#<a href="{{ url( 'activity', { 'action': 'edit', 'activity': model.getModelName|lower, 'id':model.id() } )~saurl }}" class="edit btn-icon">{{translate('Edit')}}</a>#}
+    <a href="{{ url( 'activity', { 'action': 'delete','activity':model.getModelName|lower, 'id':model.id() } )~delsaurl }}" class="delete btn-icon">{{translate('Delete')}}</a>
+{% endblock actions %}

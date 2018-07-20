@@ -1,0 +1,14 @@
+{#
+'element'           => $element,
+'label'             => $label,
+'labelAttributes'   => $this->labelAttributes,
+'labelPosition'     => $this->labelPosition,
+'renderErrors'      => $this->renderErrors,
+#}
+
+<div class="input">
+    <label for="id{{element.getName}}" {%for key,i in element.getLabelAttributes%} {{key}}="{{i}}" {%endfor%}><span class="splabel">{{label}}:</span></label>
+    {{formElement(element)}}
+    <label for="id{{element.getName}}" class="error" style="display: none;">{{FormElementErrors(element)}}</label>
+    {#<label for="" class="error"></label>#}
+</div>

@@ -1,0 +1,240 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Sign in') %}
+
+{% block header %}
+{% endblock header %}
+
+{% block globalfooter %}
+{% endblock globalfooter %}
+
+{% block style %}
+    <style>
+
+      .content { text-align: center;}
+
+      .wepolabel
+       {
+            display: inline-block;
+            background: #4c8ab0;
+            color:white;text-align:center;
+            margin-top:200px;
+            padding-left:  5px;
+            padding-right: 5px;
+       }
+
+       html, body, .wepo{background-color: #4c8ab0;}
+
+        #weposubmit{
+            -webkit-box-shadow: 0 8px 8px -7px green;
+            -moz-box-shadow: 0 8px 8px -7px green;
+            font-size: 19px;
+            background-color: #6ac965;
+            border-radius: 5px;
+            width: 302px;
+            color: white;
+            margin-top: 20px;
+            border: 1px transparent;
+            height: 39px;
+            cursor: pointer;
+        }
+
+        #weposubmit:hover{
+            border: 1px solid #a3e9a4;
+        }
+        #weposubmit:active{
+            border: 0px;
+            -webkit-box-shadow: 0 0px 0px 0px ;
+            -moz-box-shadow: 0 0px 0px 0px ;
+        }
+        #wepologin,#wepopassword:hover{cursor: pointer;}
+
+        #wepologin{
+            padding-left: 40px;
+            padding-right: 40px;
+            width: 220px;
+            font-size: 13px;
+            background-repeat: no-repeat;
+            background-position-x:10px;
+            background-position-y:13px;
+            border-radius: 2px;
+            height: 26px;
+            border: 1px solid white;
+        }
+        #wepologin:active{
+          padding-left: 40px;
+        }
+
+        #wepologin:focus, #wepopassword:focus
+        {
+            padding: 8px 10px;
+            box-shadow:0px 0px 6px 0px rgb(190, 214, 233);
+            padding-left: 40px;
+            padding-right:40px;
+            width: 220px;
+        }
+
+        #wepopassword{
+            padding-left: 40px;
+            padding-right: 40px;
+            width: 220px;
+            font-size: 12px;
+            border-radius: 2px;
+            margin-top: 20px;
+            height: 26px;
+            border: 1px solid white;
+        }
+
+        #loginico
+        {
+            position: absolute;
+            background-image: url(/css/img/icons/32x32-icons/username.png);
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+            z-index: 10;
+            top:10px;
+            left:12px;
+        }
+
+        #passwdico
+        {
+            position: absolute;
+            background-image: url(/css/img/icons/32x32-icons/key.png);
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+            z-index: 10;
+            top:31px;
+            left:12px;
+        }
+
+        .winput
+        {
+            position: relative;
+        }
+
+        .placehold:focus::-webkit-input-placeholder {
+            opacity: 0;
+            transition: opacity 1.0s ease;
+        }
+        .placehold::-webkit-input-placeholder {
+            color:black;
+            font-size: larger;
+            opacity: 1;
+            transition: opacity 1.0s ease;
+        }
+        .placehold{
+            text-align: center;
+        }
+        .bord{
+             border: 1px solid #84b8db;
+             padding: 43px;
+             border-radius: 6px;
+             width: 297px;
+             margin: auto;
+             margin-top: -11px;
+             text-align: left;
+             }
+
+     @-webkit-keyframes 'shake'
+      {
+        0%{
+             -webkit-transform: translate(0px,0px);}
+        20%{
+             -webkit-transform: translate(-25px,0px);}
+        40%{
+             -webkit-transform: translate(25px,0px);}
+        60%{
+             -webkit-transform: translate(-25px,0px);}
+        80%{
+             -webkit-transform: translate(25px,0px);}
+       100%{
+             -webkit-transform: translate(0px,0px);}
+      }
+
+     @keyframes shakeit
+      {
+        0%{
+             transform: translate(0px,0px);}
+        20%{
+             transform: translate(-25px,0px);}
+        40%{
+             transform: translate(25px,0px);}
+        60%{
+             transform: translate(-25px,0px);}
+        80%{
+            transform: translate(25px,0px);}
+       100%{
+             transform: translate(0px,0px);}
+      }
+
+.animation
+{
+  -webkit-animation: 'shake' 0.35s ease-in-out 0s;
+  animation: shakeit 0.35s ease-in-out 0s;
+}
+
+     </style>
+{% endblock style %}
+
+
+{#{% block script %}#}
+ {#<script>#}
+
+    {#$(function(){#}
+      {#$('input').click(function(){#}
+        {#$('.shake_it').removeClass("animation");#}
+       {#});#}
+
+       {#$('#form').submit(#}
+           {#function(){#}
+               {#var result = false;#}
+                   {#$.ajax(#}
+                   {#{#}
+                       {#url:window.location.pathname,#}
+                       {#type: 'post',#}
+                       {#async: false,#}
+                       {#timeout: 3000,#}
+                       {#data: {#}
+                           {#'login' : $('#wepologin').val(),#}
+                           {#'password' : $('#wepopassword').val()#}
+                       {#},#}
+                       {#success: function(results) {#}
+                           {#result = results.good_credentials;#}
+
+                           {#if( results.good_credentials == false )#}
+                           {#{#}
+                               {#$('#wepopassword').val('');#}
+                               {#$('.shake_it').addClass("animation");#}
+                               {#$('#wepologin').css('border','1px solid red');#}
+                               {#$('#wepopassword').css('border','1px solid red');#}
+                               {#$('#weposubmit').attr('disabled',true);#}
+
+                            {#setTimeout(function(){#}
+                                 {#$('#wepologin').css('border','1px solid white');#}
+                                 {#$('#wepopassword').css('border','1px solid white');#}
+                                 {#$('#weposubmit').attr('disabled',false);#}
+                               {#},1300);#}
+                           {#}#}
+                           {#else{#}
+                               {#$('#weposubmit').prop('value','Signing in');#}
+                           {#}#}
+                       {#}#}
+                   {#}#}
+               {#)#}
+               {#return result;#}
+           {#}#}
+       {#)#}
+    {#});#}
+
+ {#</script>#}
+{#{% endblock script %}#}
+
+
+{% block content %}
+
+    {% for block in data.signin %}
+        {% include block.template with block %}
+    {% endfor %}
+
+{% endblock content %}

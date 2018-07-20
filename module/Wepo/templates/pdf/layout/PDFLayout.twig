@@ -1,0 +1,56 @@
+{{ docType() }}
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta charset="utf-8">
+        <title>
+            {% block title %}WePO{% endblock title %}
+        </title>
+
+        <!-- Styles -->
+        {%block styles%}
+{#        <link rel="stylesheet" type="text/css" href="/js/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css" />#}
+        <link href="css/pdf_style.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="css/pdf_wepo.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/css/pdf_style.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/css/pdf_wepo.css" media="screen" rel="stylesheet" type="text/css" />
+{#        <link href="/css/select2/select2.css" media="screen" rel="stylesheet" type="text/css" />#}
+{#        <link href="/img/wepo_logo_unicorn2.gif" rel="shortcut icon" type="image/vnd.microsoft.icon" />#}
+        {% block style %}{% endblock style %}
+        {%endblock styles%}
+        <!-- /Styles -->
+
+        <style>
+            .footer { position: fixed; bottom: 0px; right:0; left:0; height:30; }
+{#            .pagenum:before { content: counter(page); }#}
+        </style>
+
+    </head>
+    <body>
+        <div id="header" class="header">
+            <div id="headerBlock" >
+                <div class="left_header">
+                    <div class="logo"><a href="/" class="imgTxt txtLogo"></a></div>
+                </div>
+                <div class="right_header">
+{#                    a lot of text#}
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            {#<br />#}
+            {% block content %}{{ content|raw }}{% endblock content %}
+
+
+        </div>
+        <footer>
+            <div class="footer">
+                {% block footer %}{% endblock footer %}
+                <p>&copy; {{ post.published_at|date("Y") }} by WepoCRM {#{{ translate('All rights reserved.') }}#}</p>
+                {#Zend Framework {{ constant('\\Zend\\Version\\Version::VERSION') }}#}
+            </div>
+        </footer>
+        {% block inline %}{% endblock inline %}
+    </body>
+</html>

@@ -1,0 +1,77 @@
+{% extends 'layout/layout.twig' %}
+
+{% block title %}{{parent()}}{% endblock title %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <div class="right_top_links">
+        <div class="buttons clearfix">
+            {% if saurlback !='/' %}
+                <a href="{{ saurlback }}">{{ translate('Cancel') }}</a>
+            {% else %}
+                <a href="{{ url( null, { 'action': 'list' } ) }}">{{translate('Cancel')}}</a>
+            {% endif %}
+        </div>
+        {#<a href="#"><i class="imgTxt txtHelp"></i>Help fot this page</a>#}
+    </div>
+    <div class="lead_block clearfix">
+        {% block photo %}
+            <div class="lead_photo">
+                <div class="photo">
+                    <img src="/img/catman.jpg" alt="">
+                </div>
+                <div class="social clarfix">
+                    <a href="#" class="imgTxt txtFacebook"></a>
+                    <a href="#" class="imgTxt txtTwitter"></a>
+                    <a href="#" class="imgTxt txtLinkedin"></a>
+                </div>
+            </div>
+        {% endblock photo %}
+        {% for key, fieldset in model.fieldsets %}
+            <div class="{% if fieldset.base %}lead_info{% else %}lead_other_info{% endif %}">
+                <h3>{{translate( fieldset.label )}}</h3>
+                <table>
+                    <tbody>
+                        {% for fieldname, label in attribute(model.fieldsets, key).elements %}
+                            <tr>
+                                <th>{{ label }}</th>
+                                <td>{{ attribute(model, fieldname) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if fieldset.base %}
+                    <div class="buttons">
+                        {% block actions %}
+                            {% if model.status != 'deleted' %}
+                                <a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}">{{translate('Edit')}}</a> &nbsp;
+                                <a href="{{ url( null, { 'action': 'delete','id':''~model.id() } )~saurl }}">{{translate('Delete')}}</a> &nbsp;
+                            {% elseif model.status == 'deleted' %}
+                                <a class="green_but submitLink" href="{{ url( null, { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}">{{translate('Restore')}}</a> &nbsp;
+                                {% if permission == 1 %}
+                                    <a class="red_but submitLink" href="{{ url( null, { 'action': 'clean', 'id':'' ~model.id()} )~delsaurl }}">{{translate('Clean')}}</a> &nbsp;
+                                {% endif %}
+                            {% endif %}
+                        {% endblock actions %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% block detailinfo %}
+    {% endblock detailinfo %}
+
+    <div class="clearfix">
+        <div id="leftCol" class="connected">
+            {% for wname, widget in widgets %}
+                {% include 'partial/widget.twig' with {'name':wname, 'widget': widget} %}
+                {% if loop.index == (loop.length/2)|round(0,'ceil') %}
+                </div><div id="rightCol" class="connected">
+                {%endif%}
+            {% endfor %}
+        </div>
+    </div>
+    <a align="center" id="scrollTop" href="#" onclick="top.goTop();
+            return false;"></a>
+{% endblock content %}

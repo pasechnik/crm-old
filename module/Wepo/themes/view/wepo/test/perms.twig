@@ -1,0 +1,22 @@
+<a href="{{ url('test', {'action':'index'}) }}">Index</a>
+<a href="{{ url('test', {'action':'fields'}) }}">Fields</a>
+<a href="{{ url('test', {'action':'perms'}) }}">Permissions</a>
+<a href="{{ url('test', {'action':'forms'}) }}">Forms</a>
+
+<pre>
+{% for acl in acls %}
+'{{ acl.key }}' => [
+{% for key1,prop in acl %}
+{% if key1 in ['data','modes','fields'] %}'{{ key1 }}' => [
+    {% for key2,value in prop %}
+            {% if ('tt'~loop.index0)==('tt'~key2) %}'{{ value }}',{% else %}'{{ key2 }}' => '{{ value }}',
+    {% endif %}
+{% endfor %}
+] ,
+{% else %}
+'{{ key1 }}' => '{{ prop }}',
+{% endif %}
+{% endfor %}
+],
+{% endfor %}
+</pre>

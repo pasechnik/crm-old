@@ -1,0 +1,26 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Help') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+{% block content %}
+
+    <div class="lead_block clearfix">
+        <div class="lead_info">
+            <h3 style="min-height: 10px;">{{ translate('HELP') }}</h3>
+            <h3 style="min-height: 10px;"><a href="{{ url( 'help', { 'action': 'manual' } ) }}">{{ translate(' Manual') }}</a></h3>
+            <h3 style="min-height: 10px;"><a href="{{ url( 'help', { 'action': 'faq' } ) }}">{{ translate('FAQ') }}</a></h3>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Get <i>"S"</i> off</th>
+                        <td>Never use <i>S</i> at the end of words</td>
+                    </tr>
+                    <tr>
+                        <th>Get <i>"S"</i> off</th>
+                        <td>Never use <i>S</i> at the end of words</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock content %}

@@ -1,0 +1,18 @@
+<div class="lead_info" style="width: 100%">
+    <h3>{{ translate( fieldset.label ) }}</h3>
+    <table>
+        <tbody>
+        {% for key, label in attribute(fieldsets, key).elements %}
+            <tr class="no-hover">
+                <th>{{ label }}</th>
+                <td class="{{key}}_Price">
+                        {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] with { 'avalue': model } %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if i is divisible by(3) %}
+    <div class="clear"></div>
+{% endif %}

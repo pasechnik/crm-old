@@ -1,0 +1,31 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'common', { 'data':'account', 'view':'view',  'id':avalue.id() }, { 'query': { 'back':saurlhash } } ) }}"><span class="d_title">{{ avalue.title }}</span></a>
+
+{% elseif key == 'changer_title' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.changer_title }}
+    </a>
+
+{% elseif key == 'phone' or key=='mobile' %}
+    <span class="phone">{{ attribute(avalue, key) }}</span>
+
+{% elseif key == 'status_id' %}
+    {{ attribute(avalue, "status") }}
+
+{% elseif key == 'email' and attribute(avalue, 'email') is not empty %}
+    <a href="{{ url( 'common', { 'data': 'mail','view':'send','to':''~attribute(avalue, 'email')} )~saurl }}" >
+        {{attribute(avalue, key)}}
+    </a>
+
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+        {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+        {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}

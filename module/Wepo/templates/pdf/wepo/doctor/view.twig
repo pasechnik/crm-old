@@ -1,0 +1,52 @@
+{% extends 'partial/view.twig' %}
+
+{% set title = model.name %}
+
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+
+{% block photo %}
+{% block avatar %}
+{#    <img src="{{ WepoLink(mainuser.company_id, model, 'avatar', 'Leads') }}" alt="" style="max-width:120px;max-height:120px;">#}
+{% endblock avatar %}
+{% endblock photo %}
+{% block actions %}
+    {% if model.status not in [ 'deleted', 'converted' ] %}
+        <a href="{{ url( 'doctor', { 'action': 'delete', 'id':''~model.id() } )~saurl }}" class="delete btn-icon">
+            {{ translate('Delete') }}</a>
+    {% elseif model.status == 'deleted' %}
+        <a href="{{ url( 'doctor', { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}" class="restore  btn-icon">{{ translate('Restore') }}</a>
+        {% if permission == 1 %}
+            <a href="{{ url( 'doctor', { 'action': 'clean', 'id':'' ~model.id()} )~delsaurl }}" class="clean  btn-icon">{{ translate('Clean') }}</a>
+        {% endif %}
+    {% endif %}
+{% endblock actions %}
+
+{% block otherinfo %}
+    <div class="lead_other_info" style="margin-right: 40px;">
+        <h3>Address Information</h3>
+        <table>
+            <tbody>
+            <tr>
+                <th>Country:</th>
+                <td>{{ model.country }}</td>
+            </tr>
+            <tr>
+                <th>ZIP:</th>
+                <td>{{ model.zip }}</td>
+            </tr>
+            <tr>
+                <th>State:</th>
+                <td>{{ model.state }}</td>
+            </tr>
+            <tr>
+                <th>City:</th>
+                <td>{{ model.city }}</td>
+            </tr>
+            <tr>
+                <th>Address:</th>
+                <td>{{ model.address }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock otherinfo %}

@@ -1,0 +1,10 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Home') %}
+
+{% block content %}
+
+    {% for block in data.home %}
+        {% include block.template with block %}
+    {% endfor %}
+
+{% endblock content %}

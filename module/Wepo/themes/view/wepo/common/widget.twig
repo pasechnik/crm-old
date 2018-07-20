@@ -1,0 +1,96 @@
+{% block style %}
+    <style>
+
+        .corner{
+            float         : right;
+            margin-right  : -12px;
+            opacity       : 0.3;
+        }
+
+        .widgetData{
+            max-width     : 100px;
+            overflow      : hidden;
+            white-space   : nowrap;
+            text-overflow : ellipsis;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+        $(function(){
+            $('.widget').each(function(){
+                $(this).find('.corner').css('margin-top', - $(this).height()/2);
+            });
+        });
+    </script>
+{% endblock script %}
+
+<div class="widget {{ params.data }}">
+    <div class="title">
+        <div class="listtitle">
+            <span class="small icon"
+                  style="background-image: url(/css/img/icons/32x32-icons/{{ params.data }}.png)"></span>
+            <h2>{{ title }}</h2>
+        </div>
+        <div class="buttons controls">
+            {% if links %}
+                {% for icon_key, link in links %}
+                    <a class="btn-icon {{ icon_key }}"
+                       href="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">{{ translate(link.label) }}</a>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="buttons right controls">
+            <a style="cursor: pointer;" class="minibutton minimize_button"></a>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="widget_content">
+        <table class="data">
+            <thead>
+                <tr class="tableHeader">
+                    {% for value in fields %}
+                        <th class="{% if column.sort == value %}checked{% endif %}">
+                            {#<a href="{{ url( null, params|merge({ 'sort':value, 'desc':column.desc==0?1:0 }), { 'query': queryparams|merge({ 'back':saurlhash }) } ) }}">#}
+                                {{ attribute( labels, value ) }}
+                            {#</a>#}
+                            {% if column.sort == value %}
+                                <span class="{{ column.desc!=0 ? 'down':'up' }}"></span>
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+
+                    {% if actions %}
+                        <th class="width_10p"> Actions </th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for akey,avalue in paginator.getCurrentItems %}
+                <tr>
+                    {% for key in fields %}
+                        <td class="{% if column.sort == key %}checked{% endif %} widgetData">
+                            {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                        </td>
+                    {% endfor %}
+
+                    {% if actions %}
+                        <td class="width_10p">
+                                {% for action, conf in actions %}
+                                    <a class="actionview"
+                                       href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(avalue, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                            src="/img/1.png" class="{{ action }}" alt="{{ action }}"/><span
+                                            class="tooltip top">{{ action|capitalize }}</span></a>
+                                {% endfor %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+             <img src="/css/img/icons/other-icons/corner.jpeg" class="corner"/>
+    </div>
+</div>

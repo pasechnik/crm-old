@@ -1,0 +1,9 @@
+{% extends 'layout/layout.twig' %}
+
+{% block content %}
+    
+    {% for form in data.form %}
+        {% include form.template with form %}
+    {% endfor %}
+
+{% endblock content %}

@@ -1,0 +1,95 @@
+{% set avatar = WepoLink( model, 'avatar') %}
+<div class="lead_photo" style="">
+    {% if avatar is not empty %}
+        <div class="photo">
+            <img src="{{ avatar }}" alt=""
+                 style="max-width:120px;max-height:120px;">
+            <div id="viewMode"></div>
+        </div>
+
+    {% endif %}
+    <div class="social clearfix">
+        {% if model.flink is not empty %}
+            <a href="{{ model.flink }}"
+               class="imgTxt txtFacebook{% if model.flink is empty %}Disabled{% endif %}" target="_blank"></a>
+        {% endif %}
+        {% if model.tlink is not empty %}
+            <a href="{{ model.tlink }}"
+               class="imgTxt txtTwitter{% if model.tlink is empty %}Disabled{% endif %}"  target="_blank"></a>
+        {% endif %}
+        {% if model.llink is not empty %}
+            <a href="{{ model.llink }}"
+               class="imgTxt txtLinkedin{% if model.llink is empty %}Disabled{% endif %}" target="_blank"></a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+
+    div.photo{
+        text-align: -webkit-center;
+    }
+
+    #viewMode {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        background: no-repeat;
+        background-image: url('/css/img/icons/other-icons/viewmode.png');
+        opacity: 0.5;
+    }
+
+    .small {
+        max-width: 80px !important;
+        max-height: 80px !important;
+    }
+
+    .big {
+        max-width: 120px;
+        max-height: 120px;
+    }
+
+    .photo > img {
+        transition: 0.4s;
+    }
+
+</style>
+
+<script>
+
+    $(function ()
+    {
+        var viewMode = $('#viewMode');
+        var leadInfo_first = $('.lead_info:first');
+
+        viewMode.click(function ()
+        {
+            $(this).toggleClass('smallMode');
+
+            if ($(this).hasClass('smallMode'))
+            {
+                smallView(500);
+            }
+                else
+                {
+                    usualView();
+                }
+        });
+
+        $(window).resize(function ()
+        {
+            $('.view_block').animate({"height": 'auto'}, 1);
+            leadInfo_first.find('tbody tr:first td span').css('position', 'inherit');
+
+            view_blockCoords();
+
+            if ( viewMode.hasClass('smallMode') )
+            {
+                 viewMode.trigger("click");
+                 $('.view_block').animate({"height": 'auto'}, 1);
+                 view_blockCoords();
+            }
+
+        });
+    });
+</script>

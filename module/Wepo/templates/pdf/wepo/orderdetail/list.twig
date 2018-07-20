@@ -1,0 +1,24 @@
+{% extends 'partial/detaillist.twig' %}
+
+{% set masterName = master.getModelLabel|lower %}
+{% set MasterName = master.getModelLabel %}
+{% set title = translate(MasterName) ~ ': '~ master.getName %}
+{% set detailName = details %}
+{% set detailsName = details ~ 's' %}
+
+{% block table_link %}
+    onclick='location.href="{{ url( null, { 'action': 'view', 'orderid':avalue.order_id, 'id':''~avalue.id() } )~saurl }}"'
+{% endblock table_link %}
+
+{% block detailedit %}
+    <div class="buttons">  <a href="{{ url( masterRoute, { 'action': 'edit','id':''~master.id() } )~saurl }}" class="edit btn-icon" title="Edit">{{translate("Edit")}}</a> </div>
+    <div class="buttons">  <a href="{{ url( masterRoute, { 'action': 'convert','id':''~master.id() } )~saurl }}" class="yes btn-icon" title="Generate invoice">{{translate("Generate invoice")}}</a> </div>
+{% endblock detailedit %}
+
+{% block data %}
+    {% include 'partial/orderdetail-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+    {{ parent() }}
+{% endblock action %}

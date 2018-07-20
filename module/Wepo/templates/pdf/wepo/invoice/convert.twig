@@ -1,0 +1,147 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Invoice : ' ~ model.subject %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block edit %}
+{% endblock edit %}
+{% block actions %}
+{% endblock actions %}
+
+{% block headeractions %}
+    <div class="buttons left">
+        <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+    </div>
+
+    <div class="title"><h1>{{ title }}</h1></div>
+    <div class="editedBy">
+        {% if model.toView["changer"] is defined %}
+            Last Update: {{ model.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }} by {{ model.changerfname }} {{model.changerlname}}
+        {% endif %}
+    </div>
+
+    <div class="buttons">
+        {#<a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}" class="edit btn-icon">#}
+        {#{{ translate('Edit') }}#}
+        {#</a>#}
+    </div>
+
+    {#<div class="buttons right">#}
+        {#<a href="#" class="btn-small previous" title="Previous"></a>#}
+        {#<a href="#" class="btn-small next" title="Next"></a>#}
+    {#</div>#}
+
+{% endblock headeractions %}
+
+{% block detailinfo %}
+    <form action="{{ url( route, { 'action': 'convert' } ) }}" method="post">
+        <div class="clearfix">
+            <div class="table">
+                <h2>Payment information</h2>
+                <div class="form_info">* Required Field(s)</div>
+                <div class="form">
+                    <div class="col">
+                        <div class="input">
+                            <label class="required">Description</label>
+                            <textarea name="description" type="text" required="required" value=""></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix">
+            <div class="table">
+                <h2 style="margin-top: 10px;">Detail information</h2>
+                <div class="buttons" style="padding: 10px;">
+                    <a id="details_button" class="show btn-icon">Show</a>
+                    <input type="hidden" name="id" value="{{ model.id() }}" />
+                    <a href="#" class="yes btn-icon green_but submitLink">{{ translate('Confirm payment') }}</a>
+                </div>
+                <div id="details" class="hide">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="30"><b>№</b></th>
+                                {% for key, value in details|first.toView %}
+                                    {% if (key != 'order_id') and (key != 'invoice') %}
+                                        <th><b>&nbsp;&nbsp;{{translate(detail_labels[key])}}</b></th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for detail in details %}
+                               <tr>
+                               <td width=30>{{loop.index}}</td>
+                                   {% for key, value in detail.toView %}
+
+                                       {% if key == 'product_price' or key == 'final_price' %}
+                                            <td>&nbsp;&nbsp;${{value|number_format(2, '.', ',')}}</td>
+
+                                           {% elseif key == 'discount' %}
+
+                                           {% if detail.toView.discount_type == '% of Price' %}
+                                                <td>&nbsp;&nbsp;{{value|number_format(2, '.', ',')}} %</td>
+                                           {% elseif value !='0' %}
+                                                <td>&nbsp;&nbsp;-{{value|number_format(2, '.', ',')}} $</td>
+                                           {% else %}
+                                                <td>&nbsp;&nbsp;{{value|number_format(2, '.', ',')}} $</td>
+                                           {% endif %}
+
+                                       {% elseif key!= 'order_id'%}
+                                               {% if (key != 'order_id') and (key != 'invoice') %}
+                                                   <td>&nbsp;&nbsp;{{value}}</td>
+                                               {% endif %}
+                                       {% endif %}
+                                   {% endfor %}
+                               </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock detailinfo %}
+{% block script %}
+    <script>
+      $(function(){
+           $('#details').hide();
+
+           $('#details_button').click(function()
+           {
+              if ($(this).text() === 'Hide')
+              {
+                $('#details').hide({duration:600,effect:'blind'});
+                $(this).text('Show');
+                $(this).switchClass('hide','show');
+              var interval = setInterval(function(){
+                    if ($(window).scrollTop() < $('#header').height() - $('#mainMenu').height() )
+                    {
+                      fixedMenu();
+                      clearInterval(interval);
+                    }
+                },1);
+              }
+              else{
+                $('#details').show({duration:600,effect:'blind'});
+                $(this).text('Hide');
+                $(this).switchClass('show','hide');
+              }
+           });
+        });
+    </script>
+{% endblock script %}
+{% block style %}
+    <style type="text/css">
+            <!--
+            .hide {
+                overflow:hidden;
+                display: none;
+            }
+            #details_button{
+                cursor: pointer;
+                width: 30px;
+            }
+    </style>
+{% endblock style %}

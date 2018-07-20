@@ -1,0 +1,313 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Sign Up') %}
+
+{% block header %}
+{% endblock header %}
+
+{% block globalfooter %}
+{% endblock globalfooter %}
+
+{% block style %}
+    <style>
+
+      .content { text-align: center;}
+
+      .wepolabel
+       {
+            display: inline-block;
+            background: #4c8ab0;
+            color:white;text-align:center;
+            margin-top:200px;
+            padding-left:  5px;
+            padding-right: 5px;
+       }
+
+       html, body, .wepo{background-color: #4c8ab0;}
+
+        #SU_submit{
+            -webkit-box-shadow: 0 8px 8px -7px green;
+            -moz-box-shadow: 0 8px 8px -7px green;
+            font-size: 19px;
+            background-color: #6ac965;
+            border-radius: 5px;
+            width: 302px;
+            color: white;
+            margin-top: 20px;
+            border: 1px transparent;
+            height: 39px;
+            cursor: pointer;
+        }
+
+        #SU_submit:hover{
+            border: 1px solid #a3e9a4;
+        }
+        #SU_submit:active{
+            border: 0px;
+            -webkit-box-shadow: 0 0px 0px 0px ;
+            -moz-box-shadow: 0 0px 0px 0px ;
+        }
+        #SU_login,#SU_password,#SU_password2,#SU_fname,#SU_lname,#SU_company:hover{cursor: pointer;}
+
+        #SU_login{
+            padding-left: 40px;
+            padding-right: 40px;
+            width: 220px;
+            font-size: 12px;
+            background-repeat: no-repeat;
+            background-position-x:10px;
+            background-position-y:13px;
+            border-radius: 2px;
+            height: 26px;
+            border: 1px solid white;
+        }
+        #SU_login:active{
+          padding-left: 40px;
+        }
+
+        #SU_login:focus
+        {
+            padding: 8px 10px;
+            box-shadow:0px 0px 6px 0px rgb(190, 214, 233);
+            padding-left: 40px;
+            padding-right:40px;
+            width: 220px;
+        }
+
+        #SU_company:focus
+        {
+            padding: 8px 10px;
+            box-shadow:0px 0px 6px 0px rgb(190, 214, 233);
+            padding-left: 40px;
+            padding-right:40px;
+            width: 220px;
+        }
+
+        #SU_password,#SU_password2,#SU_fname,#SU_lname,#SU_company{
+            padding-left: 40px;
+            padding-right: 40px;
+            width: 220px;
+            font-size: 12px;
+            border-radius: 2px;
+            margin-top: 20px;
+            height: 26px;
+            border: 1px solid white;
+        }
+
+        .winput
+        {
+            position: relative;
+        }
+
+        .placehold:focus::-webkit-input-placeholder {
+            opacity: 0;
+            transition: opacity 1.0s ease;
+        }
+        .placehold::-webkit-input-placeholder {
+            color:black;
+            font-size: larger;
+            opacity: 1;
+            transition: opacity 1.0s ease;
+        }
+        .placehold{
+            text-align: center;
+        }
+        .bord{
+             border: 1px solid #84b8db;
+             padding: 43px;
+             border-radius: 6px;
+             width: 297px;
+             margin: auto;
+             margin-top: -11px;
+             text-align: left;
+             }
+
+{#     @-webkit-keyframes 'shake'
+      {
+        0%{
+             -webkit-transform: translate(0px,0px);}
+        20%{
+             -webkit-transform: translate(-25px,0px);}
+        40%{
+             -webkit-transform: translate(25px,0px);}
+        60%{
+             -webkit-transform: translate(-25px,0px);}
+        80%{
+             -webkit-transform: translate(25px,0px);}
+       100%{
+             -webkit-transform: translate(0px,0px);}
+      }
+
+     @keyframes shakeit
+      {
+        0%{
+             transform: translate(0px,0px);}
+        20%{
+             transform: translate(-25px,0px);}
+        40%{
+             transform: translate(25px,0px);}
+        60%{
+             transform: translate(-25px,0px);}
+        80%{
+            transform: translate(25px,0px);}
+       100%{
+             transform: translate(0px,0px);}
+      }
+
+.animation
+{
+  -webkit-animation: 'shake' 0.35s ease-in-out 0s;
+  animation: shakeit 0.35s ease-in-out 0s;
+}#}
+
+     </style>
+{% endblock style %}
+
+
+{#{% block script %}
+ <script>
+
+    $(function(){
+      $('input').click(function(){
+        $('.shake_it').removeClass("animation");
+       });
+
+       $('#form').submit(
+           function(){
+               var result = false;
+                   $.ajax(
+                   {
+                       url:window.location.pathname,
+                       type: 'post',
+                       async: false,
+                       timeout: 3000,
+                       data: {
+                           'login' : $('#wepologin').val(),
+                           'password' : $('#wepopassword').val()
+                       },
+                       success: function(results) {
+
+                           result = results.good_credentials;
+
+                           if( results.good_credentials == false )
+                           {
+                               $('#wepopassword').val('');
+                               $('.shake_it').addClass("animation");
+                               $('#wepologin').css('border','1px solid red');
+                               $('#wepopassword').css('border','1px solid red');
+                               $('#weposubmit').attr('disabled',true);
+
+                            setTimeout(function(){
+                                 $('#wepologin').css('border','1px solid white');
+                                 $('#wepopassword').css('border','1px solid white');
+                                 $('#weposubmit').attr('disabled',false);
+                               },1300);
+                           }
+                           else{
+                               $('#weposubmit').prop('value','Signing in');
+                           }
+                       }
+                   }
+               )
+               return result;
+           }
+       )
+    });
+
+ </script>
+{% endblock script %}#}
+
+
+{% block content %}
+
+<div class = 'shake_it'>
+
+    <h3 class="wepolabel"><a href="/" class="imgTxt txtLogo"></a></h3>
+    <div class="bord">
+
+            {{ form().openTag(form)|raw }}
+
+            <table style="margin: auto;">
+                        <tr>
+                            <td>
+                                <div class="winput">
+                                    <input name="user[login]" type="email" id="SU_login" placeholder="Login(Email)" class="placehold" value="{{element.value}}" required="required" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="winput">
+                                  <input name="user[password]" type="password" id="SU_password" placeholder="Password" class="placehold" value="" required="required" />
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="winput">
+                                  <input name="user[password2]" type="password" id="SU_password2" placeholder="Confirm Password" class="placehold" value="" required="required" />
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="winput">
+                                  <input name="user[fname]" type="text" id="SU_fname" placeholder="First Name" class="placehold" value="" required="required" />
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="winput">
+                                  <input name="user[lname]" type="text" id="SU_lname" placeholder="Last Name" class="placehold" value="" required="required" />
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="winput">
+                                  <input name="company[company]" type="text" id="SU_company" placeholder="Company Name" class="placehold" value="" required="required" />
+                                </div>
+                            </td>
+                        </tr>
+
+                       <tr>
+                            <td>
+                                <input class="submitLink" type = "submit" value="Create" id="SU_submit"/>
+                            </td>
+                        </tr>
+
+
+                    <tr>
+                        <td>
+                            <br/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                            <td>
+                                <a style="color:#6bc784;float: right;" href="{{ url('common',{ 'data':'signin'})}}">Sign in</a>
+                            </td>
+                    </tr>
+
+            </table>
+
+            {{ form().closeTag(form)|raw }}
+    </div>
+</div>
+
+        <table style="margin: auto;">
+                <tr>
+                    <td>
+                        <br/>
+                          <br/>
+                            <br/>
+                        <span style="color:#e0ffff;font-size: small;"> &#169; {{ post.published_at|date("Y") }} by Wepo Inc. All rights reserved </span>
+                    </td>
+                </tr>
+        </table>
+
+{% endblock content %}

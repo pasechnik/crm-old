@@ -1,0 +1,436 @@
+{% block style %}
+  <style>
+      .ui-dialog-content{
+          height: auto !important;
+      }
+      .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons{
+          height: auto !important ;
+      }
+  </style>
+{% endblock style %}
+
+<script>
+
+    _thisurl = location.href;
+
+    $(function ()
+    {
+        //mail sync
+        $('a.btn-icon.sync').click(function (event)
+        {
+            event.preventDefault();
+            var link = $(this).attr('href');
+            startloader();
+            $.ajax({
+                url: link,
+                success: function (data, textStatus) {
+                    $('#refresh').trigger('click');
+                    stoploader();
+                },
+                error: function (data, textStatus) {
+                    $('#refresh').trigger('click');
+                    alert('Sorry, some problem with email sync happened. Ask administrator');
+                    stoploader();
+                }
+            });
+        });
+
+        $('#body').on("click", "#c_all", function ()
+        {
+            if ( $('div.checked', this).size() )
+            {
+                $('input.check').prop('checked', true);
+                $('div.checkboxArea').addClass('checked');
+                $('tr', "#tbody").addClass('checked');
+                $('#deletebtn,#restorebtn,#clearbtn,#massMail').removeClass('disabled');
+            }
+            else {
+                $('input.check').prop('checked', false);
+                $('div.checkboxArea').removeClass('checked');
+                $('tr', "#tbody").removeClass('checked');
+                $('#deletebtn,#restorebtn,#clearbtn,#massMail').addClass('disabled');
+            }
+        });
+
+        // search input animation
+        $('#titleSearchIcon').click(function () {
+            if ($('#titleSearch').is(':visible')) {
+                $('#titleSearch').stop().animate({
+                        width: '0px',
+                        height: '0px',
+                        opacity: 0
+                    }, 200, function () {
+                        $(this).hide();
+                    }
+                );
+            }
+            else {
+                $('#titleSearch').show(200,
+                    function () {
+                        $('#titleSearch').stop().animate({
+                            width: '220px',
+                            height: '31px',
+                            opacity: 1
+                        }, 200);
+                    }
+                );
+            }
+            return false;
+        });
+    });
+
+    $(function ()
+    {
+        $('#body').on("click", "div.alphabet a.ajax", function () {
+            $('div.alphabet a.ajax').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        $('#body').on("click", "a.ajax", function ()
+        {
+            var _target   = $(this).attr('ajax-target');
+            var _src      = $(this).attr('ajax-src');
+            var _location = $(this).attr('href');
+
+            if (_src.length) {
+                _src = ' ' + _src;
+            }
+
+            startloader();
+
+            $(_target).load(_location + _src, null, function () {
+                setCheckboxes();
+                stoploader();
+            });
+
+            _thisurl = _location;
+             return false;
+        });
+
+        $('#refresh').click(function ()
+        {
+            var _target   = $('a.ajax.active').attr('ajax-target');
+            var _location = $('a.ajax.active').attr('href');
+            var _src      = $('a.ajax.active').attr('ajax-src');
+
+            if (_src.length) {
+                _src = ' ' + _src;
+            }
+
+            startloader();
+
+            $(_target).load(_thisurl + _src, null, function () {
+                setCheckboxes();
+                stoploader();
+            });
+            return false;
+        });
+
+        $('#body').on("click", "a#deletebtn", function () {
+            apiDialog();
+        });
+
+        $('#body').on("click", "img.delete", function () {
+            window.id    = $(this).closest('tr').find('.check').val();
+            window.title = $(this).closest('tr').find('.d_title').text();
+            apiDialog('single');
+            return false;
+        });
+
+        $('#body').on("click", ".tooltip", function () {
+            return false;
+        });
+
+        $('#body').on("click", "img.convert", function (event)
+        {
+            event.preventDefault();
+            var Url   = $(this).closest('a').attr('href');
+            var name  = $(this).closest('tr').find('.d_title').text();
+            var model = '';
+            var    to = '';
+
+            if      ( $('form#deleteForm').attr('data-scope') == 'lead'  ) {to = 'Patient'; model = 'Lead: '}
+            else if ( $('form#deleteForm').attr('data-scope') == 'quote' ) {to = 'Order'  ; model = 'Quote: '}
+            else if ( $('form#deleteForm').attr('data-scope') == 'order' ) {to = 'Invoice'; model = 'Sales Order: '}
+
+
+            $(window).on("scroll resize",function()
+            {
+                $('.dialog-convert').dialog("option", "position", $('.dialog-convert').dialog("option", "position"));
+            });
+
+                $('.dialog-convert').dialog(
+                {
+                    open: function () {
+                        $('.dialog-convert').text('"' + model+ name + '" will be converted to '+ to);
+                        $('.ui-widget-overlay').addClass('custom-overlay');
+                    },
+
+                    close: function () {
+                        $('.ui-widget-overlay').removeClass('custom-overlay');
+                    },
+
+                    show: {effect: '', duration: 600, my: "top", at: "center", of: window},
+                    hide: {effect: '', duration: 400},
+                    title: "Do you want to convert ?",
+                    modal: true, width: '400',resizable: false, draggable: false, closeOnEscape: true,
+                    buttons:
+                    {
+                        Yes: function ()
+                        {
+                            startloader();
+
+                            $.ajax({
+                                url: Url,
+                                type: 'POST',
+                                traditional: true,
+                                data:{ object_id : 1 },
+                                success: function ()
+                                {
+                                    stoploader();
+                                    window.location.href = '/common/'+ to.toLowerCase() +'/index.html';
+                                },
+                                error: function() {
+                                    alert('An ERROR has occurred!');
+                                    location.reload();
+                                }
+                            });
+
+                            $(this).dialog("close");
+                        },
+                        No: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+        });
+
+        $("#body").on("click","#massMail",function()
+        {
+            var massMail = [];
+            var massTo   = [];
+
+            $("input[name='checkedid[]']:checked").each(function ()
+            {
+                var to = $(this).closest('tr').find('td').children("a[data-to]").attr('data-to');
+                if (to.length) {
+                   massMail.push('<option value='+to+'>'+to+'</option>');
+                   massTo.push(to);
+                }
+            });
+
+            $.extend(
+            {
+                redirectPost: function (location, args)
+                {
+                    var form = '';
+
+                    $.each(args, function (key, value) {
+                        form += '<input type="hidden" name="' + key + '" value="' + value + '">';
+                    });
+
+                    $('<form id="myForm" action="' + location + '" method="POST">' + form + '</form>').appendTo('body').submit();
+                }
+            });
+
+            $.redirectPost('/common/mail/send/index.html'+$('a.insert').attr('href').substr($('a.insert').attr('href').indexOf('?back')),{
+                'fields[to][]'      : massTo,
+                'fields[info_hide]' : massMail,
+                'fields[from_scope]': $('#deleteForm').attr('data-scope')
+            });
+        });
+    });
+</script>
+
+<div id="progress">Loading...</div>
+
+<div class="listtable">
+    <div class="title">
+        <div class="listtitle">
+
+            {% if 'detail' in modelname %}
+                <span class="icon_1"
+                      style="background-image: url(/css/img/icons/32x32-icons/product.png)"></span>
+            {% else %}
+                <span class="icon_1"
+                      style="background-image: url(/css/img/icons/32x32-icons/{{ modelname }}.png)"></span>
+            {% endif %}
+
+            <h1 class="{{ title|lower|replace(' ', '_') }}">
+                {{ title }}
+            </h1>
+        </div>
+        <div class="buttons">
+            {% if links %}
+                {% for icon_key, link in links %}
+                    <a class="btn-icon {{ icon_key }}"
+                       href="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">{{ translate(link.label) }}</a>
+                {% endfor %}
+            {% endif %}
+            <div id="titleSearch" class="titleSearch" style="">
+                <form class="search_form"
+                      action="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}"
+                      method="get" name="list_search">
+
+                    <input class="long_placehldr" type="text" name="q"
+                           value="{{ search_query }}"
+                           placeholder="Search in &quot;{{ title }}&quot;"/>
+
+                    <div class="searchico"></div>
+                </form>
+            </div>
+        </div>
+        {% if search_query %}
+            <div class="buttons" style="padding-left: 8px;">
+                <a href="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}">Show
+                    all records</a>
+            </div>
+        {% endif %}
+        <div
+            style='display: inline; font-size: larger; font-style: italic;color:#999999; vertical-align: super;'
+            id="letter"></div>
+        <div class="buttons right">
+            <a id="refresh" class="refresh btn-icon" href="">
+                {{ translate('Refresh') }}
+            </a>
+            {#<a class="choose btn-icon"#}
+            {#href="{{ url( 'common', { 'action': 'field', 'data':modelname, 'view':params.view }, { 'query': queryparams|merge({ 'back':saurlhash }) } ) }}">#}
+            {#{{ translate('Output fields') }}#}
+            {#</a>#}
+            {#{% if 'recyclelistAction' in actions_list %}#}
+            {#<a href="{{ url( null, { 'data': modelname, 'view': 'recyclelist' } )~saurl }}"#}
+            {#class="delete btn-icon">#}
+            {#{{ translate('Recycle') }}#}
+            {#</a>#}
+            {#{% endif %}#}
+        </div>
+    </div>
+    <div id="tableBody">
+        <form id="deleteForm"
+              action="{{ url( null, { 'data': modelname, 'view': 'delete' } )~saurl }}"
+              method="post"
+              name="checked"
+              data-scope={{ modelname }}>
+            <table id="data" class="data">
+                <thead>
+                <tr class="tableHeader">
+                    <th class="width_4p">
+                        {% if actions.delete or 'email' in fields  %}
+                            <div id="c_all" class="checkbox">
+                                <input type="checkbox" name="c_all_input"
+                                       value=""/>
+                            </div>
+                        {% endif %}
+                    </th>
+                    {% for value in fields %}
+                    <th class="{% if column.sort == value %}checked{% endif %}">
+                        <a href="{{ url( null, params|merge({ 'sort':value, 'desc':column.desc==0?1:0 }), { 'query': queryparams|merge({ 'back':saurlhash }) } ) }}">{{ attribute( labels, value ) }}</a>
+                        {#{ 'data': modelname, 'view': 'list','sort':value, 'desc':column.desc==0?1:0 } ) }}">{{ attribute( labels, value ) }}</a>#}
+                        {% if column.sort == value %}
+                            <span
+                                class="{{ column.desc!=0 ? 'down':'up' }}"></span>
+                        {% endif %}
+                    </th>
+                    {% endfor %}
+                    <th class="width_10p">Actions</th>
+                </tr>
+                </thead>
+                <tbody id="tbody">
+                {% for akey,avalue in paginator.getCurrentItems %}
+                    {% set record_acl = [] %}
+                    {% for aclByType in avalue._acl %}
+                        {% for item in aclByType.data %}
+                            {% if item not in record_acl %}
+                                {% set record_acl = record_acl|merge([item]) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    <tr>
+                        <td class="first_td">
+                            {% if actions.delete and 'delete' in record_acl or 'email' in fields  %}
+                                <div class="checkbox">
+                                    <input title="" type="checkbox"
+                                           name="checkedid[]"
+                                           id="{{ avalue.id() }}"
+                                           value="{{ avalue.id() }}"
+                                           class="check"/>
+                                </div>
+                            {% endif %}
+                        </td>
+                        {% for key in fields %}
+                            <td class="{% if column.sort == key %}checked{% endif %}">
+                                {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                            </td>
+                        {% endfor %}
+                        <td class="width_10p">
+                            {% for action, conf in actions %}
+                                {% if action != "delete" or action in record_acl %}
+                                    <a class="actionview"
+                                       href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(avalue, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                            src="/img/1.png"
+                                            class="{{ action }}"
+                                            alt="{{ action }}"/><span
+                                            class="tooltip top">{{ action|capitalize }}</span></a>&nbsp;
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="tableBottomToolbar">
+                <div class="buttons left">
+                    {% if 'email' in fields  %}
+                       <a id="massMail"
+                         class="send btn-icon disabled">{{ translate('Send for selected') }}</a>
+                    {% endif %}
+                    {% if actions.delete %}
+                        <a id="deletebtn"
+                           class="delete btn-icon disabled">{{ translate('Delete selected') }}</a>
+                    {% endif %}
+                </div>
+                <div class="buttons right">
+                    {% if paginator.count > 1 %}
+                        {% include 'partial/pagination.twig' with { 'pages':paginator.getPages, 'route': null, 'params':params } %}
+                    {% endif %}
+                </div>
+                <div class="buttons">
+                    {% if paginator.getTotalItemCount > 5 %}
+                        <div class="selectRows" id="selectRows">
+                            <div class="msg"><span>Rows on the page:</span>
+                            </div>
+                            {% for i in rows %}
+                                <a href="{{ url( null, { 'data': modelname, 'view': 'list' }, { 'query': queryparams | merge({ 'rowcount': i }) } ) }}"
+                                   class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div style="float: right; padding-top: 2px;" class="msg"
+                     id="total_count">
+                    {% if paginator.getTotalItemCount > 0 %}
+                        Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                    {% endif %}
+                </div>
+                <div class="alphabet">
+                    <a id="#All" ajax-src="#tableBody" ajax-target="#tableBody"
+                       class="ajax {% if not letter %}active{% endif %}"
+                       href="{{ url( null, params, { 'query': { 'back': back, 'q': search_query } } ) }}">All</a>
+                    {% for _letter in 'A'..'Z' %}
+                        <a id="#{{ _letter }}" ajax-src="#tableBody"
+                           ajax-target="#tableBody"
+                           class="ajax {% if letter == _letter %}active{% endif %}"
+                           href="{{ url( null, params, { 'query': { 'letter':_letter, 'back': back, 'q': search_query } } ) }}">{{ _letter }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="dialog-message"></div>
+<div class="dialog-convert"></div>
+
+<a align="center" id="scrollTop" href="#"
+   onclick="top.goTop();return false;"></a>

@@ -1,0 +1,22 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate(action|capitalize~' '~modelname~'(s)')  %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<h1>{{title}}</h1>
+    <div>
+        {% block message %}{{ translate('Are you sure that you want to '~action~' '~modelname~'(s)?')}}{% endblock message %}
+        {% for item in items %}
+            <p><b>"{{item.getName}}"</b></p>
+        {% endfor %}
+    </div>
+    <form action="{{ url( modelname, { 'action': action } ) }}" method="post">
+        <div>
+            <input type="hidden" name="eventtype" value="{{ eventtype }}" />
+            {% for id in ids %}
+                <input type="hidden" name="checkedid[]" value="{{ id }}" />
+            {% endfor %}
+            <input type="submit" name="delyes" value="{{ translate('Yes') }}" />
+            <input type="submit" name="delno" value="{{ translate('No') }}" />
+        </div>
+    </form>
+{% endblock content %}

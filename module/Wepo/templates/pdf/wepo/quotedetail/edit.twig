@@ -1,0 +1,20 @@
+{% extends 'partial/edit.twig' %}
+{% block upperform %}
+<div class="table">
+     <h2>{{ translate('Product : ') }} {{name}}</h2>
+        <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b>{{startprice}} $</b></span></h2>
+   <div class="hide">
+       <input type="text" name="price" id="price" value="{{price}}">
+    </div>
+</div>
+{% endblock upperform %}
+{% block style %}
+      {{parent()}}
+        <style type="text/css">
+                <!--
+                .hide {
+                    overflow:hidden;
+                    display: none;
+                }
+        </style>
+{% endblock style %}

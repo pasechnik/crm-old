@@ -1,0 +1,154 @@
+{% extends 'partial/add.twig' %}
+{% set title = translate('New '~modelname|capitalize) %}
+
+{% block script %}
+    <style>
+        div.dropdown-option img{display: none;}
+        div.dropdown-option:hover img{display: block; float: left; margin: 7px 7px 7px 0; max-height: 50px; max-width: 50px;}
+        span.email { font-style: italic;  color: #ccc;}
+    </style>
+    <div style="overflow:hidden; display: none;"><input type="hidden" id="company_id" value="{{mainuser.company_id}}"/></div>
+    <script>
+        var target_id = {{ target_id|json_encode|raw }};
+        var table_id = {{ table_id|json_encode|raw }};
+        var table_labels = {{ table_names|json_encode|raw }}
+        var select_target, $select_target;
+        var select_table;
+
+        $(function(){
+            {#var table_labels = {{ table_labels|json_encode|raw }}#}
+            $select_target = $("select[name='additional[target_id]']").selectize({
+                dropdownParent: 'body',
+                valueField: '_id',
+                labelField: 'title',
+                sortField: '_id',
+                searchField: 'title',
+                openOnFocus:true,
+                render: {
+                    item: function(item, escape){
+                        var result = escape(item.title);
+                        if(item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                            result = "My current lead";
+                        }
+                        return '<div>'+result+'</div>';
+                    },
+                    option: function(item, escape){
+                        {#                            console.log(item);#}
+                        var avatarsrc = '';
+                        var title = escape(item.title);
+                        var email = escape(item.email);
+//                        var onerror = window.location.protocol+'//'+window.location.host+'/link/public/img/'.concat($('input[checked="checked"]').parent().text(),'.jpg');
+                        var onerror = window.location.protocol+'//'+window.location.host+'/link/public/img/'.concat(table_labels[$("[name='additional[table_id]']:checked").val()],'.jpg');
+                        console.log(onerror);
+//                        console.log(table_labels[$("[name='additional[table_id]']:checked").val()]);
+                        if (item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                            title = "My current lead";
+                            email = "";
+                            avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/img/Lead.jpg';
+                            {#                                console.log(avatarsrc);#}
+                        }else
+                        if (
+                                typeof item.avatar !== 'undefined' &&
+                                item.avatar.toLowerCase() !== 'img/lead.jpg' &&
+                                item.avatar.toLowerCase() !== 'lead.jpg' &&
+                                item.avatar.toLowerCase() !== 'contact.jpg' &&
+                                item.avatar.toLowerCase() !== 'img/contact.png' &&
+                                item.avatar !== 'img/lead.png' &&
+                                item.avatar !== 'img/Contact.jpg'
+                        )
+                        {
+                            avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/'+ document.getElementById("company_id").value +'/Leads/'+ item.avatar;
+                        }else{
+                            avatarsrc = onerror;
+                        }
+                        return '<div class="dropdown-option">' +
+                                '<span>' +
+                                '<img style="dropdown-avatar" src="'+ avatarsrc +'"/>'+
+                                title+
+                                '</span>'+
+                                '<ul>'+
+                                '<li>'+ '<span class="email">' + email +'</span>' + '</li>' +
+                                {#                                            '<li>'+ '<span>' + '</span>' + '</li>' +#}
+                                '</ul>'+
+                                '</div>';
+                    }
+                }
+            });
+            select_target = $select_target[0].selectize;
+        });
+
+        $( function(){
+            setTargets();
+
+            $('div[id="uidadditional[table_id]"] label').eq(0).click( setTargets );
+            $('div[id="uidadditional[table_id]"] label').eq(1).click( setTargets );
+        });
+
+
+        function setTargets(){
+            $("label[for='idadditional[target_id]'] span").text($('input[checked="checked"]').parent().text());
+
+            select_target.clearOptions();
+            select_target.disable();
+            select_target.load(function(callback) {
+                $.ajax({
+                    url: '/api/v1/search/'.concat($('input[checked="checked"]').parent().text().toLowerCase()),
+                    type: 'POST',
+                    data:{
+                        'default[id]':'_id'
+                    },
+                    success: function(results) {
+                        select_target.clearOptions();
+                        select_target.enable();
+                        console.log(results);
+//                        console.log('/api/v1/search/'.concat($('input[checked="checked"]').parent().text().toLowerCase()));
+                        callback(results.data);
+                        if($("[name='additional[table_id]']:checked").val()==table_id)
+                        {
+                            select_target.setValue(target_id);
+                        }
+                        else
+                        {
+                            select_target.setValue(0);
+                        }
+                    },
+                    error: function() {
+                        callback();
+                    }
+                })
+            });
+            select_target.refreshItems();
+        }
+     </script>
+    {{parent()}}
+{% endblock script %}
+
+
+
+{% block additionalFieldset %}
+    <div class="table fieldset">
+        <h2>{{ fieldset.getLabel }}</h2>
+        <div class="form_info">* Required Field(s)</div>
+        <div class="form">
+            <div class="col">
+                {%for ekey, element in fieldset %}
+                    {% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}
+                        </div><div class="col">
+                    {% endif %}
+                <div class="input">
+                    <label for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}>
+                        <span class="splabel">{{ element.getLabel }}:</span>
+                    </label>
+                    <div class="{% if loop.index0 %}selectize-wrapper{% else %}radio{% endif %}" id="uid{{ element.getName }}" >
+                        {{ formElement(element) }}
+                    </div>
+                    <label for="id{{element.getName}}" class="error" style="display: {% if element.getMessages %}{%else%}none{% endif %};">{% for message in element.getMessages %}{{message}}{% endfor %}</label>
+                </div>
+                {% endfor %}
+{#                <div class="input">
+                    <label for="iderror" class="error">{{message}}</label>
+                </div>#}
+            </div>
+        </div>
+    </div>
+{% endblock additionalFieldset %}

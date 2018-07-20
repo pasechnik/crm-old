@@ -1,0 +1,7 @@
+{% extends 'partial/recyclelist.twig' %}
+
+{% set title = translate(modelLabel)~"s" %}
+
+{% block data %}
+    {% include 'partial/doctor-list.twig' %}
+{% endblock data %}

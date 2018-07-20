@@ -1,0 +1,30 @@
+{% if key == 'title' or key == 'subject' %}
+    <a href="{{ url( 'common', { 'data':'mailReceiveSetting', 'view':'view',  'id':avalue.id() }, { 'query': { 'back':saurlhash } } ) }}"><span class="d_title">{{ attribute(avalue, key) }}</span></a>
+{% elseif key == 'email' %}
+    <a href="{{ url( null, { 'action': 'view','id':avalue.id()} )~saurl }}" ><span class="d_title">{{ attribute(avalue, key) }}</span></a>
+{% elseif key == 'changer_id' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(avalue, 'changer_id')} )~saurl }}" >
+        {{ avalue.changerfname}}
+        {{ avalue.changerlname}}
+    </a>
+{% elseif key == 'owner_id' and attribute(avalue, 'owner_id') is not empty %}
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+{% elseif key == 'status_id' %}
+    {{ attribute(avalue, "status") }}
+{% elseif key == 'user_id' and attribute(avalue, 'user_id') is not empty %}
+{% elseif key == 'user_title' and attribute(avalue, 'user_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'user_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.user_title }}
+    </a>
+{% elseif key == 'contact' and attribute(avalue, 'contact_id') is not empty %}
+    <a href="{{ url( 'contact_id', { 'action': 'view','id':''~attribute(avalue, 'contact_id')} )~saurl }}" >{{ attribute(avalue, "contact") }}</a>
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}

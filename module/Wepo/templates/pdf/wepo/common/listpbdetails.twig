@@ -1,0 +1,524 @@
+{% block style %}
+    <style>
+        #data td.list_price{
+            transition: 0.7s;
+        }
+        .td_editing{
+            background : #eee !important ;
+            cursor: pointer !important;
+        }
+        .ui-dialog-content{
+            height: auto !important;
+        }
+        .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons{
+            height: auto !important ;
+        }
+
+        .dialog-form > input{
+            width: 290px !important;
+            height: 30px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 5px !important;
+            display: block;
+        }
+
+        .ui-button:first-of-type, .ui-button:last-of-type{
+            width: 73px !important;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+       <script>
+           _thisurl = location.href;
+
+           $(function ()
+           {
+               $('#body').on("click", "#c_all", function () {
+                   if ($('div.checked', this).size()) {
+                       $('input.check').prop('checked', true);
+                       $('div.checkboxArea').addClass('checked');
+                       $('tr', "#tbody").addClass('checked');
+                       $('#deletebtn, #restorebtn, #clearbtn').removeClass('disabled');
+                   }
+                   else {
+                       $('input.check').prop('checked', false);
+                       $('div.checkboxArea').removeClass('checked');
+                       $('tr', "#tbody").removeClass('checked');
+                       $('#deletebtn, #restorebtn, #clearbtn').addClass('disabled');
+                   }
+               });
+           });
+
+           //FOR DIALOG ACTIONS URL'S
+           restoreurl = "{{ url( null, { 'data':modelname, 'view': 'restore' } ) }}";
+           cleanurl   = "{{ url( null, { 'data':modelname, 'view': 'clean' } ) }}";
+           deleteurl  = "{{ url( null, { 'data':modelname, 'view': 'delete' } ) }}";
+
+           $(function () {
+               $('#body').on("click", "div.alphabet a.ajax", function () {
+                   $('div.alphabet a.ajax').removeClass('active');
+                   $(this).addClass('active');
+               });
+
+               $('#body').on("click", "a.ajax", function () {
+                   var _target = $(this).attr('ajax-target');
+                   var _src = $(this).attr('ajax-src');
+                   var _location = $(this).attr('href');
+
+                   if (_src.length) {
+                       _src = ' ' + _src;
+                   }
+
+                   startloader();
+
+                   $(_target).load(_location + _src, null, function () {
+                       stoploader();
+                       setCheckboxes();
+
+                       if ($('#tbody').find('#No_record').length) {
+                           $('#deletebtn').addClass('hidden');
+                       }
+                   });
+                   _thisurl = _location;
+                   return false;
+               });
+
+               $('#refresh').click(function () {
+                   var _target = $('a.ajax.active').attr('ajax-target');
+                   var _location = $('a.ajax.active').attr('href');
+                   var _src = $('a.ajax.active').attr('ajax-src');
+
+                   if (_src.length) {
+                       _src = ' ' + _src;
+                   }
+
+                   startloader();
+
+                   $(_target).load(_thisurl + _src, null, function () {
+                       stoploader();
+                       setCheckboxes();
+
+                       $('img.delete').each(function (){
+                           $(this).addClass('single_del'); //FOR DIALOG DELETING. REFRESH KNOKS DIALOGUE DELETE CLASS
+                       });
+                   });
+                   return false;
+               });
+
+               $('#body').on("click", "#deletebtn", function () {
+                   dialogfnct('delete');
+               });
+
+               $('#body').on("click", ".single_del", function () {
+                   single_action = true;
+                   title = $(this).closest('tr').find('.d_title').text();
+                   id = $(this).closest('tr').find('.check').val();
+                   dialogfnct('delete');
+                   return false;
+               });
+
+               $('#body').on("click", ".tooltip", function () {
+                   return false;
+               });
+
+               $('img.delete').each(function () {
+                   $(this).addClass('single_del');
+               });
+
+           });
+       </script>
+
+       <script>
+           $(function () {
+               $('select.select2_details').each(function (index)
+               {
+                   var scope = $(this).attr('data-scope');
+                   $(this).select2(
+                           {
+                               ajax: {
+                                   url: '/api/v2/data/'+scope,
+                                   dataType: 'json',
+                                   delay: 250,
+                                   data: function (params) {
+                                       return {
+                                           q: params.term, // search term
+                                           p: params.page
+                                       };
+                                   },
+                                   processResults: function (data, params) {
+                                       params.page = params.page || 1;
+
+                                       return {
+                                           results: data.data,
+                                           pagination: {
+                                               more: (params.page * 10) < data.count
+                                           }
+                                       };
+                                   },
+                                   cache: true
+                               },
+                               minimumInputLength: 1,
+                               templateResult: function (item) {
+                                   if (item.loading) return item.text;
+                                   if (item.price == ''){
+                                       item.price = '0.00'
+                                   }
+                                   return item.title +' '+'$'+item.price;
+                               },
+                               templateSelection: function (item) {
+                                   $('input.form_listPrice').val(item.price);
+                                   return item.title || item.text;
+                               }
+                           }
+                   );
+               });
+               $('select.static-select2').select2(
+                       { minimumResultsForSearch: 5 }
+               );
+               $('.select2-selection').click(function()
+               {
+                   $('.select2-search__field').focus();
+               });
+           });
+
+           Number.prototype.formatMoney = function(c, d, t){
+               var n = this,
+                       c = isNaN(c = Math.abs(c)) ? 2 : c,
+                       d = d == undefined ? "." : d,
+                       t = t == undefined ? "," : t,
+                       s = n < 0 ? "-" : "",
+                       i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                       j = (j = i.length) > 3 ? j % 3 : 0;
+               return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+           };
+
+           $(function()
+           {
+
+               $('body').on('mouseenter',"#data td.list_price",function()
+               {
+                   if ($('td.width_10p').find('img.update').length) {
+                       $(this).addClass('td_editing');
+                   }
+               });
+
+               $('body').on('mouseleave',"#data td.list_price",function()
+               {
+                   if ($('td.width_10p').find('img.update').length) {
+                       $(this).removeClass('td_editing');
+                   }
+               });
+
+               $('body').on("click","#data td.list_price",function()
+               {
+                   if ($('td.width_10p').find('img.update').length)
+                   {
+                       $(this).attr('contentEditable', true).focus();
+                       $(this).css({'background': '#eee '});
+
+                       window.oldTotal = $(this).closest('tr').find('td.total').text();
+                       window.oldTotal = window.oldTotal.replace(/[$,]/g, '');
+                   }
+               });
+
+               $(document).on("blur","#data td.list_price",function(event)
+               {
+                   if ($('td.width_10p').find('img.update').length)
+                   {
+                       $(this).css({'background': 'none'});
+
+    //count list price
+                       var lPrice = $(this).closest('tr').find('td.list_price').text();
+                       lPrice = lPrice.replace(/[$,]/g, '');
+    //end count list price
+
+                       var editUrl = $(event.target).closest('tr').find('a.actionview').eq(1).attr('href'); //URL
+                       editUrl = editUrl.substring(0, editUrl.indexOf('?'));
+
+                       var target = $(event.target).attr('class');
+                       var field = $(event.target).closest('tr').find('.' + target).text();
+                       field = field = field.replace(/[$,]/g, '');
+
+                       $(document).ajaxStart(function () {
+                           startloader();
+                       });
+
+                       var data = {};
+                       data['fields[' + target + ']'] = field;
+
+                       var request = $.ajax(
+                               {
+                                   url: editUrl,
+                                   type: 'POST',
+                                   traditional: true,
+                                   data: data,
+                                   success: function () {
+                                       stoploader();
+                                   },
+                                   error: function () {
+                                       alert('An ERROR has occurred');
+                                       location.reload();
+                                   }
+                               });
+                     }
+               });
+
+           });
+
+
+           $(function()
+           {
+               $('a.insert').click(function(e)
+               {
+                   e.preventDefault();
+                   var formUrl = $(this).attr('href');
+
+
+                   $('.dialog-form').removeClass('hidden');
+                   $('.dialog-form').dialog(
+                   {
+                       open: function ()
+                       {
+                           stoploader();
+                           $('.dialog-form input').val('');
+                           $('.ui-widget-overlay').addClass('custom-overlay');
+                           $(window).on('scroll resize',function(){
+                               $('.dialog-form').dialog("option", "position", $('.dialog-form').dialog("option", "position"));
+                           });
+
+                       },
+                       close: function(){
+                           $( '.ui-widget-overlay' ).removeClass('custom-overlay');
+                       },
+
+                       show: { effect: '', duration: 600, my: "top", at: "center", of: window },
+                       hide: { effect: '', duration: 400 },
+                       title: "Do you want to add new item ?",
+                       modal:false, width: '355', resizable: false, draggable: false,closeOnEscape: false,
+                       buttons:
+                       {
+                           Save : function ()
+                           {
+                               startloader();
+                               var form_list_price = $('input.form_listPrice').val();
+                                   form_list_price = form_list_price.replace(/[$,]/g, '');
+
+                               var product_id = $('.select2_details option:last').attr('value');
+
+                               $.ajax({
+                                   url: formUrl,
+                                   type: 'POST',
+                                   traditional: true,
+                                   data: {
+                                        'fields[product_id]' :  product_id,
+                                        'fields[list_price]' :  form_list_price
+                                   },
+                                   success: function ()
+                                   {
+                                       $('#tableBody').load(location.href + " #tableBody", null, function () {
+                                           stoploader();
+                                       });
+                                   },
+                                   error: function(){
+                                       alert('An ERROR has occurred');
+                                       location.reload();
+                                   }
+                               });
+
+                               $(document).ajaxComplete(function(){
+                                   setCheckboxes();
+                                   $('img.delete').each(function () {
+                                       $(this).addClass('single_del');
+                                   });
+                               });
+
+                               $(this).dialog("close");
+                               $('span.select2-selection__rendered').text('');
+                           },
+                           Cancel : function ()
+                           {
+                               $(this).dialog("close");
+                               $('span.select2-selection__rendered').text('');
+                           }
+                       }
+                   });
+               });
+           });
+       </script>
+   {% endblock script %}
+
+
+<div class="listtable">
+    <div class="title">
+
+        <div class="listtitle">
+
+            {# title #}
+            <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/product.png)"></span>
+            <h1 class="{{ title|lower|replace(' ', '_') }}">{{ title }}</h1>
+
+        </div>
+
+        <div class="buttons">
+
+            {# links #}
+
+            {# search form #}
+            <div id="titleSearch" class="titleSearch">
+                <form class="search_form" action="{{ url( null, viewboxparams|removeKey( [ 'q', 'p' ] ), { 'query': queryparams|merge( { 'back': saurlhash } ) } ) }}" method="get" name="list_search">
+                    <input class="long_placehldr" type="text" name="q" value="{{ search_query }}"
+                           placeholder="Search in &quot;{{ title }}&quot;"/>
+
+                    <div class="searchico"></div>
+                </form>
+            </div>
+
+        </div>
+
+        {# clear filters q or letter #}
+        {% if search_query or letter %}
+            <div class="buttons" style="padding-left: 8px;">
+                <a href="{{ url( null, viewboxparams|removeKey( [ 'q', 'p' ] ), { 'query': queryparams|removeKey( [ 'letter', 'p', 'q' ] )|merge( { 'back': saurlhash } ) } ) }}">Show all records</a>
+            </div>
+        {% endif %}
+
+        <div style='display: inline; font-size: larger; font-style: italic;color:#999999; vertical-align: super;'
+             id="letter"></div>
+
+        <div class="buttons right">
+            <a id="refresh" class="refresh btn-icon" href="">{{ translate('Refresh') }}</a>
+
+            {#<a class="choose btn-icon"#}
+               {#href="{{ url( 'common', { 'action': 'field', 'view':'list', 'data':modelname }, { 'query': queryparams|merge({ 'back':saurlhash }) } ) }}">#}
+                {#{{ translate('Output fields') }}#}
+            {#</a>#}
+        </div>
+    </div>
+    <div id="tableBody">
+        <form id="deleteForm" action="{{ url( null, { 'data': modelname, 'view': 'delete' } )~saurl }}"
+              method="post"
+              name="checked">
+            <table id="data" class="data">
+                <thead>
+                <tr class="tableHeader">
+                    <th class="width_4p">
+                        {% if actions.delete %}
+                        <div id="c_all" class="checkbox">
+                            <input type="checkbox" name="c_all_input" value=""/>
+                        </div>
+                        {% endif %}
+                    </th>
+                    {% block sortUrlConstruction %}
+                        {% for value in fields %}
+                            <th class="{% if column.sort == value %}checked{% endif %}">
+                                <a href="{{ url( null, viewboxparams|merge({ 'sort':value, 'desc':column.desc==0?1:0 }), { 'query': queryparams } ) }}">{{ attribute( labels, value ) }}</a>
+                                {% if column.sort == value %}
+                                    <span class="{{ column.desc != 0 ? 'down':'up' }}"></span>
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                    {% endblock sortUrlConstruction %}
+                    {% if actions is not empty %}
+                        <th class="width_10p">Actions</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody id="tbody">
+                {% for akey,avalue in paginator.getCurrentItems %}
+                    {% set record_acl = [] %}
+                    {% for aclByType in avalue._acl %}
+                        {% for item in aclByType.data %}
+                            {% if item not in record_acl %}
+                                {% set record_acl = record_acl|merge([item]) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    <tr>
+                        <td class="first_td">
+                            {% if actions.delete and 'delete' in record_acl %}
+                            <div class="checkbox">
+                                <input title="" type="checkbox" name="checkedid[]" id="{{ avalue.id() }}"
+                                       value="{{ avalue.id() }}" class="check"/>
+                            </div>
+                            {% endif %}
+                        </td>
+                        {% for key in fields %}
+                            <td class="{% if column.sort == value %}checked{% endif %}{{ key }}">
+                                {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                            </td>
+                        {% endfor %}
+                        {% if actions is not empty %}
+                        <td class="width_10p">
+                            {% for action, conf in actions %}
+                                <a class="actionview"
+                                   href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(avalue, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                        src="/img/1.png" class="{{ action }}" alt="{{ action }}"/><span
+                                        class="tooltip top">{{ action|capitalize }}</span></a>&nbsp;
+                            {% endfor %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="tableBottomToolbar">
+                <div class="buttons left">
+                    {% if actions.delete %}
+                        <a id="deletebtn" class="delete btn-icon disabled">{{ translate('Delete selected') }}</a>
+                    {% endif %}
+                </div>
+
+                <div class="buttons right">
+                    {% if paginator.count > 1 %}
+                        {% include 'partial/pagination.twig' with { 'pages':paginator.getPages, 'route': null, 'params':viewboxparams } %}
+                    {% endif %}
+                </div>
+
+                <div class="buttons">
+
+                    {% if paginator.getTotalItemCount > 5 %}
+                        <div class="selectRows" id="selectRows">
+                            <div class="msg"><span>Rows on the page:</span>
+                            </div>
+                            {% for i in rows %}
+                                <a href="{{ url( null, viewboxparams, { 'query': queryparams | merge({ 'rowcount': i }) } ) }}"
+                                   class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <div style="float: right; padding-top: 2px;" class="msg" id="total_count">
+                    {% if paginator.getTotalItemCount > 0 %}
+                        Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                    {% endif %}
+                </div>
+
+                <div class="alphabet">
+                    <a id="#All" ajax-src="#tableBody" ajax-target="#tableBody"
+                       class="ajax {% if not letter %}active{% endif %}"
+                       href="{{ url( null, viewboxparams|removeKey( [ 'p' ] ), { 'query': queryparams|removeKey( [ 'letter', 'p' ] )|merge( { 'back': saurlhash } ) } ) }}">All</a>
+                    {% for _letter in 'A'..'Z' %}
+                        <a id="#{{ _letter }}" ajax-src="#tableBody" ajax-target="#tableBody"
+                           class="ajax {% if letter == _letter %}active{% endif %}"
+                           href="{{ url( null, viewboxparams, { 'query': { 'letter':_letter, 'back': saurlhash, 'q': search_query } } ) }}">{{ _letter }}</a>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="dialog-message"></div>
+
+<div class="dialog-form hidden">
+
+    <select class="select2_details" data-scope="product"></select>
+    <input  type="text" class="form_listPrice long_placehldr" placeholder="List Price" />
+
+</div>

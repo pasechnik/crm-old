@@ -1,0 +1,300 @@
+{% extends 'partial/add.twig' %}
+
+{% block script %}
+    {{parent()}}
+    <style>
+        div.dropdown-option img{display: none;}
+        div.dropdown-option:hover img{display: block; float: left; margin: 7px 7px 7px 0; max-height: 50px; max-width: 50px;}
+        span.email { font-style: italic;  color: #ccc;}
+    </style>
+    <div style="overflow:hidden; display: none;"><input type="hidden" id="company_id" value="{{mainuser.company_id}}"/></div>
+<script>
+    $( function() {
+        $('#img').error(function() {
+            $(this).attr({
+                style:'display: none;'
+            });
+        });
+        $('#attach_lead').selectize({
+                    plugins: ['remove_button'],
+                    delimiter: ',',
+                    valueField: '_id',
+                    labelField: 'title',
+                    searchField: 'title',
+                    dataAttr: 'data-data',
+                    hideSelected: true,
+                    dropdownParent:'body',
+                    openOnFocus:true,
+                    preload:true,
+                    onInitialize: function (){
+{#                        console.log($('#attach_lead').val());#}
+                    },
+                    render: {
+                        item: function(item, escape){
+                            var result = escape(item.title);
+                            if(item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                                result = "My current lead";
+                            }
+                           return '<div>'+result+'</div>';
+                        },
+                        option: function(item, escape){
+{#                            console.log(item);#}
+                            var avatarsrc = '';
+                            var title = escape(item.title);
+                            var email = escape(item.email);
+                            var onerror = window.location.protocol+'//'+window.location.host+'/link/public/img/Lead.jpg';
+                            if (item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                                title = "My current lead";
+                                email = "";
+                                avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/img/Lead.jpg';
+{#                                console.log(avatarsrc);#}
+                            }else
+                            if (item.avatar !== 'img/Lead.jpg' && item.avatar !== 'Lead.jpg' && item.avatar !== 'lead.jpg' && item.avatar !== 'img/lead.png')
+                            {
+                                avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/'+ document.getElementById("company_id").value +'/Leads/'+ item.avatar;
+                            }else{
+                                avatarsrc = onerror;
+                            }
+                        return '<div class="dropdown-option">' +
+                                        '<span>' +
+                                            '<img style="dropdown-avatar" src="'+ avatarsrc +'"/>'+
+                                            title+
+                                        '</span>'+
+                                        '<ul>'+
+                                            '<li>'+ '<span class="email">' + email +'</span>' + '</li>' +
+{#                                            '<li>'+ '<span>' + '</span>' + '</li>' +#}
+                                        '</ul>'+
+                                '</div>';
+                        }
+                    },
+                    load: function (query, callback) {
+                        $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/select2-spinner.gif)');
+                        $('div.selectize-input', '.multi').css('background-position', '7px 7px');
+                        $.ajax({
+                            url: '/api/v1/search/lead',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {
+                                q: query
+                            },
+                            error: function () {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback();
+                            },
+                            success: function (res) {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback(res.data);
+                                {#for (var key in res.data) {
+                                    var val = res.data [key];
+                                      console.log(val);
+                                }#}
+                            }
+                        });
+                    }
+                });
+         $('#attach_contact').selectize({
+                    plugins: ['remove_button'],
+                    delimiter: ',',
+                    valueField: '_id',
+                    labelField: 'title',
+                    searchField: 'title',
+                    hideSelected: true,
+                    dropdownParent:'body',
+                    openOnFocus:true,
+                    preload:true,
+                    render: {
+                        item: function(item, escape){
+                            var result = escape(item.title);
+                            if(item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                                result = "My current contact";
+                            }
+                           return '<div>'+result+'</div>';
+                        },
+                        option: function(item, escape){
+                            var avatarsrc = '';
+                            var title = escape(item.title);
+                            var email = escape(item.email);
+                            var onerror = window.location.protocol+'//'+window.location.host+'/link/public/img/Contact.jpg';
+                            if (item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                                avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/img/Contact.jpg';
+                                title = "My current contact";
+                                email = "";
+{#                                console.log(avatarsrc);#}
+                            } else if (item.avatar !== 'img/Contact.jpg' && item.avatar !== 'Contact.jpg' && item.avatar !== 'contact.jpg' && item.avatar !== 'img/contact.png'){
+                                avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/'+ document.getElementById("company_id").value +'/Leads/'+ item.avatar;
+                            }else{
+                                avatarsrc = onerror;
+                            }
+                        return '<div class="dropdown-option">' +
+                                        '<span>' +
+                                            '<img style="dropdown-avatar" src="'+ avatarsrc +'"/>'+
+                                            title+
+                                        '</span>'+
+                                        '<ul>'+
+                                            '<li>'+ '<span class="email">' + email +'</span>' + '</li>' +
+{#                                            '<li>'+ '<span>' + '</span>' + '</li>' +#}
+                                        '</ul>'+
+                                '</div>';
+                        }
+                    },
+                    load: function (query, callback) {
+                        $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/select2-spinner.gif)');
+                        $('div.selectize-input', '.multi').css('background-position', '7px 7px');
+                        $.ajax({
+                            url: '/api/v1/search/contact',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {
+                                q: query
+                            },
+                            error: function () {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback();
+                            },
+                            success: function (res) {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback(res.data);
+                                {#for (var key in res.data) {
+                                    var val = res.data [key];
+                                      console.log(val);
+                                }#}
+                            }
+                        });
+                    }
+                });
+         $('#attach_user').selectize({
+                    plugins: ['remove_button'],
+                    delimiter: ',',
+                    valueField: '_id',
+                    labelField: 'title',
+                    searchField: 'title',
+                    hideSelected: true,
+                    dropdownParent:'body',
+                    openOnFocus:true,
+                    preload:true,
+                    render: {
+                        item: function(item, escape){
+                            var result = escape(item.title);
+                            if(item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                                result = "My current user";
+                            }
+                           return '<div>'+result+'</div>';
+                        },
+                        option: function(item, escape){
+                            var avatarsrc = '';
+                            var title = escape(item.title);
+                            var email = escape(item.login);
+                            if (item.title.match(/[0-9a-f]{24}/) && item.title === item._id){
+                                title = "My current user";
+                                email = "";
+                                avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/img/User.jpg';
+{#                                console.log(avatarsrc);#}
+                            }else
+                            if (item.avatar !== 'img/User.jpg' && item.avatar !== 'User.jpg' && item.avatar !== 'user.jpg' && item.avatar !== 'img/user.png')
+                            {
+                                avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/'+ item.company_id +'/'+ item._id +'/'+ item.avatar;
+                            }else{
+                                avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/img/User.jpg';
+                            }
+                        return '<div class="dropdown-option">' +
+                                        '<span>' +
+                                            '<img style="dropdown-avatar" src="'+ avatarsrc +'"/>'+
+                                            title+
+                                        '</span>'+
+                                        '<ul>'+
+                                            '<li>'+ '<span class="email">' + email +'</span>' + '</li>' +
+{#                                            '<li>'+ '<span>' + '</span>' + '</li>' +#}
+                                        '</ul>'+
+                                '</div>';
+                        }
+                    },
+                    load: function (query, callback) {
+                        $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/select2-spinner.gif)');
+                        $('div.selectize-input', '.multi').css('background-position', '7px 7px');
+                        $.ajax({
+                            url: '/api/v1/search/user',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {
+                                q: query
+                            },
+                            error: function () {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback();
+                            },
+                            success: function (res) {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback(res.data);
+                            }
+                        });
+                    }
+
+                });
+       {# $( 'div[id="uidattach[table_id]"] label' ).eq( 0 ).click( setLead );
+        $( 'div[id="uidattach[table_id]"] label' ).eq( 1 ).click( setContact );
+        $( 'div[id="uidattach[table_id]"] label' ).eq( 2 ).click( setMe );#}
+        $( 'div[id="uidattach[table_id]"] label' ).change( 'keyup', updateTargetArray );
+
+    } );
+
+
+   {# function setLead() {
+        $( "label[for='idattach[target_id]'] span" ).text( 'Lead:' );
+    }
+
+    function setMe() {
+        $( "label[for='idattach[target_id]'] span" ).text( 'Me:' );
+    }
+
+
+    function setContact() {
+        $( "label[for='idattach[target_id]'] span" ).text( 'Contact:' );
+    }#}
+
+
+    function updateTargetArray()
+    {
+        var target;
+        var form;
+
+        target = $( 'select[name="attach[target_id]"]' );
+        target.val( '0' );
+        target.change();
+
+        form = document.getElementById( "form" );
+        form.submit();
+    }
+</script>
+{% endblock script %}
+
+{% block additionalFieldset %}
+<div class="table">
+    <h2>{{ fieldset.getLabel }}</h2>
+    <div class="form_info">* Required Field(s)</div>
+    <div class="form">
+        <div class="col">
+                {%for ekey, element in fieldset %}
+                {% if ekey == fieldset|length//2 - 1 and fieldset|length > 2 %}
+        </div>
+        <div class="col">
+                {%endif%}
+            <div class="input">
+                <label for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}>
+                    <span class="splabel">{{ element.getLabel }}:</span>
+                </label>
+                <div class="selectize-wrapper" id="uid{{ element.getName }}" >
+                        {{ formElement(element) }}
+                </div>
+                <label for="id{{element.getName}}" class="error" style="display: {% if element.getMessages %}{%else%}none{% endif %};">{% for message in element.getMessages %}{{message}}{% endfor %}</label>
+            </div>
+                {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock additionalFieldset %}

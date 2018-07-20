@@ -1,0 +1,74 @@
+{% extends 'partial/edit.twig' %}
+{#{% extends 'layout/layout.twig' %}#}
+    {% set title = translate('Convert to patient') %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{#{% block content %}
+<h1>{{title}}</h1>
+<div class="rselect">
+<label><input name="view" type="radio" value="hide" onClick="test(false);" checked><span>Add new client</span></label>
+<label><input name="view" type="radio" value="view" onClick="test(true);"><span>Choose exist client</span></label>
+</div>
+<div class="wform">
+    <div id="test" class="d">
+        <label>
+            <span>Client</span>
+                <select name="client_id" value="">
+                    {% for key,value in client_ids %}
+                        <option value={{key}}>{{value}}</option>
+                    {% endfor %}
+                </select>
+        </label>
+    </div>
+    {{form().openTag(form)|raw}}
+    {{formCollection(form)}}
+    {{form().closeTag(form)|raw}}
+</div>
+<div>{{message}}</div>
+            <a href="{{saurlback}}">{{translate('Back')}}</a><br/>
+            <a href="{{ url( 'lead', { 'action': 'list' } ) }}">{{translate('Back to lead profiles')}}</a>
+{% endblock content %}#}
+{% block script %}
+      {{parent()}}
+    <script>
+          $( function(){
+            $('#client_id').change( PutAccount );
+          });
+
+          function PutAccount()
+          {
+{#              var client_id = document.getElementById('client_id');#}
+            var id = $('#client_id option:selected').val();
+//              if (id !== "rrrrrrrrrrrrrrrrrrrrrrrr" )
+              if (id !== "0" )
+              {
+                  document.getElementById('account').disabled = true;
+{#                  document.getElementById('account').value = client_id.options[client_id.selectedIndex].text();#}
+                  var value = $('#client_id option:selected').text();
+                  if ( value === '')
+                  {
+                      value = $('#client_id')[0].selectize.getOption(id).text();
+                  }
+                  document.getElementById('account').value = value;
+
+              }
+              else
+              {
+                  document.getElementById('account').disabled = false;
+                  document.getElementById('account').value ="";
+{#                  document.getElementById('account').value ="";#}
+              }
+          }
+    </script>
+{% endblock script %}
+{% block style %}
+      {{parent()}}
+    <style type="text/css">
+            <!--
+            .d {
+                overflow:hidden;
+                display: none;
+            }
+    </style>
+{% endblock style %}

@@ -1,0 +1,120 @@
+<!-- Testosterone Program Invoice -->
+
+<table style="background: none repeat scroll 0% 0% rgb(255, 255, 255); padding: 2px;" border="0" cellpadding="0"
+       cellspacing="0" width="100%">
+    <tbody>
+    <tr>
+        <td>
+            <table style="padding: 10px; background-color: rgb(255, 255, 255);" border="0" cellpadding="0"
+                   cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td style="border: 2px solid rgb(232, 232, 232); color: rgb(0, 0, 0);" valign="top"
+                                    width="50%">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="2"><strong>Patient Information:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="top"> Date:<br> Name:<br> License:<br> Social:<br>
+                                                Allergies:<br> Address:<br> City/St/Zip:<br> Phone:
+                                            </td>
+                                            <td align="left" valign="top"> ${SalesOrders.Due Date}<br>
+                                                ${Accounts.Account Name}<br> ${Contacts.Drivers License}<br>
+                                                ${Contacts.Social Security}<br> ${Contacts.Allergies}<br>
+                                                ${SalesOrders.Billing Street}<br> ${SalesOrders.Billing City},&nbsp;${SalesOrders.Billing
+                                                State},&nbsp;${SalesOrders.Billing Country},&nbsp;${SalesOrders.Billing
+                                                Code}<br> ${Contacts.Phone}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><strong><br> Billing Info:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="top"> Name:<br> Address:<br> City/St/Zip:</td>
+                                            <td align="left" valign="top"> ${Accounts.Account Name}<br>
+                                                ${SalesOrders.Billing Street}<br> ${SalesOrders.Billing City},&nbsp;${SalesOrders.Billing
+                                                State},&nbsp;${SalesOrders.Billing Country},&nbsp;${SalesOrders.Billing
+                                                Code}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="border: 2px solid rgb(232, 232, 232); color: rgb(0, 0, 0);" valign="top"
+                                    width="50%">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="2"><strong>Patient Detail:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top"> Doctor:<br> Consultant:<br> Gender:<br> DOB:<br> Email:
+                                            </td>
+                                            <td valign="top">${Contacts.Name}<br> ${Contacts.Consultant}<br>
+                                                ${Contacts.Gender}<br> ${Contacts.Date of Birth}<br> ${Contacts.Email}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br> <br>
+                        <table
+                            style="font-family: Arial,Helvetica,sans-serif; font-size: 11px; color: rgb(0, 0, 0); border-collapse: collapse;"
+                            border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(234, 234, 234); border-top: 2px solid gray; width: 115px;"
+                                    align="center">Qty
+                                </td>
+                                <td style="font-weight: bold; background-color: rgb(234, 234, 234); border-top: 2px solid gray;"
+                                    align="center">Products
+                                </td>
+                                <td colspan="2"
+                                    style="font-weight: bold; background-color: rgb(234, 234, 234); border-top: 2px solid gray; width: 100px;"
+                                    align="center">Total W
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody id="lineItem">
+                            <tr>
+                                <td style="border: 1px solid rgb(0, 0, 0);" align="center" valign="top">
+                                    ${SalesOrders.Qty}
+                                </td>
+                                <td style="border: 1px solid rgb(0, 0, 0);"><b>${Products.Product Name}</b></td>
+                                <td colspan="2" style="border: 1px solid rgb(0, 0, 0);" align="center"
+                                    valign="top"></td>
+                            </tr>
+                            </tbody>
+                            <tbody>
+                            <tr>
+                                <td rowspan="2" style="border: 1px solid rgb(0, 0, 0);" align="center"><b>SHIP
+                                        INST.:</b><b></b></td>
+                                <td rowspan="2" style="border: 1px solid rgb(0, 0, 0);" align="left">
+                                    ${SalesOrders.Description}
+                                </td>
+                                <td colspan="2" style="border: 1px solid rgb(0, 0, 0);" align="center">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid rgb(0, 0, 0);" align="center">TOTAL</td>
+                                <td style="border: 1px solid rgb(0, 0, 0); background-color: rgb(255, 204, 153);"
+                                    align="center"><b>${SalesOrders.Grand Total}</b></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>

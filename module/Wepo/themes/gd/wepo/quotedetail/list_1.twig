@@ -1,0 +1,93 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Quote')~': '~quote.subject %}
+
+{% block right_top_links %}
+        <div style = "float: right; margin:0 0 0 12px;">
+            <div  class="buttons clearfix" >
+                {% if saurlback !='/' %}
+                    <a href="{{ saurlback }}">{{ translate('Cancel') }}</a>
+                {% else %}
+                    <a href="{{ url( 'quote', { 'action': 'list' } ) }}">{{translate('Cancel')}}</a>
+                {% endif %}
+            </div>
+        </div>
+{% endblock right_top_links %}
+
+{% block link %}
+    <a href="{{ url( 'quote', { 'action': 'edit', 'id': quote.id()} )~saurl }}">{{translate('Edit quote')}}</a>
+    <a href="{{ url( 'quotedetail', { 'action': 'add', 'quoteid': quote.id()} )~saurl }}">{{translate('Add new product')}}</a>
+    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">{{translate('Choose output fields')}}</a>
+    <a href="{{ url( 'quote', { 'action': 'order', 'id': quote.id()} )~saurl }}">{{translate('Convert to order')}}</a>
+{% endblock link %}
+
+{% block uppertable %}
+    <div>
+        <table>
+            <thead>
+                <tr>
+                   <th colspan="2">
+                       {{translate('Quote info:')}}
+                   </th>
+               </tr>
+            </thead>
+            {% for key, value in quote.toView %}
+               {%if key != 'id' %}
+               <tr>
+                   <th>&nbsp&nbsp{{field_labels[key]}}</th>
+                    {% if key == 'owner'%}
+                        {% if quote.owner_id is not empty %}
+                            <td><a href="{{ url( 'user', { 'action': 'view','id':''~quote.owner_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                        {% else %}
+                            <td>&nbsp;&nbsp;{{value}}</td>
+                        {%endif%}
+                    {% elseif key == 'pricebook'%}
+                        {% if quote.pricebook_id is not empty %}
+                            <td><a href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~quote.pricebook_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                        {% else %}
+                            <td>&nbsp;&nbsp;{{value}}</td>
+                        {%endif%}
+                    {% elseif key == 'contact'%}
+                        {%if quote.contact_id is not empty %}
+                            <td><a href="{{ url( 'contact', { 'action': 'view','id':''~quote.contact_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                        {%else%}
+                            <td>&nbsp;&nbsp;{{value}}</td>
+                        {%endif%}
+                    {% elseif key == 'changer'%}
+                        {%if quote.changer_id is not empty %}
+                            <td><a href="{{ url( 'user', { 'action': 'view','id':''~quote.changer_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                        {%else%}
+                            <td>&nbsp;&nbsp;{{value}}</td>
+                        {%endif%}
+                    {% else %}
+                        <td>&nbsp;&nbsp;{{value}}</td>
+                    {% endif %}
+               </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+        <br/>
+    </div>
+{% endblock uppertable %}
+
+{% block data %}
+    {% if key == 'product' %}
+        {% if attribute(avalue, 'product_id') is not empty %}
+            <a href="{{ url( 'product', { 'action': 'view','id':''~attribute(avalue, 'product_id')} )~saurl }}" >{{ attribute(avalue, key) }}</a>
+        {%else%}
+            {{ attribute(avalue, key) }}
+        {%endif%}
+    {% else %}
+        {{ attribute(avalue, key) }}
+    {%endif%}
+{% endblock data %}
+
+{% block table_link %}
+    <td onclick='location.href="{{ url( 'quotedetail', {  'action': 'view','quoteid':''~avalue.quote_id,'id':avalue.id() } )~saurl }}"'>
+{% endblock table_link %}
+
+{% block action %}
+    <a href="{{ url( 'quotedetail', { 'action': 'view','quoteid':''~avalue.quote_id,'id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="view" /></a>&nbsp;
+    <a href="{{ url( 'quotedetail', { 'action': 'edit', 'quoteid':''~avalue.quote_id,'id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="edit" /></a>&nbsp;
+    <a href="{{ url( 'quotedetail', { 'action': 'delete','id':''~avalue.id() } )~saurl }}"><img src="/img/1.png" class="delete" /></a>
+{% endblock action %}

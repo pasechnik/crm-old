@@ -1,0 +1,115 @@
+{% extends 'layout/layout.twig' %}
+
+{% block script %}
+
+
+    <script>
+
+        $(function () {
+//            $('select.s2').select2({});
+//            $('select.sz').selectize({});
+//            $('input.sz').selectize({});
+//          $('input.sz').select2({});
+            $('#global-search').selectize({
+                maxItems: 1,
+                valueField: 'title',
+                labelField: 'title',
+                searchField: 'title',
+                options: [],
+                create: true,
+                render: {
+                    option: function (item, escape) {
+
+                        return '<div>' +
+                            '<span class="title">' +
+                            '<a href="' + item._url + '">' +
+                            '<span class="name">' + escape(item.title) + '</span>' +
+                            '</a>' +
+                            '</span>' +
+                            '</div>';
+                        var actors = [];
+                        for (var i = 0, n = item.abridged_cast.length; i < n; i++) {
+                            actors.push('<span>' + escape(item.abridged_cast[i].name) + '</span>');
+                        }
+
+                        return '<div>' +
+                            '<img src="' + escape(item.posters.thumbnail) + '" alt="">' +
+                            '<span class="title">' +
+                            '<span class="name">' + escape(item.title) + '</span>' +
+                            '</span>' +
+                            '<span class="description">' + escape(item.synopsis || 'No synopsis available at this time.') + '</span>' +
+                            '<span class="actors">' + (actors.length ? 'Starring ' + actors.join(', ') : 'Actors unavailable') + '</span>' +
+                            '</div>';
+                    }
+                },
+                load: function (query, callback) {
+                    if (!query.length) return callback();
+                    $.ajax({
+                        url: 'http://wepo.local/api/v1/search',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            q: query
+                        },
+                        error: function () {
+                            callback();
+                        },
+                        success: function (res) {
+                            callback(res.data);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock script %}
+
+{% block content %}
+    {#<div id="the-basics">#}
+    {#<input id="input" class="typeahead" type="text" placeholder="States of USA">#}
+    {#</div>#}
+
+    <div class="table mainTable">
+        <h2>Mubarak</h2>
+
+        <div class="table_links">
+            <form class="search_form" action="{{ url( 'search', {} )~saurl }}"
+                  method="get" style="display: inline-block;" name="list_search">
+
+                <div class="input">
+                    {#<label for="search_query">Search</label>#}
+                    <input class="sz search_ico" type="text" name="q" id="global-search" value=""
+                           placeholder="Global search {{ search_query ? 'for "'~search_query~'"': '' }}"/>
+                    <a href="#" class="imgTxt txtSearch submitLink" title="Global search"
+                       style="display: inline-block;">Search</a>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>1</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr>
+                <td>1</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="buttons clearfix">
+
+        </div>
+
+
+    </div>
+    {#</div>#}
+
+{% endblock content %}

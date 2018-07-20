@@ -1,0 +1,13 @@
+ {% extends 'partial/list.twig' %}
+
+{% set title = translate(modelLabel)~"s" %}
+
+{% block data %}
+    {% include 'partial/doctor-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+<a class="actionview" href="{{ url( null, { 'action': 'view','id':avalue.id() }, { 'query': params + {'back': back} } )  }}"><img src="/img/1.png" class="view"  alt="{{translate('View')}}" /><span class="tooltip top">View</span></a>&nbsp;
+    <a class="actionview" href="{{ url( null, { 'action': 'edit','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="edit"  alt="{{translate('Edit')}}" /><span class="tooltip top">Edit</span></a>&nbsp;
+    <a class="actionview"><img src="/img/1.png" class="delete single_del"  alt="{{translate('Delete')}}" /><span class="tooltip top">Delete</span></a>&nbsp;
+{% endblock action %}

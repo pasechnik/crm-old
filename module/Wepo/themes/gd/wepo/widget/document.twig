@@ -1,0 +1,26 @@
+{%if document%}
+<table>
+    <thead>
+        <tr>
+            <th>Document name</th>
+            <th>Real name</th>
+            <th>File size</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+            {% for akey,avalue in document %}
+        <tr>
+            <th><a href="{{ url( 'document', { 'action': 'download','id':avalue.id() } ) }}"> {{avalue.document_name}}</a></th>
+            <td>{{ avalue.document_real_name }}</td>
+            <td>{{ avalue.file_size }}</td>
+            <td>
+                <a href="{{ url( 'document', { 'action': 'download','id':avalue.id() } )}}"><img src="/img/1.png" class="download" /></a>&nbsp;
+                <a href="{{ url( 'document', { 'action': 'edit','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="edit" /></a>&nbsp;
+                <a href="{{ url( 'document', { 'action': 'delete','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="delete" /></a>
+            </td>
+        </tr>
+            {% endfor%}
+    </tbody>
+</table>
+{%endif%}

@@ -1,0 +1,26 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Activity: ' ~ model.getModelName %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block headeractions %}
+     {% if saurlback !='/' %}
+        <a href="{{ saurlback }}" class="titleBack" title="Back"></a>
+            {% else %}
+        <a href="{{ url( null, { 'action': 'list' } ) }}" class="titleBack"></a>
+            {% endif %}
+    <div class="title"><h1>{{ title }}</h1></div>
+    <span class="edited">
+        {% if model.toView["changer"] is defined %}
+            Last Update: {{model.changed_dtm}} by {{model.changer}}
+        {% else %}
+        {% endif %}
+    </span>
+        <a href="{{ url( 'activity', { 'action': 'edit', 'activity': model.getModelName|lower, 'id':model.id() } )~saurl }}" class="titleEdit" title="Edit"></a>
+        <a href="#" class="titleNext" title="Next"> </a>
+        <a href="#" class="titlePrevious" title="Previous"> </a>
+{% endblock headeractions %}
+{% block actions %}
+    <a href="{{ url( 'activity', { 'action': 'edit', 'activity': model.getModelName|lower, 'id':model.id() } )~saurl }}">{{translate('Edit')}}</a>
+    <a href="{{ url( 'activity', { 'action': 'delete', 'id':model.id() } )~delsaurl }}">{{translate('Delete')}}</a>
+{% endblock actions %}

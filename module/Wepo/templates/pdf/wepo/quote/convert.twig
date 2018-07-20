@@ -1,0 +1,89 @@
+{% extends 'partial/form.twig' %}
+{#{% extends 'partial/view.twig' %}#}
+{% set title = 'Quote: Convert to Order'%}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{#{% block actions %}#}
+    {#<a href="{{ url( 'quote', { 'action': 'edit','id':model.id() } )~saurl }}">{{translate('Edit main info')}}</a>#}
+    {#<a href="{{ url( 'quotedetail', { 'action': 'list','quoteid':model.id() } )~saurl }}">{{translate('Edit details')}}</a>#}
+{#{% endblock actions %}#}
+{#{% block detailinfo %}#}
+    {#<form action="{{ url( route, { 'action': 'order' } ) }}" method="post">#}
+        {#<div class="clearfix">#}
+            {#<div class="table">#}
+                {#<h2>Detail information</h2>#}
+                {#<div class="buttons" style="padding: 10px;">#}
+                    {#<a id="details_button" href="" onClick="show(); return false;">Show</a>#}
+                    {#<input type="hidden" name="id" value="{{ model.id() }}" />#}
+                    {#<a href="#" class="green_but submitLink">{{ translate('Create order') }}</a>#}
+                {#</div>#}
+                {#<div id="details" class="hide">   #}
+                    {#<table>#}
+                        {#<thead>#}
+                            {#<tr>#}
+                                {#<th width="30"><b>№</b></th>#}
+                                {#{% for key, value in details|first.toView %}#}
+                                    {#{% if (key == 'product') %}#}
+                                    {#<th><b>&nbsp;&nbsp;{{translate('Product')}}</b></th>#}
+                                {#{% elseif key == 'quote'%}    #}
+                                    {#<th><b>&nbsp;&nbsp;{{translate('Subject')}}</b></th>#}
+                                {#{% elseif key == 'pricebook'%}    #}
+                                    {#<th><b>&nbsp;&nbsp;{{translate('Pricebook')}}</b></th>#}
+                                {#{% elseif key == 'title'%}    #}
+                                {#{% elseif key == 'id'%}    #}
+                                {#{% else %}#}
+                                {#<th><b>&nbsp;&nbsp;{{translate(detail_labels[key])}}</b></th>#}
+                                    {#{% endif %}        #}
+                                {#{% endfor %}    #}
+                            {#</tr>#}
+                        {#</thead>#}
+                        {#<tbody>#}
+                           {#{% for detail in details %} #}
+                               {#<tr>#}
+                               {#<td width=30>{{loop.index}}</td>    #}
+                                   {#{% for key, value in detail.toView %}#}
+                                       {#{% if key!= 'id'%}#}
+                                               {#{% if (key != 'quote_id') and (key != 'order') and (key != 'title') %}#}
+                                                   {#<td>&nbsp;&nbsp;{{value}}</td>#}
+                                               {#{% endif %}        #}
+                                       {#{% endif %}        #}
+                                   {#{% endfor %}#}
+                               {#</tr>#}
+                           {#{% endfor %}#}
+                        {#</tbody>#}
+                    {#</table>#}
+                {#</div>#}
+            {#</div>#}
+        {#</div>#}
+    {#</form>#}
+{#{% endblock detailinfo %}#}
+{#{% block script %}#}
+    {#<script>#}
+        {#var flag = true;#}
+        {#function show()#}
+        {#{#}
+            {#if ( flag === true )#}
+            {#{#}
+                {#document.getElementById('details').style.display='block';#}
+                {#document.getElementById('details_button').textContent='Hide'#}
+                {#flag = false;#}
+            {#}#}
+            {#else#}
+            {#{#}
+                {#document.getElementById('details').style.display='none';#}
+                {#document.getElementById('details_button').textContent='Show'#}
+                {#flag = true;#}
+            {#}#}
+        {#}#}
+    {#</script>#}
+{#{% endblock script %}#}
+{#{% block style %}#}
+    {#<style type="text/css">#}
+            {#<!--#}
+            {#.hide {#}
+                {#overflow:hidden;#}
+                {#display: none;#}
+            {#}#}
+    {#</style>#}
+{#{% endblock style %}#}

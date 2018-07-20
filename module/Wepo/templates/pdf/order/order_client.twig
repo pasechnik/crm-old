@@ -1,0 +1,174 @@
+<!-- Order Form for Client -->
+
+<table style="background: none repeat scroll 0% 0% rgb(255, 255, 255); padding: 2px;" border="0" cellpadding="0"
+       cellspacing="0" width="100%">
+    <tbody>
+    <tr>
+        <td>
+            <table style="padding: 10px; background-color: rgb(255, 255, 255);" border="0" cellpadding="0"
+                   cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td style="border: 2px solid rgb(232, 232, 232); color: rgb(0, 0, 0);" valign="top"
+                                    width="50%">
+                                    <table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0"
+                                           width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="2"><strong>Patient Information:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="top"> Date:<br> Name:<br> License:<br>
+                                                Allergies:<br> Address:<br> City/St/Zip:<br> Phone:
+                                            </td>
+                                            <td align="left" valign="top"> ${SalesOrders.Due Date}<br>
+                                                ${Accounts.Account Name}<br> ${Contacts.Drivers License}<br>
+                                                ${Contacts.Allergies}<br> ${SalesOrders.Billing Street}<br>
+                                                ${SalesOrders.Billing City}, ${SalesOrders.Billing State},
+                                                ${SalesOrders.Billing Country}, ${SalesOrders.Billing Code}<br>
+                                                ${Contacts.Phone}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><strong><br> Billing Info:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="top"> Name:<br> Address:<br> City/St/Zip:</td>
+                                            <td align="left" valign="top"> ${Accounts.Account Name}<br>
+                                                ${SalesOrders.Billing Street}<br> ${SalesOrders.Billing City},
+                                                ${SalesOrders.Billing State}, ${SalesOrders.Billing Country},
+                                                ${SalesOrders.Billing Code}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="border: 2px solid rgb(232, 232, 232); color: rgb(0, 0, 0);" valign="top"
+                                    width="50%">
+                                    <table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0"
+                                           width="100%">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="2"><strong>Patient Detail:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top"> Doctor:<br> Consultant:<br> Gender:<br> DOB:<br> Email:
+                                            </td>
+                                            <td valign="top">${Contacts.Name}<br> ${Contacts.Consultant}<br>
+                                                ${Contacts.Gender}<br> ${Contacts.Date of Birth}<br> ${Contacts.Email}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><strong><br> Shipping Info:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="left" valign="top"> Name:<br> Address:<br> City/St/Zip:</td>
+                                            <td align="left" valign="top"> ${Accounts.Account Name}<br>
+                                                ${SalesOrders.Shipping Street}<br> ${SalesOrders.Shipping City},
+                                                ${SalesOrders.Shipping State}, ${SalesOrders.Shipping Country},
+                                                ${SalesOrders.Shipping Code}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <table style="font-size: 12px; color: rgb(0, 0, 0); border-collapse: collapse;" border="0"
+                               cellpadding="0" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(234, 234, 234); border-top: 2px solid gray; width: 115px;"
+                                    align="center">Qty
+                                </td>
+                                <td style="font-weight: bold; background-color: rgb(234, 234, 234); border-top: 2px solid gray;"
+                                    align="center">Products
+                                </td>
+                                <td style="font-weight: bold; background-color: rgb(234, 234, 234); border-top: 2px solid gray; width: 100px;"
+                                    align="center">W/Unit
+                                </td>
+                                <td style="font-weight: bold; background-color: rgb(234, 234, 234); border-top: 2px solid gray; width: 100px;"
+                                    align="center">Total W
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody id="lineItem">
+                            <tr>
+                                <td style="border: 1px solid rgb(0, 0, 0);" align="center" valign="top">
+                                    ${SalesOrders.Qty}
+                                </td>
+                                <td style="border: 1px solid rgb(0, 0, 0);"><b>${Products.Product Name}</b></td>
+                                <td style="border: 1px solid rgb(0, 0, 0);" align="center" valign="top">
+                                    ${SalesOrders.List Price}
+                                </td>
+                                <td style="border: 1px solid rgb(0, 0, 0); background-color: rgb(255, 204, 153);"
+                                    align="center" valign="top">${SalesOrders.Total}
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tbody>
+                            <tr>
+                                <td rowspan="2" style="border: 1px solid rgb(0, 0, 0);" align="center"><b>SHIP
+                                        INST.:</b><b></b></td>
+                                <td rowspan="2" style="border: 1px solid rgb(0, 0, 0);" align="left">
+                                    ${SalesOrders.Description}
+                                </td>
+                                <td style="border: 1px solid rgb(0, 0, 0);" align="center"></td>
+                                <td style="border: 1px solid rgb(0, 0, 0); background-color: rgb(255, 204, 153);"
+                                    align="center"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid rgb(0, 0, 0);" align="center">TOTAL</td>
+                                <td style="border: 1px solid rgb(0, 0, 0); background-color: rgb(255, 204, 153);"
+                                    align="center"><b>${SalesOrders.Grand Total}</b></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <table style="background: none repeat scroll 0% 0% rgb(255, 255, 255); padding: 2px; font-size:11px"
+                   border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td style="border: 2px solid rgb(232, 232, 232);"><p align="center"><strong><u>Return Policy
+                                    KIngsberg Medical</u></strong></p>
+
+                        <p><strong>State law dictates that once a prescription medication leaves the premises of a
+                                pharmacy, it can no longer be returned.&nbsp;</strong></p>
+
+                        <p>We regret that we cannot accept returns on any custom compounds or commercial prescription
+                            products. State regulations prohibit the return and resale of such items. We encourage
+                            chemically sensitive patients to discuss any problems with their healthcare providers and
+                            thoroughly inquire about ingredients before filling a prescription or purchasing new
+                            therapies through Kingsberg Medical. Please check every order for completeness and accuracy
+                            as well as any possible damage . &nbsp;Upon receipt of product, any discrepancies must be
+                            disputed within 24 hours.</p>
+
+                        <p>If there are any concerns, please call the Clinical Service Department at 954-321-8885&nbsp;within
+                            24 hours of receiving your order. Also, please be sure to notify us immediately if your
+                            address and phone number have changed.</p></td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>

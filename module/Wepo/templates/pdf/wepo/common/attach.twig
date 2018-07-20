@@ -1,0 +1,365 @@
+{% block script %}
+
+    {#&#123;&#35;<div style="overflow:hidden; display: none;"><input type="hidden" id="company_id" value="{{mainuser.company_id}}"/></div>&#35;&#125;#}
+    <script>
+        $(function () {
+            $('select:visible').selectize({
+                dropdownParent: 'body'
+            });
+        });
+        {#&#123;&#35;var target_id = {{ target_id|json_encode|raw }};&#35;&#125;#}
+        {#&#123;&#35;var table_id = {{ table_id|json_encode|raw }};&#35;&#125;#}
+        {#var $lead, $contact;#}
+        {#var lead, contact;#}
+        {#$( function() {#}
+            {#$('#img').error(function() {#}
+                {#$(this).attr({#}
+                    {#style:'display: none;'#}
+                {#});#}
+            {#});#}
+
+{#//            $( 'div[id="uidattach[table_id]"] label' ).change( 'keyup', updateTargetArray );#}
+        {#} );#}
+
+
+        {#function updateTargetArray()#}
+        {#{#}
+            {#var target;#}
+            {#var form;#}
+
+            {#target = $( 'select[name="attach[target_id]"]' );#}
+            {#target.val( '0' );#}
+            {#target.change();#}
+
+            {#form = document.getElementById( "form" );#}
+            {#form.submit();#}
+        {#}#}
+    {#</script>#}
+{#{% endblock script %}#}
+{#{% block script %}#}
+    {#<script xmlns="http://www.w3.org/1999/html">#}
+        {#var $lead;#}
+//        $(function () {
+//            $("select[name='fields[owner_id]']").selectize({
+//                dropdownParent: 'body'
+//            });
+            {#$lead =  $('#attach_lead').selectize({#}
+{#//                plugins: ['remove_button'],#}
+{#//                delimiter: ',',#}
+                {#maxItems : 1,#}
+                {#valueField: '_id',#}
+                {#labelField: 'title',#}
+                {#searchField: 'title',#}
+                {#dataAttr: 'data-data',#}
+                {#hideSelected: true,#}
+                {#dropdownParent:'body',#}
+                {#openOnFocus:true,#}
+                {#preload:true,#}
+{#//                onInitialize: function (){#}
+{#//                },#}
+                {#render: {#}
+                    {#item: function(item, escape){#}
+                        {#var result = escape(item.title);#}
+                        {#if(item.title.match(/[0-9a-f]{24}/) && item.title === item._id){#}
+                            {#result = "My current lead";#}
+                        {#}#}
+                        {#return '<div>'+result+'</div>';#}
+                    {#},#}
+                    {#option: function(item, escape){#}
+                        {#var avatarsrc = '';#}
+                        {#var email = '';#}
+                        {#var title = escape(item.title);#}
+                        {#if (item.email !== ''){#}
+
+                            {#email = escape(item.email);#}
+                        {#}#}
+                        {#else#}
+                            {#email = 'no email';#}
+                        {#var onerror = window.location.protocol+'//'+window.location.host+'/link/public/img/Lead.jpg';#}
+                        {#if (item.title.match(/[0-9a-f]{24}/) && item.title === item._id){#}
+                            {#title = "My current lead";#}
+                            {#email = "";#}
+                            {#avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/img/Lead.jpg';#}
+                        {#}else#}
+                        {#if (item.avatar !== 'img/Lead.jpg' && item.avatar !== 'Lead.jpg' && item.avatar !== 'lead.jpg' && item.avatar !== 'img/lead.png' && item.avatar !== '')#}
+                        {#{#}
+                            {#avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/auto/lead/'+ item.avatar;#}
+                        {#}else{#}
+                            {#avatarsrc = onerror;#}
+                        {#}#}
+                        {#return '<div class="dropdown-option">' +#}
+                            {#'<span>' +#}
+                            {#'<img style="dropdown-avatar" src="'+ avatarsrc +'"/>'+#}
+                            {#'<div>'+ title+'</div>'+#}
+                            {#'</span>'+#}
+                            {#'<ul>'+#}
+                            {#'<li>'+ '<span class="email">' + email +'</span>' + '</li>' +#}
+                            {#'</ul>'+#}
+                            {#'</div>';#}
+                    {#}#}
+                {#},#}
+                {#load:  function (query, callback) {#}
+                    {#$('div.selectize-input', '.multi').css('background-image', 'url(/css/img/select2-spinner.gif)');#}
+                    {#$('div.selectize-input', '.multi').css('background-position', '7px 7px');#}
+                    {#$.ajax({#}
+                        {#url: '/api/v1/search/lead',#}
+                        {#type: 'GET',#}
+                        {#dataType: 'json',#}
+                        {#data: {#}
+                            {#q: query#}
+                        {#},#}
+                        {#error: function (err) {#}
+                            {#$('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');#}
+                            {#$('div.selectize-input', '.multi').css('background-position', '0px 0px');#}
+                            {#callback();#}
+                            {#console.log(err);#}
+                        {#},#}
+                        {#success: function (res) {#}
+                            {#$('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');#}
+                            {#$('div.selectize-input', '.multi').css('background-position', '0px 0px');#}
+                            {#callback(res.data);#}
+{#//                            console.log(res.data);#}
+{#//                            if(table_id === "lead"){#}
+{#//                                ($lead[0].selectize).setValue(target_id);#}
+{#//                            }#}
+                        {#}#}
+                    {#});#}
+                {#}#}
+            {#});#}
+            {#$patient = $('#attach_patient').selectize({#}
+{#//                plugins: ['remove_button'],#}
+{#//                delimiter: ',',#}
+                {#maxItems : 1,#}
+                {#valueField: '_id',#}
+                {#labelField: 'title',#}
+                {#searchField: 'title',#}
+                {#hideSelected: true,#}
+                {#dropdownParent:'body',#}
+                {#openOnFocus:true,#}
+                {#preload:true,#}
+                {#render: {#}
+                    {#item: function(item, escape){#}
+                        {#var result = escape(item.title);#}
+                        {#if(item.title.match(/[0-9a-f]{24}/) && item.title === item._id){#}
+                            {#result = "My current contact";#}
+                        {#}#}
+                        {#return '<div>'+result+'</div>';#}
+                    {#},#}
+                    {#option: function(item, escape){#}
+                        {#var avatarsrc = '';#}
+                        {#var email = '';#}
+                        {#var title = escape(item.title);#}
+                        {#if (item.email !== ''){#}
+
+                            {#email = escape(item.email);#}
+                        {#}#}
+                        {#else#}
+                            {#email = 'no email';#}
+                        {#var onerror = window.location.protocol+'//'+window.location.host+'/link/public/img/Patient.jpg';#}
+                        {#if (item.title.match(/[0-9a-f]{24}/) && item.title === item._id){#}
+                            {#avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/img/Patient.jpg';#}
+                            {#title = "My current patient";#}
+                            {#email = "";#}
+                        {#} else if (item.avatar !== 'img/Patient.jpg'&& item.avatar !== 'Lead.jpg' && item.avatar !== 'Patient.jpg' && item.avatar !== 'patient.jpg' && item.avatar !== 'img/patient.png'  && item.avatar !== ''){#}
+{#//                            avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/'+ document.getElementById("company_id").value +'/patient/'+ item.avatar;#}
+                            {#avatarsrc = window.location.protocol+'//'+window.location.host+'/link/public/auto/patient/'+ item.avatar;#}
+                        {#}else{#}
+                            {#avatarsrc = onerror;#}
+                        {#}#}
+                        {#return '<div class="dropdown-option">' +#}
+                            {#'<span>' +#}
+                            {#'<img style="dropdown-avatar" src="'+ avatarsrc +'"/>'+#}
+                            {#'<div>'+ title+'</div>'+#}
+                            {#'</span>'+#}
+                            {#'<ul>'+#}
+                            {#'<li>'+ '<span class="email">' + email +'</span>' + '</li>' +#}
+                            {#'</ul>'+#}
+                            {#'</div>';#}
+                    {#}#}
+                {#},#}
+                {#load: function (query, callback) {#}
+                    {#$('div.selectize-input', '.multi').css('background-image', 'url(/css/img/select2-spinner.gif)');#}
+                    {#$('div.selectize-input', '.multi').css('background-position', '7px 7px');#}
+                    {#$.ajax({#}
+                        {#url: '/api/v1/search/patient',#}
+                        {#type: 'GET',#}
+                        {#dataType: 'json',#}
+                        {#data: {#}
+                            {#q: query#}
+                        {#},#}
+                        {#error: function () {#}
+                            {#$('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');#}
+                            {#$('div.selectize-input', '.multi').css('background-position', '0px 0px');#}
+                            {#callback();#}
+                        {#},#}
+                        {#success: function (res) {#}
+                            {#$('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');#}
+                            {#$('div.selectize-input', '.multi').css('background-position', '0px 0px');#}
+                            {#callback(res.data);#}
+{#//                            if(table_id === "contact"){#}
+{#//                                ($contact[0].selectize).setValue(target_id);#}
+{#//                            }#}
+                        {#}#}
+                    {#});#}
+                {#}#}
+            {#});#}
+{#//            $('div.dropdown-option + span > img').hide();#}
+{#//            $('div.dropdown-option + span > img').hover(function(){#}
+{#//                $(this).show({duration:300});#}
+{#//            });#}
+
+
+        {#});#}
+    </script>
+{% endblock script %}
+
+
+    {#<style>#}
+        {#div.dropdown-option img{#}
+            {#max-height: 25px;#}
+            {#max-width: 25px;#}
+            {#float: right;#}
+            {#opacity:0;#}
+
+            {#transition:opacity 0.2s linear;#}
+            {#-webkit-transition: all 0.2s ease;#}
+            {#transition: all 0.4s ease;#}
+            {#padding-top: 6px;#}
+            {#padding-bottom: 4px;#}
+            {#padding-right: 5px;#}
+        {#}#}
+
+        {#div.dropdown-option:hover img{#}
+            {#margin: 2px 7px 7px 0;#}
+            {#opacity:1;#}
+            {#transition-delay:0s;#}
+            {#/*border-radius: 50px 50px 50px 50px;*/#}
+            {#-webkit-transform:scale(2);#}
+        {#}#}
+
+        {#span.email {#}
+            {#font-style: italic;#}
+            {#color: #ccc;#}
+        {#}#}
+    {#</style>#}
+
+
+
+{% block content %}
+    <div class="viewtable">
+        <div class="form_header">
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+        {% do form.setAttribute('class',form.getAttribute('class')) %}
+        {{ form().openTag(form)|raw }}
+        {% block upperform %}
+        {% endblock upperform %}
+        {% block formDetails %}
+
+            {#{% block additionalFieldset %}#}
+                {#<div class='table fieldset'>#}
+                    {#<h2>Attach to {{ mainuser.company_id }}</h2>#}
+
+                    {#<div class="form_info">* Required Field(s)</div>#}
+                    {#<div class="form">#}
+                        {#<div class="col">#}
+                            {#<div class="input">#}
+                                {#<label for="id" >#}
+                                    {#<span class="splabel">Leads: </span>#}
+                                {#</label>#}
+                                {#&#123;&#35;<input name ="attach_lead" id="attach_lead"/>&#35;&#125;#}
+                                {#<select id="attach_lead" name ="attach_lead"></select>#}
+                            {#</div>#}
+                            {#<div class="input">#}
+                                {#<label for="iderror" class="error">{{ message }}</label>#}
+                            {#</div>#}
+                        {#</div>#}
+                        {#<div class="col">#}
+                            {#<div class="input">#}
+                                {#<label for="id" >#}
+                                    {#<span class="splabel">Patients: </span>#}
+                                {#</label>#}
+                                {#&#123;&#35;<input name ="attach_patient" id="attach_patient"/>&#35;&#125;#}
+                                {#<select name ="attach_patient" id="attach_patient"></select>#}
+                            {#</div>#}
+                            {#<div class="input">#}
+                                {#<label for="iderror" class="error">{{ message }}</label>#}
+                            {#</div>#}
+                        {#</div>#}
+                    {#</div>#}
+                {#</div>#}
+            {#{% endblock additionalFieldset %}#}
+            {% for fkey, fieldset in form %}
+                {% if fieldset.getAttribute('class')=='table' %}
+                    <div class='table fieldset'>
+                        <h2>{{ fieldset.getLabel }}</h2>
+
+                        <div class="form_info">* Required Field(s)</div>
+                        <div class="form">
+                            <div class="col">
+                                {% for ekey, element in fieldset %}
+                                {% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}
+                            </div>
+                            <div class="col">
+                                {% endif %}
+                                <div class="input">
+                                    <label
+                                        for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}
+                                    >
+                                    {% if element.Label!=NULL %}
+                                        <span class="splabel">{{ element.getLabel }}:</span>
+                                    {% endif %}
+                                    </label>
+                                    {% if element.getAttribute('type')=='checkbox' %}
+                                        <div class="checkbox">{{ formElement(element) }}</div>
+                                    {% else %}
+                                        {{ formElement(element) }}
+                                    {% endif %}
+                                    <label for="id{{ element.getName }}"
+                                           class="error {% if element.getMessages %}{% else %}hidden{% endif %}">{% for message in element.getMessages %}{{ message }}{% endfor %}</label>
+                                    {#{ WepoElementErrors(element) }#}
+                                </div>
+                                {% endfor %}
+                                <div class="input">
+                                    <label for="iderror" class="error">{{ message }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='buttons' %}
+                    <div class="listtable">
+                        <div class="buttons clearfix {{ fieldset.getName }}">
+                            {% for ekey, element in fieldset %}
+                                <a href="#" class="submitLink btn-icon save" type='submit'
+                                   value='{{ element.getLabel }}'
+                                   title='{{ element.getValue }}'>{{ element.getValue }}</a>
+                                <noscript>{{ formRow(element) }}</noscript>
+                            {% endfor %}
+                            <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                               class="btn-icon cancel" title="Cancel">{{ translate("Cancel") }}</a>
+
+                            <div class="success_msg hidden"><i class="imgTxt txtError"></i>
+
+                                <div>some global error message</div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='additional' %}
+
+                {% else %}
+                    <div class="">
+                        {% for ekey, element in fieldset %}
+                            {{ formElement(element) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock formDetails %}
+        {{ form().closeTag(form)|raw }}
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

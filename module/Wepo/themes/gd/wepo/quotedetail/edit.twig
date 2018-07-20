@@ -1,0 +1,68 @@
+{% extends 'partial/edit.twig' %}
+{% block upperform %}
+<div class="table" onKeyUp="test();" onKeyPress="test();" onClick="test();">
+     <h2>{{ translate('Product : ') }} {{name}}</h2>
+        <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b>{{startprice}} $</b></span></h2>
+   <div class="hide">
+       <input type="text" name="price" id="price" value="{{price}}">
+    </div>
+</div>
+{% endblock upperform %}
+{% block script %}
+      {{parent()}}
+      <script>
+          $( function(){
+            $('#disc,#qty').change( test );
+          });
+
+          function test ()
+          {
+              var price = 0;
+              var disc = 0;
+              var qty = 0;
+              var res = NaN;
+              price = parseFloat(document.getElementById("price").value);
+              disc = parseFloat(document.getElementById("disc").value);
+              qty = parseFloat(document.getElementById("qty").value);
+              if (isNaN(price))
+              {
+                  document.getElementById("showTotalPrice").innerHTML = "<b>0 $ </b>";
+              }
+              if (!isNaN(price))
+                {
+                    res = price;
+                    if (!isNaN(disc))
+                        {
+
+                          res = price/100*(100-disc);
+                          if (!isNaN(qty))
+                              {
+                                  res = price/100*(100-disc)*qty;
+                              }
+                        }
+                }
+                if (!isNaN(price))
+                    {
+                        res = res.toFixed(2);
+                        document.getElementById("showTotalPrice").innerHTML= "<b>"+res+" $ </b>";
+                    }
+          }
+
+          function PutToPrice()
+          {
+            var price;
+            price = document.getElementById('price');
+            test ();
+           }
+      </script>
+{% endblock script %}
+{% block style %}
+      {{parent()}}
+        <style type="text/css">
+                <!--
+                .hide {
+                    overflow:hidden;
+                    display: none;
+                }
+        </style>
+{% endblock style %}

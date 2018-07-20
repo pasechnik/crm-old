@@ -1,0 +1,41 @@
+{% extends 'partial/recyclelist.twig' %}
+
+{% set title = translate('Mail') %}
+
+{% block data %}
+    {% include 'partial/mail-list.twig' %}
+{% endblock data %}
+
+{% block RightUpButtons %}
+    <div class="buttons right_buttons">
+        {#<a class="ico_button" href="#"><i class="imgTxt txtClose">Close</i></a>#}
+        {% if saurlback !='/' %}
+            <a href="{{ saurlback }}">{{ translate('Cancel') }}</a>
+        {% else %}
+            <a href="{{ url( null, { 'action': 'list' } ) }}">{{ translate('Cancel') }}</a>
+        {% endif %}
+        <a href="" class="green_but submitLink"
+           onClick="actionChange( 'restore' );">{{ translate('Restore  selected') }}</a>
+    </div>
+{% endblock RightUpButtons %}
+
+{% block downButtons %}
+    <div class="buttons clearfix">
+        {% if saurlback !='/' %}
+            <a href="{{ saurlback }}">{{ translate('Cancel') }}</a>
+        {% else %}
+            <a href="{{ url( null, { 'action': 'list' } ) }}">{{ translate('Cancel') }}</a>
+        {% endif %}
+        <a href="" class="green_but submitLink"
+           onClick="actionChange( 'restore' );">{{ translate('Restore  selected') }}</a>
+        {% if paginator.count > 1 %}
+            {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+        {% endif %}
+    </div>
+{% endblock downButtons %}
+
+{% block actions %}
+    <a href="{{ url( null, { 'action': 'view','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="view" /></a>&nbsp;
+    <a href="{{ url( null, { 'action': 'restore','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="restore" /></a>&nbsp;
+{#    <a href="{{ url( null, { 'action': 'clean','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="clean" /></a>&nbsp;#}
+{% endblock actions %}

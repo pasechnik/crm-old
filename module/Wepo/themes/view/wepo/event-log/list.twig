@@ -1,0 +1,84 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('History') %}
+
+{% block data %}
+    {% include 'partial/eventlog-list.twig' %}
+{% endblock data %}
+
+{% block actiontitle %}
+    <th class="width_10p"></th>
+{% endblock actiontitle %}
+
+{% block action %}
+{% endblock action %}
+
+{% block leftlink %}
+    <div class="buttons left">
+        <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+    </div>
+{% endblock leftlink %}
+
+{% block rightlink %}
+    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">
+             {{ translate('Output fields') }}
+    </a>
+{% endblock rightlink %}
+
+{% block downButtons %}
+
+        <div class="buttons right">
+            {% if paginator.count > 1 %}
+                {% include 'partial/pagination.twig' with { 'pages':paginator.getPages, 'route': null, 'params':params } %}
+            {% endif %}
+        </div>
+
+        <div class="buttons">
+
+            {% if paginator.getTotalItemCount > 5 %}
+                <div class="selectRows" id="selectRows">
+                    <div class="msg"><span>Rows on the page:</span>
+                    </div>
+                    {% for i in rows %}
+                        <a href="{{ url( null, { 'action': 'rowscount' } )~saurl }}&rows={{ i }}"
+                           class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div style="float: right; padding-top: 2px;" class = "msg" >
+         <table>
+             <tbody>
+                 <tr>
+                    <td id = "total_count">
+                        {% if paginator.getTotalItemCount > 0 %}
+                              Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                        {% endif %}
+                    </td>
+                 </tr>
+             </tbody>
+         </table>
+        </div>
+
+{% endblock downButtons %}
+
+{% block script %}
+    <script>
+        $(function(){
+          $('.width_4p').hide();
+          $('.first_td').hide();
+
+          _thisurl = location.href;
+
+          $('#refresh').click(function() {
+                $('#tbody').html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+                 $('#tbody').load(function(){
+                     setCheckboxes();
+                     return false;
+                 });
+            });
+        });
+    </script>
+{% endblock script %}

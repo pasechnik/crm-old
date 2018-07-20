@@ -1,0 +1,17 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Payment') %}
+
+{% block rightlink %}
+    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">{{translate('Output fields')}}</a>
+{% endblock rightlink %}
+
+{% block data %}
+    {% include 'partial/payment-list.twig' %}
+{% endblock data %}
+
+{#{% block action %}
+    <a href="{{ url( 'payment', { 'action': 'view','id':''~attribute(avalue, '_id') } )~saurl }}"><img src="/img/1.png" class="view"  alt="{{translate('View')}}" /></a>&nbsp;
+    <a href="{{ url( 'payment', { 'action': 'edit','id':''~attribute(avalue, '_id') } )~saurl }}"><img src="/img/1.png" class="edit"  alt="{{translate('Edit')}}" /></a>&nbsp;
+    <a href="{{ url( 'payment', { 'action': 'delete','id':''~attribute(avalue, '_id')} )~saurl }}"><img src="/img/1.png" class="delete"  alt="{{translate('Delete')}}" /></a>
+{% endblock action %}#}

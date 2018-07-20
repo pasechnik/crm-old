@@ -1,0 +1,75 @@
+{% extends 'partial/recyclelist.twig' %}
+
+{% set title = translate('Emails') %}
+
+{% block data %}
+    {% include 'partial/mail-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+    <a class="actionview"
+       href="{{ url( null, { 'action': 'view','id':''~avalue.id() } )~saurl }}">
+        <img src="/img/1.png" class="view" alt="{{ translate('View') }}"/>
+        <span class="tooltip top">View</span>
+    </a>&nbsp;
+    <a class="actionview">
+{#       href="{{ url( null, { 'action': 'restore','id':''~avalue.id() } )~saurl }}">#}
+        <img src="/img/1.png" class="restore single_res" alt="{{ translate('Restore') }}"/>
+        <span class="tooltip top">Restore</span>
+    </a>&nbsp;
+{% endblock action %}
+
+{% block downButtons %}
+
+    <div class="buttons left">
+          <a id="restorebtn" class="restore btn-icon disabled">
+{#        <a href="#" class="restore submitLink btn-icon" onClick="actionChange( 'restore' );">#}
+            {{ translate('Restore selected') }}
+        </a>
+    </div>
+
+    <div class="buttons right">
+        {% if paginator.count > 1 %}
+            {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+        {% endif %}
+    </div>
+
+    <div class="buttons">
+
+
+        {% if paginator.getTotalItemCount > 5 %}
+            <div class="selectRows">
+                <div class="msg"><span>Rows on the page:</span></div>
+                {% for i in rows %}
+                    <a href="{{ url( null, { 'action': 'rowscount' } )~saurl }}&rows={{ i }}"
+                       class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </div>
+
+        <div style="float: right; padding-top: 2px;" class = "msg" >
+            <table>
+                <tbody>
+                    <tr>
+                        <td id = "total_count">
+                            Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+<div class="alphabet">
+      <a id="#All" ajax-src="#tbody tr" ajax-target="#tbody"
+        class="ajax {% if not letter %}active{% endif %}"
+        href="{{ url( null, params, { 'query': { 'back': back } } ) }}">All</a>
+      {% for _letter in 'A'..'Z' %}
+         <a id="#{{ _letter }}" ajax-src="#tbody tr" ajax-target="#tbody"
+         class="ajax {% if letter == _letter %}active{% endif %}"
+         href="{{ url( null, params, { 'query': { 'letter':_letter, 'back': back } } ) }}">{{ _letter }}</a>
+      {% endfor %}
+  </div>
+
+{% endblock downButtons %}

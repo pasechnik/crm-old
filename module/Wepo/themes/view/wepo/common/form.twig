@@ -1,0 +1,309 @@
+{% block style %}
+    <style>
+
+        .copyaddress {
+            float: right;
+            background-color: transparent;
+            -webkit-border-radius:6px;
+            border:1px solid #d7d7d7;
+            display:inline-block;
+            cursor:pointer;
+            color:#666666;
+            font-size:13px;
+            padding:6px 10px;
+            color: #1191d4 !important;
+        }
+        .copyaddress:hover{
+            border:1px solid #1191d4;
+        }
+        .copyaddress:active{
+            box-shadow:none;
+        }
+
+        #copy_to_sh{
+            margin-top: 19px;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+
+    <script type="text/javascript" src="/js/libs/tinymce/tinymce.min.js"></script>
+
+    {% raw %}
+
+    <script>
+
+    if (typeof(pattern) == 'undefined'){
+        pattern = null;
+    }
+
+        var menu = {
+            selector: "textarea.htmltext",
+            theme: "modern",
+            height: 400,
+            menubar: false,
+            setup: window.pattern,
+            verify_html:false,
+            resize:false,
+            cleanup_on_startup: false,
+            cleanup: false,
+            forced_root_block: false,
+            validate_children: false,
+            remove_redundant_brs: false,
+            remove_linebreaks: false,
+            force_p_newlines: false,
+            force_br_newlines: false,
+            fix_table_elements: false,
+//            cleanup_on_startup: false,
+//            trim_span_elements: false,
+//            verify_html: false,
+//            cleanup: false,
+//            convert_urls: false,
+            valid_child_elements: 'table[tr|td]',
+            plugins: [
+                "advlist autolink link image lists charmap preview hr anchor pagebreak spellchecker",
+                "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime  nonbreaking",
+                "save table  contextmenu directionality emoticons template paste textcolor"
+            ],
+//            file_browser_callback: function(field_name, url, type, win) {
+//                if(type=='image') $('#my_form input').click();
+//            },
+//            content_css: "css/content.css",
+            toolbar: "pattern | undo redo | forecolor backcolor | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image |  preview  code | emoticons",
+            style_formats: [
+                {title: 'Bold text', inline: 'b'},
+                {title: 'Red text', inline: 'span', styles: {color: '#ff0000'}},
+                {title: 'Red header', block: 'h1', styles: {color: '#ff0000'}},
+                {title: 'Example 1', inline: 'span', classes: 'example1'},
+                {title: 'Example 2', inline: 'span', classes: 'example2'},
+                {title: 'Table styles'},
+                {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
+            ]
+
+        };
+        tinymce.init(menu);
+    </script>
+    {% endraw %}
+
+    <script>
+        $(function () {
+//            console.log(new FormData);
+            $('#product_id').change(PutToPrice);
+            $('#product_id,#raw_price,#discount_type,#discount,#adjustment,#vat,#sales_tax,#qty').change(countTotalPrice);
+//            $('#Leadform input, #Leadform select, #Leadform textarea').each(
+//                function(index){
+//                    var input = $(this);
+//                    console.log(input.attr('name'), input.val());
+//                    'Type: ' + input.attr('type') + 'Name: ' + input.attr('name') + 'Value: ' + input.val();
+//                }
+//            );
+//
+//            $('form a.submitLink').click(function (e) {
+//                $(".submitLink[type=submit]", $(this).parents("form")).removeAttr("clicked");
+//                $(this).attr("clicked", "true");
+//                e.preventDefault();
+//                apiPost($(this).parents("form"));
+//            });
+
+//            $('form.apiform a.submitLink').click(function (e)
+//            {
+//                $('form.apiform').valid();
+//                $(".submitLink[type=submit]", $(this).parents("form")).removeAttr("clicked");
+//                $(this).attr("clicked", "true");
+//                e.preventDefault();
+//
+//                $.when(apiSaveForm($(this).parents("form"))).then(function()
+//                {
+//                    $(document).ajaxComplete(function()
+//                    {
+//                       if ( window.status == 'true' ) {
+//                           $('form .success_msg').removeClass('hidden redColor').addClass('greenColor');
+//                           $('form .success_msg i').removeClass('txtError').addClass('txtSuccess').next('div').text('Data saved successfully');
+//                       }
+//                       else {
+//                           $('form .success_msg').removeClass('hidden greenColor').addClass('redColor');
+//                           $('form .success_msg i').removeClass('txtSuccess').addClass('txtError').next('div').text('Data doesn\'t save. Please, check your data');
+//                       }
+//                           setTimeout(function(){
+//                               $('form .success_msg').addClass('hidden');
+//                           },2200);
+//                    });
+//                });
+//                return false;
+//            });
+
+        });
+
+
+    </script>
+
+    <script>
+
+        function CopyAddress(from,to)
+        {
+            var i = 0; var Address = [];
+
+            from.find('input:text').each(function()
+            {
+                Address.push($(this).val());
+            });
+
+            to.find('input:text').each(function(){
+                $(this).val(Address[i]);
+                i++;
+            });
+        }
+
+        $(function()
+        {
+            if( $("input[name = 'fields[list_price]']").length )
+            {
+                $('select[name = "fields[product_id]"]').change(function(){
+                var productName = $('.select2 option:last').text();
+                if (productName.indexOf('$') != -1 && productName.length)
+                {
+                    var price = productName.substr(productName.indexOf('$') + 1,productName.length);
+                    $("input[name = 'fields[list_price]']").val(price);
+                }
+            });
+
+            }
+        });
+
+        $(function(){
+           $("input[name='fields[price]'],input[name='fields[list_price]']").keydown(function(event){
+               if ( (event.keyCode =='188') || (event.keyCode=='110') ) {
+                   event.preventDefault();
+               }
+           });
+        });
+
+        $(function()
+        {
+            if ( ($('div#address').length)&&( $('div#address').find('div.col:first input').length == $('div#address').find('div.col:last input').length) )
+            {
+                $('div#address').find('div.col:first .input:last').after('<input type="button" class="copyaddress" id="copy_to_sh"  value="Copy to Shipping" />');
+                $('div#address').find('div.col:last .input:last').after('<input type="button" class="copyaddress"  id="copy_to_bil" value="Copy to Billing" />');
+
+                $('input#copy_to_sh').click(function(){
+                    CopyAddress( $('div#address').find('div.col:first'),$('div#address').find('div.col:last'));
+                });
+
+                $('input#copy_to_bil').click(function(){
+                    CopyAddress($('div#address').find('div.col:last'),$('div#address').find('div.col:first'));
+                });
+            }
+        });
+
+        $(function(){
+            if(  $('img#imginput').length ){
+                $('img#imginput').fadeOut().prop('src',$('div#avatar').text()).fadeIn();
+            }
+        });
+
+    </script>
+{% endblock script %}
+
+{% block content %}
+    {#http://pixabay.com/ru/blog/posts/direct-image-uploads-in-tinymce-4-42/#}
+    <iframe id="form_target" name="form_target" style="display:none"></iframe>
+    <form id="my_form" action="/common/imagetpl/insert" target="form_target" method="post" enctype="multipart/form-data" style="width:0px;height:0;overflow:hidden"><input name="template_image" type="file" onchange="$('#my_form').submit();this.value='';"></form>
+    {#end#}
+    {% set avatar = WepoLink( model, 'avatar') %}
+    <div id="avatar" class="hidden">{{ avatar }}</div>
+
+    <div class="viewtable">
+        <div class="form_header">
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon"
+                   title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+        {% do form.setAttribute('class',form.getAttribute('class')) %}
+        {{ form().openTag(form)|raw }}
+        {% block upperform %}
+        {% endblock upperform %}
+        {% block formDetails %}
+            {% for fkey, fieldset in form %}
+                {% if fieldset.getAttribute('class')=='table' and fieldset is not empty %}
+                    <div class='table fieldset'>
+                        <h2>{{ fieldset.getLabel }}</h2>
+
+                        <div class="form_info">* Required Field(s)</div>
+                        <div class="form" id="{{fieldset.getAttribute('name')}}">
+                            <div class="col">
+                                {% for ekey, element in fieldset %}
+                                {#{% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}#}
+                                {% if ekey == fieldset|length//2 - 1 %}
+                            </div>
+                            <div class="col">
+                                {% endif %}
+                                <div class="input">
+                                    <label
+                                        for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}
+                                    >
+                                    {% if element.Label!=NULL %}
+                                        <span
+                                            class="splabel">{{ element.getLabel }}
+                                            :</span>
+                                    {% endif %}
+                                    </label>
+                                    {% if element.getAttribute('type')=='checkbox' %}
+                                        <div
+                                            class="checkbox">{{ formElement(element) }}</div>
+                                    {% else %}
+                                        {{ formElement(element) }}
+                                    {% endif %}
+                                    <label for="id{{ element.getName }}"
+                                           class="error {% if element.getMessages %}{% else %}hidden{% endif %}">{% for message in element.getMessages %}{{ message }}{% endfor %}</label>
+                                    {#{ WepoElementErrors(element) }#}
+                                </div>
+                                {% endfor %}
+                                <div class="input">
+                                    <label for="iderror"
+                                           class="error">{{ message }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='buttons' %}
+                    <div class="listtable">
+                        <div class="buttons clearfix {{ fieldset.getName }}">
+                            {% for ekey, element in fieldset %}
+                                <a href="#" class="submitLink btn-icon save"
+                                   type='submit'
+                                   value='{{ element.getLabel }}'
+                                   title='{{ element.getValue }}'>{{ element.getValue }}</a>
+                                <noscript>{{ formRow(element) }}</noscript>
+                            {% endfor %}
+                            <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                               class="btn-icon cancel"
+                               title="Cancel">{{ translate("Cancel") }}</a>
+
+                            <div class="success_msg hidden"><i
+                                    class="imgTxt txtError"></i>
+
+                                <div>some global error message</div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='additional' %}
+                    {% block additionalFieldset %}
+                    {% endblock additionalFieldset %}
+                {% else %}
+                    <div class="">
+                        {% for ekey, element in fieldset %}
+                            {{ formElement(element) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock formDetails %}
+        {{ form().closeTag(form)|raw }}
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

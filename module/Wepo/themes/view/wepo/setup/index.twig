@@ -1,0 +1,7 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Fields')%}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<h1>{{title}}</h1>
+<a href="{{ url( 'common', { 'data': 'dashboard' } ) }}">{{translate('Cancel')}}</a>
+{% endblock content %}

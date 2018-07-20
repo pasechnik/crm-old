@@ -1,0 +1,26 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'common', { 'data':(attribute(avalue, 'type_title')|lower)|replace({' ':'', 'to':'' } ), 'view':'view',  'id':avalue.id() }, { 'query': { 'back':saurlhash } } ) }}"><span class="d_title">{{attribute(avalue, key)}}</span></a>
+
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+
+{% elseif key == 'changer_title' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.changer_title }}
+    </a>
+
+{% elseif key == 'table_id' and attribute(avalue, 'owner_id') is not empty %}
+    {{ avalue.table}}
+{% elseif key == 'type_id' and attribute(avalue, 'owner_id') is not empty %}
+    {{ avalue.type}}
+{% elseif key == 'target_id' and attribute(avalue, 'target_id') is not empty %}
+    <a href="{{ url( tableHandler.getTransportName( avalue.table_id )|lower, { 'action': 'view','id':''~attribute(avalue, 'target_id')} )~saurl }}">{{attribute(avalue, 'target')}}</a>
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% else %}
+    {{attribute(avalue, key)}}
+{% endif %}

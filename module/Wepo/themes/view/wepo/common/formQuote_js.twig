@@ -1,0 +1,352 @@
+{% block style %}
+    <style>
+
+        .copyaddress {
+            float: right;
+            background-color: transparent;
+            -webkit-border-radius: 6px;
+            border: 1px solid #d7d7d7;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 6px 10px;
+            color: #1191d4 !important;
+        }
+
+        .copyaddress:hover {
+            border: 1px solid #1191d4;
+        }
+
+        .copyaddress:active {
+            box-shadow: none;
+        }
+
+        #copy_to_sh {
+            margin-top: 19px;
+        }
+
+        .toggleField{
+            width: 13px;
+            height: 13px;
+            margin-top: 8px !important;
+            padding: 9px 9px 5px 8px !important;
+            background-repeat: no-repeat;
+            background-position: 6px 5px;
+        }
+
+        .mini{
+            background-image: url('/css/img/icons/other-icons/minimize.png');
+        }
+
+        .maxi{
+            background-image: url('/css/img/icons/other-icons/maximize.png') !important;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+
+        $(function () {
+            $('#product_id').change(PutToPrice);
+            $('#product_id,#raw_price,#discount_type,#discount,#adjustment,#vat,#sales_tax,#qty').change(countTotalPrice);
+        });
+
+    </script>
+
+    <script>
+
+        function CopyAddress(from, to)
+        {
+            var i = 0;
+            var Address = [];
+
+            from.find('input:text').each(function () {
+                Address.push($(this).val());
+            });
+
+            to.find('input:text').each(function () {
+                $(this).val(Address[i]);
+                i++;
+            });
+        }
+
+        function CopyPatientAddress()
+        {
+            var patient_id = $("select[name='fields[patient_id]'] option:last").val();
+
+            apiGet('patient', patient_id, function (item)
+            {
+                $("input[name^='address']").each(function ()
+                {
+                  var opt = $(this).attr('name');
+                      opt = opt.substr(opt.indexOf('[') + 1, opt.length - opt.indexOf('[') - 2);
+                  $(this).val(item['data'][opt]);
+                });
+            });
+        }
+
+        $(function ()
+        {
+            if ($('div#address').length)
+            {
+                $('div#address').find('div.col:first .input:last').after('<input type="button" class="copyaddress" id="copy_to_sh"  value="Copy to Shipping" />');
+                $('div#address').find('div.col:last .input:last').after('<input type="button" class="copyaddress"  id="copy_to_bil" value="Copy to Billing" />');
+
+                $('input#copy_to_sh').click(function () {
+                    CopyAddress($('div#address').find('div.col:first'), $('div#address').find('div.col:last'));
+                });
+
+                $('input#copy_to_bil').click(function () {
+                    CopyAddress($('div#address').find('div.col:last'), $('div#address').find('div.col:first'));
+                });
+            }
+
+            if ($('div#fields').length)
+            {
+                $('div#fields').find('select[name="fields[patient_id]"]').after('<input type="button" class="address copyaddress" id="copy_patient"  title="Copy Patient Address" />');
+                $('div#fields').find('.col:last').css('margin-left',- $('.copyaddress').width() - 17+'px');
+
+                $('input#copy_patient').click(function () {
+                    CopyPatientAddress();
+                });
+            }
+        });
+
+    </script>
+
+    <script>
+
+        $(function ()
+        {
+            $("select[name='fields[patient_id]']").each(function (index)
+            {
+                var scope = $(this).attr('data-scope');
+                var query = $(this).attr('data-query')||'';
+                $(this).select2(
+                {
+                    placeholder: 'Please select...',
+                    allowClear: true,
+                    ajax: {
+                        url: '/api/v2/data/' + scope,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            data = {
+                                q: params.term, // search term
+                                p: params.page
+                            };
+
+                            if (query.length) {
+                                data.query = query;
+                            }
+                            return data;
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.data,
+                                pagination: {
+                                    more: (params.page * 10) < data.count
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    templateResult: function (item) {
+                        if (item.loading) return item.text;
+                        return $('<div />').text(item.title).html();
+                    },
+                    templateSelection: function (item) {
+                        return $('<div />').text(item.title || item.text).html();
+                    }
+                });
+            });
+
+            $('select.static-select2').select2(
+                {minimumResultsForSearch: 5}
+            );
+
+            $('.select2-selection').click(function () {
+                $('.select2-search__field').focus();
+            });
+        });
+
+    </script>
+
+    <script>
+
+        $(function ()
+        {
+            var $quote = $("select[name='fields[quote_id]']");
+            var  scope = $quote.attr('data-scope');
+            var  query = $quote.attr('data-query')||'';
+            $quote.select2(
+            {
+                placeholder: 'Please select...',
+                allowClear: true,
+                ajax: {
+                    url: '/api/v2/data/' + scope,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        data = {
+                            q: params.term, // search term
+                            p: params.page
+                        };
+
+                        if (query.length) {
+                            data.query = query;
+                        }
+                        return data;
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+
+                        return {
+                            results: data.data,
+                            pagination: {
+                                more: (params.page * 10) < data.count
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                templateResult: function (item) {
+                    if (item.loading) return item.text;
+                    return $('<div />').text(item.title).html();
+                },
+                templateSelection: function (item)
+                {
+                    if (item.patient_id)
+                    {
+                        $("select[name='fields[patient_id]'] option:last").val(item.patient_id).trigger('change');
+                        $("select[name='fields[patient_id]']").next('.select2').find('.select2-selection__rendered').text(item.patient_title).append('<span class="select2-selection__clear">×</span>');
+
+                        $("input[name^='address']").each(function ()
+                        {
+                          var opt = $(this).attr('name');
+                              opt = opt.substr(opt.indexOf('[') + 1, opt.length - opt.indexOf('[') - 2);
+                          $(this).val(item[opt]);
+                        });
+                    }
+                    else
+                    {
+                        if ( $("select[name='fields[quote_id]'] option:last").val() !== "" && ('address' in item) )
+                        {
+                            $("[name='fields[patient_id]'] option:last ").val(null).trigger('change');
+
+                            $("input[name^='address']").each(function () {
+                                $(this).val(null);
+                            });
+                        }
+                    }
+
+                    // -> order create
+                    if(item.carrier)
+                        $('select[name="fields[carrier_id]"]').val(item.carrier_id).trigger("change");
+                    if(item.subject)
+                        $('input[name="fields[subject]"]').val(item.subject);
+                    if(item.shipping_instr)
+                        $('textarea[name="instructions[shipping_instr]"]').val(item.shipping_instr);
+                    if(item.payment_instr)
+                        $('textarea[name="instructions[payment_instr]"]').val(item.payment_instr);
+
+                    return $('<div />').text(item.title || item.text).html();
+                }
+            });
+        });
+
+    </script>
+
+    <script>
+
+        $(function()
+        {
+            $('a.toggleField').click(function()
+            {
+                var interval = setInterval(function () {
+                    if ( $(window).scrollTop() < $('#header').height() - $('#mainMenu').height() ) {
+                        fixedMenu();
+                        clearInterval(interval);
+                    }
+                }, 1);
+
+                $(this).closest('.fieldset').find('.form').slideToggle(400,function(){
+                    clearInterval(interval);
+                });
+
+                $(this).toggleClass('maxi');
+            });
+        });
+
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <div class="viewtable">
+        <div class="form_header">
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon"
+                   title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+        {% do form.setAttribute('class',form.getAttribute('class')) %}
+        {% block upperform %}
+        {% endblock upperform %}
+        {% block formDetails %}
+            {% for fkey, fieldset in form %}
+                {% if fieldset.getAttribute('class')=='table' and fieldset is not empty %}
+                    <div class='table fieldset'>
+                        <h2>{{ fieldset.getLabel }}</h2>
+
+                        <div class="buttons right ">
+                            <a style="cursor: pointer;" class="toggleField mini"></a>
+                        </div>
+
+                        <div class="form_info">* Required Field(s)</div>
+                        <div class="form" id="{{ fieldset.getAttribute('name') }}">
+                            <div class="col">
+                                {% for ekey, element in fieldset %}
+                                {% if ekey == fieldset|length//2 - 1 %}
+                            </div>
+                            <div class="col">
+                                {% endif %}
+                                <div class="input">
+                                    <label
+                                        for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}
+                                    >
+                                    {% if element.Label!=NULL %}
+                                        <span
+                                            class="splabel">{{ element.getLabel }}&nbsp;:</span>
+                                    {% endif %}
+                                    </label>
+                                    {% if element.getAttribute('type')=='checkbox' %}
+                                        <div
+                                            class="checkbox">{{ formElement(element) }}</div>
+                                    {% else %}
+                                        {{ formElement(element) }}
+                                    {% endif %}
+                                    <label for="id{{ element.getName }}"
+                                           class="error {% if element.getMessages %}{% else %}hidden{% endif %}">{% for message in element.getMessages %}{{ message }}{% endfor %}</label>
+                                </div>
+                                {% endfor %}
+                                <div class="input">
+                                    <label for="iderror"
+                                           class="error">{{ message }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock formDetails %}
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

@@ -1,0 +1,708 @@
+{% block style %}
+    <style>
+        .tab {
+            position: relative;
+            overflow: hidden;
+            min-width: 300px;
+            float: right;
+            width: 45%;
+            line-height: 1.5;
+            color: #888;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .tabs {
+            display: table;
+            position: relative;
+            overflow: hidden;
+            margin: 0;
+            width: 100%;
+        }
+
+        .tabs li {
+            float: right;
+            width: 100px;
+            text-align: center;
+            line-height: 20px;
+            overflow: hidden;
+            padding: 0;
+            position: relative;
+        }
+
+        .tabs a {
+            /*border-bottom: 1px solid #fff;*/
+            color: #888;
+            display: block;
+            letter-spacing: 0;
+            outline: none;
+            text-decoration: none;
+            -webkit-transition: all 0.2s ease-in-out;
+            -moz-transition: all 0.2s ease-in-out;
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid #d0e4ed;
+        }
+
+        .tabs_item {
+            display: none;
+        }
+
+        .tabs_item:first-child {
+            display: block;
+        }
+
+        .current a {
+            color: #fff;
+            background: #2d5877;
+        }
+
+        .social_view{
+            float: left;
+            width: 9%;
+            min-width: 150px;
+            /*height: auto;*/
+        }
+
+        .other_view{
+            float: left;
+            width: 85%;
+            /*height: auto;*/
+        }
+        .partials_view{
+            float: left;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            padding-left: 9%;
+            border-top: solid 1px #ececec;
+            width: 91%;
+            height: auto;
+        }
+
+        .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons{
+            height: auto !important;
+        }
+        #activityWidget_select + .selectBox {
+            width: 160px !important;
+            height: 19px !important;
+        }
+
+        #activityWidget_select + .selectBox > .selectBox-label {
+            padding: 2px !important;
+            font-size: 14px;
+            margin-top: -7px;
+        }
+
+        .view_dialogPBook > input{
+            width: 294px !important;
+            height: 30px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 5px !important;
+            background: #fff;
+            border: none;
+            box-shadow: inset 0 1px 3px #ccc;
+        }
+
+        .view_dialogPBook > .select2{
+            margin-top: 9px !important;
+        }
+
+        .view_dialogPBook{
+            text-align: center;
+        }
+
+        .select2-selection__rendered{
+            text-align: -webkit-auto;
+        }
+
+        .disableIt{
+            text-decoration: line-through;
+        }
+
+    </style>
+{% endblock style %}
+
+<div id="progress">Loading...</div>
+
+<div class="viewtable">
+    <div class="view_header">
+        {# <div class="buttons left">
+         {% if saurlback !='/' %}
+             <a href="{{ saurlback }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+                 {% else %}
+             <a href="{{ url( null, { 'action': 'list' } ) }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+                 {% endif %}
+         </div>#}
+        {% block headeractions %}
+            <div class="buttons left">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title" data-scope="{{ modelname }}" data-id="{{ model.id() }}"><h1>{{ title }}</h1></div>
+            <div class="editedBy">
+                {% if model.toArray["changer"] is defined %}
+                    Last Update: {{ model.changed_dtm is not empty ? model.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) : "" }} by {{ model.changerfname }} {{ model.changerlname }}
+                {% endif %}
+            </div>
+            {% if model.status_title != 'Deleted' and 'edit' in actions|keys %}
+                <div class="buttons">
+                    <a href="{{ url( null, { 'data': modelname, 'view': 'edit','id':''~model.id() } )~saurl }}"
+                       class="edit btn-icon">
+                        {{ translate('Edit') }}
+                    </a>
+                </div>
+            {% endif %}
+            {#{% block PreviousNext %}#}
+            {#<div class="buttons right">#}
+            {#<a href="#" class="btn-small previous" title="Previous"></a>#}
+            {#<a href="#" class="btn-small next" title="Next"></a>#}
+            {#</div>#}
+            {#{% endblock PreviousNext %}#}
+        {% endblock headeractions %}
+    </div>
+    <div class="view_block">
+        <div class="viewToolbar">
+            <div class="buttons">
+                {#{% block actions %}#}
+                {#{% if model.status_title != 'deleted' %}#}
+                {#<a href="{{ url( null, { 'data': modelname, 'view': 'delete','id':''~model.id() } )~saurl }}"#}
+                {#class="delete btn-icon">{{ translate('Delete') }}</a>#}
+                {#{% elseif model.status_title == 'deleted' %}#}
+                {#<a#}
+                {#href="{{ url( null, { 'data': modelname, 'view': 'restore', 'id':'' ~model.id()} )~saurl }}"#}
+                {#class="restore btn-icon green_but submitLink">{{ translate('Restore') }}</a>#}
+                {#{% if permission == 1 %}#}
+                {#<a#}
+                {#href="{{ url( null, { 'data': modelname, 'action': 'clean', 'id':'' ~model.id()} )~saurldoubleback }}"#}
+                {#class="clean btn-icon green_but submitLink">{{ translate('Clean') }}</a>#}
+                {#{% endif %}#}
+                {#{% endif %}#}
+                {#{% for aaction, alabel in actions %}#}
+                {#<a class="{{ aaction }} btn-icon"#}
+                {#href="{{ url( null, { 'data': modelname, 'view': aaction, 'id':model.id() }, { 'query': { 'back': back } } ) }}">#}
+                {#<span class="tooltip top">{{ alabel }}</span>#}
+                {#</a>&nbsp;#}
+                {#{% endfor %}#}
+                {#{% endblock actions %}#}
+                {% for icon_key, link in links %}
+                    <a class="btn-icon {{ icon_key }}"
+                       href="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">{{ translate(link.label) }}</a>
+                {% endfor %}
+
+                {% if model.status_title != 'Deleted' %}
+                    {% for action, conf in actions %}
+                        <a class="{{ action }} btn-icon {% if action == 'delete' %} dialogAction{% endif %}"
+                                {% if action == 'delete' %} data-action="delete" {% endif %}
+                           href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~model.id() }),
+                           { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}">{{ conf.label }}</a>
+                    {% endfor %}
+
+                {% else %}
+                    <a class="restore btn-icon dialogAction" data-action="restore"
+                       href="{{ url( null, { 'data': modelname, 'view': 'restore','id':''~model.id() } )~saurl }}">
+                        <img src="/img/1.png" alt="{{ translate('Restore') }}"/>
+                        <span class="top">Restore</span>
+                    </a>
+
+                    <a class="clean btn-icon dialogAction" data-action="clean"
+                       href="{{ url( null, { 'data': modelname, 'view': 'clean','id':''~model.id() } )~saurl }}">
+                        <img src="/img/1.png" alt="{{ translate('Clean') }}"/>
+                        <span class="top">Clean</span>
+                    </a>
+                {% endif %}
+                <div class="tooolbar_partials">
+                    {% for wname, widget in data.toolbar_partials %}
+                        {% include widget.template with widget %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="viewData" style="position: relative;">
+
+            {% set tabs = [] %}
+            {#{% for key, fieldset in fieldsets if fieldset.group != 'tabs' %}#}
+            {% if  'social' in fieldsets|keys %}
+            <div class="social_view">
+                {% include [ 'partial/viewblocks/social.twig'] %}
+            </div>
+            {% endif %}
+            {#<div class="default_view">#}
+
+            {#</div>#}
+            {% set  i = 0 %}
+            <div class="other_view">
+                {% for key, fieldset in fieldsets if key!='social'%}
+                    {% set  i = i+1 %}
+                    {% include [ 'partial/viewblocks/'~ key ~'.twig', 'partial/viewblocks/default.twig' ] %}
+                {% endfor %}
+                {#{% for wname, widget in data.view_partials %}#}
+                    {#{% include widget.template with widget %}#}
+                {#{% endfor %}#}
+            </div>
+            {#TABS#}
+                {#{% for key, fieldset in fieldsets %}#}
+                    {#{% include [ 'partial/viewblocks/'~ key ~'.twig', 'partial/viewblocks/default.twig' ] %}#}
+                {#{% endfor %}#}
+                {#<div class="tab">#}
+                {#<ul class="tabs">#}
+                {#{% for key, fieldset in fieldsets if fieldset.group == 'tabs' %}#}
+                {#<li><a href="#">{{ fieldset.label }}</a></li>#}
+                {#{% endfor %}#}
+                {#</ul>#}
+                {#<div class="tab_content">#}
+                {#{% for key, fieldset in fieldsets if fieldset.group == 'tabs' %}#}
+                {#{% include [ 'partial/viewblocks/'~ key ~'.twig', 'partial/viewblocks/default.twig' ] %}#}
+                {#{% endfor %}#}
+                {#</div>#}
+                {#</div>#}
+            {#ENDTABS#}
+            <div class="partials_view">
+                {% for wname, widget in data.view_partials %}
+                        {% include widget.template with widget %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="view_dialogAction"></div>
+<div class="view_dialogConvert"></div>
+
+<div class="view_dialogPBook hidden">
+    <select class="select2_detailsPBook" data-scope="pricebook"></select>
+    <input  type="text" class="form_listPrice long_placehldr" placeholder="List Price" />
+</div>
+
+<script>
+    function getDocHeight(doc) {
+        doc = doc || document;
+        // stackoverflow.com/questions/1145850/
+        var body = doc.body, html = doc.documentElement;
+        var height = Math.max(body.scrollHeight, body.offsetHeight,
+            html.clientHeight, html.scrollHeight, html.offsetHeight);
+        return height;
+    }
+
+    function setIframeHeight(id) {
+        var ifrm = document.getElementById(id);
+        var doc = ifrm.contentDocument ? ifrm.contentDocument :
+            ifrm.contentWindow.document;
+
+        ifrm.style.visibility = 'hidden';
+        ifrm.style.height = "10px"; // reset to minimal height ...
+        // IE opt. for bing/msn needs a bit added or scrollbar appears
+        ifrm.style.height = getDocHeight(doc) + 4 + "px";
+        ifrm.style.visibility = 'visible';
+
+        var anchors = ifrm.contentDocument.getElementsByTagName("a");
+        for (var i in anchors) {
+            anchors[i].setAttribute("target", "_blank");
+        }
+    }
+
+    function setEqualHeight(columns)
+    {
+        var tallestcolumn = 0;
+        columns.each(
+            function()
+            {
+                currentHeight = $(this).height();
+                if(currentHeight > tallestcolumn)
+                {
+                    tallestcolumn = currentHeight;
+                }
+            }
+        );
+        columns.height(tallestcolumn);
+    }
+
+//    $(document).ready(function () {
+//        setEqualHeight($(".other_view > div"));
+//        (function ($) {
+//            $('.tab ul.tabs').addClass('active').find('> li:eq(0)').addClass('current');
+//
+//            $('.tab ul.tabs li a').click(function (g) {
+//                var tab = $(this).closest('.tab'),
+//                    index = $(this).closest('li').index();
+//
+//                tab.find('ul.tabs > li').removeClass('current');
+//                $(this).closest('li').addClass('current');
+//
+//                tab.find('.tab_content').find('div.tabs_item').not('div.tabs_item:eq(' + index + ')').slideUp();
+//                tab.find('.tab_content').find('div.tabs_item:eq(' + index + ')').slideDown();
+//
+//                g.preventDefault();
+//            });
+//        })(jQuery);
+//
+//    });
+
+    $(function ()
+    {
+        Reload_widgets();
+        setEqualHeight($('.other_widget'));
+
+        $('#body').on("click", ".tooltip", function () {
+            return false;
+        });
+
+         $('div.other_widget').each(function()
+         {
+                $(this).find('a:first').after('<span class="viewRecord">No records</span>');
+                $('.viewRecord').css(
+                {
+                    'color'       :'#999999',
+                    'font-style'  :'italic',
+                    'font-size'   :'13px',
+                    'margin-left' :'10px'
+                });
+
+             if ($(this).find('.has_record').children().length > 0) {
+                $(this).find('.viewRecord').hide();
+             }
+         });
+    });
+
+
+</script>
+
+<script>
+    $(function()
+    {
+        $('#activityWidget_select').selectBox();
+        $('.selectBox-dropdown-menu li:first').remove();
+
+        $('#activityWidget_select').closest('.selectBox').change(function()
+        {
+            var url = '';
+            url = $('#activityWidget_select').find('option:selected').val();
+
+            if (url.length)
+            {
+                window.location.href = url;
+                $('a.selectBox').addClass('disabled');
+            }
+        });
+    });
+
+    $(function()
+    {
+        $('#body').on("click",'div.buttons .dialogAction',function(event)
+        {
+            event.preventDefault();
+
+            var $this = $(this);
+            var title = $('div.title h1:first').text();
+            var Url   = $(this).attr('href');
+            var scope = $('div.title').attr('data-scope');
+            var item = '';
+
+            if ( scope.indexOf('detail') < 0 ){
+                item = scope;
+            }
+            else{
+                item = 'product';
+            }
+
+            if ( scope == 'calllead' || scope == 'callpatient' || scope == 'tasklead' || scope == 'taskpatient' || scope == 'eventlead' || scope == 'eventpatient' ){
+                 item = 'activity';
+            }
+
+            $(window).on("scroll resize",function()
+            {
+                $('.view_dialogAction').dialog("option", "position", $('.view_dialogAction').dialog("option", "position"));
+            });
+
+            $('.view_dialogAction').dialog(
+            {
+                open: function ()
+                {
+                    $('.view_dialogAction').text('"' + title + '"');
+                    $('.ui-widget-overlay').addClass('custom-overlay');
+                },
+
+                close: function () {
+                    $('.ui-widget-overlay').removeClass('custom-overlay');
+                },
+
+                show: {effect: '', duration: 600, my: "top", at: "center", of: window},
+                hide: {effect: '', duration: 400},
+                title: " Do you want to  "+ $this.attr('data-action')+" current " + item + " ? ",
+                modal: true, width: '400',resizable: false, draggable: false, closeOnEscape: true,
+                buttons:
+                {
+                    Yes: function ()
+                    {
+                        startloader();
+
+                        $.ajax({
+                            url: Url,
+                            type: 'POST',
+                            traditional: true,
+                            data:{ delyes:1 },
+                            success: function ()
+                            {
+                                stoploader();
+
+                                var isDetail = scope.indexOf('detail');
+
+                                if (isDetail <= 0){
+                                    window.location.href = '/common/'+ $('div.title').attr('data-scope') +'/index.html';
+                                }
+                                else{
+                                    window.location.href = $('a[title="Back"]').attr('href');
+                                }
+                            },
+                            error: function() {
+                                alert('An ERROR has occurred!');
+                                location.reload();
+                            }
+                        });
+
+                        $(this).dialog("close");
+                    },
+                    No: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+        });
+
+        $('#body').on("click",'div.buttons a.convert',function(event)
+        {
+            event.preventDefault();
+            var title = $('div.title h1:first').text();
+            var Url   = $(this).attr('href');
+            var to    = '';
+
+            if      ( $('div.title').attr('data-scope') == 'lead'  ) to = 'Patient';
+            else if ( $('div.title').attr('data-scope') == 'quote' ) to = 'Order';
+            else if ( $('div.title').attr('data-scope') == 'order' ) to = 'Invoice';
+
+            $(window).on("scroll resize",function()
+            {
+                $('.view_dialogConvert').dialog("option", "position", $('.view_dialogConvert').dialog("option", "position"));
+            });
+
+            $('.view_dialogConvert').dialog(
+            {
+                open: function ()
+                {
+                    $('.view_dialogConvert').text('"' + title + '" will be converted to '+ to);
+                    $('.ui-widget-overlay').addClass('custom-overlay');
+                },
+
+                close: function () {
+                    $('.ui-widget-overlay').removeClass('custom-overlay');
+                },
+
+                show: {effect: '', duration: 600, my: "top", at: "center", of: window},
+                hide: {effect: '', duration: 400},
+                title: "Do you want to convert ?",
+                modal: true, width: '400',resizable: false, draggable: false, closeOnEscape: true,
+                buttons:
+                {
+                    Yes: function ()
+                    {
+                        startloader();
+
+                        $.ajax({
+                            url: Url,
+                            type: 'POST',
+                            traditional: true,
+                            data:{ object_id : 1 },
+                            success: function ()
+                            {
+                               stoploader();
+                               window.location.href = '/common/'+ to.toLowerCase() +'/index.html';
+                            },
+                            error: function() {
+                                alert('An ERROR has occurred!');
+                                location.reload();
+                            }
+                        });
+
+                        $(this).dialog("close");
+                    },
+                    No: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+        });
+    });
+</script>
+
+<script>
+    $(function ()
+    {
+        $('select.select2_detailsPBook').each(function (index)
+        {
+            var scope = $(this).attr('data-scope');
+            var query = $(this).attr('data-query')||'';
+            $(this).select2(
+            {
+                placeholder: "Please select the Pricebook",
+                allowClear: true,
+                ajax: {
+                    url: '/api/v2/data/'+scope,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        data = {
+                            q: params.term, // search term
+                            p: params.page
+                        };
+
+                        if (query.length)
+                        {
+                            data.query = query;
+                        }
+                        return data;
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+
+                        return {
+                            results: data.data,
+                            pagination: {
+                                more: (params.page * 10) < data.count
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                templateResult: function (item)
+                {
+                    if ( $.inArray(item._id,window.pbookID) == -1 )
+                    {
+                        if (item.loading) return item.text;
+                        return $('<div />').text(item.title).html();
+                    }
+                    else{
+                        return '<div class = "disableIt">'+item.title+'</div>';
+                    }
+                },
+
+                templateSelection: function (item)
+                {
+                    if ( $.inArray(item._id,window.pbookID) == -1 ) {
+                       return $('<div />').text(item.title || item.text).html();
+                    }
+                    else{
+                        $('.select2_detailsPBook').val(null).trigger('change');
+                        $('.select2_detailsPBook option').each(function(){
+                            $(this).remove();
+                        });
+                    }
+                }
+            });
+        });
+
+        $('select.static-select2').select2(
+                { minimumResultsForSearch: 5 }
+        );
+
+        $('.select2-selection').click(function()
+        {
+            $('.select2-search__field').focus();
+        });
+    });
+
+    $(function()
+    {
+      window.pbookID = [];
+       var id = $('.title').attr('data-id');
+
+      apiList("PricebookDetail", {"query":"ProductPricebookDetail.list","product":id}, function(item)
+      {
+         $.each(item.data,function(index){
+             window.pbookID.push(item.data[index].pricebook_id);
+         });
+      });
+
+      $('.view_dialogPBook').prepend($('.d_title').text()+' will be added to PriceBook ');
+
+        if ($('div.title').attr('data-scope') == 'product')
+        {
+            $('#body').on("click",'div.buttons a.insert',function(event)
+            {
+                event.preventDefault();
+                var Url = $(this).attr('href');
+
+                $(window).on("scroll resize",function()
+                {
+                    $('.view_dialogPBook').dialog("option", "position", $('.view_dialogPBook').dialog("option", "position"));
+                });
+
+
+                $('.view_dialogPBook').dialog(
+                {
+                    open: function ()
+                    {
+                        var list_price = $('.price_Price').text();
+                            list_price = list_price.replace(/[$, ]/g, '');
+
+                        $('.form_listPrice ').val(list_price);
+                        $('.view_dialogPBook').removeClass('hidden');
+
+                        $('.ui-widget-overlay').addClass('custom-overlay');
+                    },
+
+                    close: function () {
+                        $('.ui-widget-overlay').removeClass('custom-overlay');
+                    },
+
+                    show: {effect: '', duration: 600, my: "top", at: "center", of: window},
+                    hide: {effect: '', duration: 400},
+                    title: " Do you want to add product ?",
+                    modal: false, width: '380',resizable: false, draggable: false, closeOnEscape: true,
+                    buttons:
+                    {
+                        Yes: function ()
+                        {
+                            if ($('.select2_detailsPBook option:last').attr('value') && $('.form_listPrice ').val()&&!$('.select2-selection__placeholder').length)
+                            {
+                                startloader();
+
+                                $.ajax({
+                                    url: Url,
+                                    type: 'POST',
+                                    traditional: true,
+                                    data:{
+                                       'fields[pricebook_id]' : $('.select2_detailsPBook option:last').attr('value'),
+                                       'fields[product_id]'   : $('div.title').attr('data-id'),
+                                       'fields[list_price]'   : $('.form_listPrice ').val()
+                                    },
+                                    success: function ()
+                                    {
+                                      location.reload();
+                                    },
+                                    error: function() {
+                                        alert('An ERROR has occurred!');
+                                        location.reload();
+                                    }
+                                });
+
+                            $('div.view_dialogPBook input').val('');
+                            $('.select2_detailsPBook').val(null).trigger('change');
+                            $(this).dialog("close");
+                            }
+                            else{
+                                alert('Please fill in the data !');
+                            }
+
+                        },
+                        No: function () {
+                            $('div.view_dialogPBook input').val('');
+                            $('.select2_detailsPBook').val(null).trigger('change');
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+            });
+        }
+    });
+</script>

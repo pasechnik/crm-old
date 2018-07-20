@@ -1,0 +1,76 @@
+{% extends 'partial/add.twig' %}
+{% set title = translate('New Product') %}
+{% block upperform %}
+<div class="table" onKeyUp="test();" onKeyPress="PutToPrice();" onClick="PutToPrice();">
+    <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b>0 $</b></span></h2>
+    <div class="hide">
+        <select name="prices"  id="prices">
+            {% for key,value in prices %}
+                <option value={{key}}>{{value}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endblock upperform %}
+{% block script %}
+      {{parent()}}
+      <script>
+          $( function(){
+            $('#product_id,#disc,#qty').change( PutToPrice );
+          });
+
+          function test ()
+          {
+              var price = 0;
+              var disc = 0;
+              var qty = 1;
+              var res = NaN;
+              price = parseFloat(document.getElementById("price").value);
+              disc = parseFloat(document.getElementById("disc").value);
+              qty = parseFloat(document.getElementById("qty").value);
+              if (isNaN(price))
+              {
+                  document.getElementById("showTotalPrice").innerHTML = "<b>0 $ </b>";
+              }
+              if (!isNaN(price))
+                {
+                    res = price;
+                    if (!isNaN(disc))
+                        {
+
+                          res = price/100*(100-disc);
+                          if (!isNaN(qty))
+                              {
+                                  res = price/100*(100-disc)*qty;
+                              }
+                        }
+                }
+                if (!isNaN(price))
+                    {
+                        res = res.toFixed(2);
+                        document.getElementById("showTotalPrice").innerHTML= "<b>"+res+" $ </b>";
+                    }
+          }
+
+          function PutToPrice() {
+              var id = $('#product_id option:selected').val();
+              if (id !== "0") {
+                  $('#price').val($('#prices option[value=' + id + ']').text());
+              }
+              else {
+                  $('#price').val('');
+              }
+              test();
+          }
+      </script>
+{% endblock script %}
+{% block style %}
+      {{parent()}}
+        <style type="text/css">
+                <!--
+                .hide {
+                    overflow:hidden;
+                    display: none;
+                }
+        </style>
+{% endblock style %}

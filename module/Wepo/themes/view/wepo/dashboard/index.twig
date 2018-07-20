@@ -1,0 +1,21 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Dashboard') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+
+{% block content %}
+    {#<h1>{{ title }}</h1>#}
+
+    <div class="fullwidth_area drop_area">
+
+        {% for wname, widget in widgets %}
+            {% include 'partial/widget.twig' with {'name':wname, 'widget': widget} %}
+        {% endfor %}
+
+    </div>
+    <div class="left_area half_area drop_area"></div>
+    <div class="right_area half_area drop_area"></div>
+    <div class="clear"></div>
+
+    <a align="center" id="scrollTop" href="#" onclick="top.goTop();
+        return false;"></a>
+{% endblock content %}

@@ -1,0 +1,35 @@
+{% if key == 'title' %}
+    <span class="d_title">{{ attribute(avalue, "title") }}</span>
+{% elseif key == 'pricebook_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'pricebook', 'id':''~attribute( avalue, 'pricebook_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "pricebook_title") }}</a>
+{% elseif key == 'order_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'order', 'id':''~attribute( avalue, 'order_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "order_title") }}</a>
+{% elseif key == 'invoice_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'invoice', 'id':''~attribute( avalue, 'invoice_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "invoice_title") }}</a>
+{% elseif key == 'quote_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'quote', 'id':''~attribute( avalue, 'quote_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "quote_title") }}</a>
+{% elseif key == 'product_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'product', 'id':''~attribute( avalue, 'product_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "product_title") }}</a>
+{% elseif key == 'owner_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'user', 'id':''~attribute( avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "owner_title") }}</a>
+{% elseif key == 'changer_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'user', 'id':''~attribute( avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "changer_title") }}</a>
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% elseif key[-5:] == 'price' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'total' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'amount' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'tax' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'discount' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'pricebook_detail_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'pricebookdetail', 'id':''~attribute( avalue, 'pricebook_detail_id') }, { 'query': { 'back':saurlhash } } ) }}">{{ attribute(avalue, "pricebook_detail_title") }}</a>
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}

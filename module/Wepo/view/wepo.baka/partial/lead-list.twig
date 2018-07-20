@@ -1,0 +1,12 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'lead', { 'action': 'view','id':avalue.id()} )~saurl }}" >{{ avalue.fname ~ ' ' ~ avalue.lname }}</a>
+    {# {% elseif key == 'email' and attribute(avalue, 'email') is not empty %} #}
+    {# <a href="{{ url( 'mail', { 'action': 'add','email':''~attribute(avalue, key)} )~saurl }}" >{{attribute(avalue, key)}}</a> #}
+{% elseif key == 'changer' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(avalue, 'changer_id')} )~saurl }}" >{{ attribute(avalue, key) }}</a>
+{% elseif key == 'owner' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(avalue, 'owner_id')} )~saurl }}" >{{ attribute(avalue, key) }}</a>
+{% else %}
+    -{{ key }}-
+    {{ attribute(avalue, key) }}
+{% endif %}

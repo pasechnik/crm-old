@@ -1,0 +1,62 @@
+{% extends 'partial/add.twig' %}
+{% block script %}
+    <script>
+        $(
+            function(){
+                $('#email').selectize({
+                    plugins: ['remove_button'],
+                    delimiter: ',',
+                    valueField: 'title',
+                    labelField: 'title',
+                    searchField: 'title',
+                    persist: false,
+                    dropdownParent:'body',
+                    openOnFocus:true,
+                    preload:true,
+                    create: function(input)
+                    {
+                        var regExp = /\<.*\>/;
+                        match = regExp.exec(input);
+                        if(match!=null)
+                        {
+                            return {
+                                title: match[0]
+                            }
+                        }
+                        else
+                        {
+                            return {
+                                title:'<'+input+'>'
+                            }
+                        }
+                    },
+                    load: function (query, callback) {
+                        $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/select2-spinner.gif)');
+                        $('div.selectize-input', '.multi').css('background-position', '7px 7px');
+                        $.ajax({
+                            url: '/api/v1/search/email',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {
+                                q: query
+                            },
+                            error: function () {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback();
+                            },
+                            success: function (res) {
+                                $('div.selectize-input', '.multi').css('background-image', 'url(/css/img/search_ico.png)');
+                                $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                                callback(res.data);
+                            }
+                        });
+                    }
+                });
+                $('select:visible').selectize({
+                    dropdownParent:'body'
+                });
+            }
+        );
+    </script>
+{% endblock script %}

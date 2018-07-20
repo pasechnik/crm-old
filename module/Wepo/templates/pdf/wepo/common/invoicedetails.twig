@@ -1,0 +1,164 @@
+{% block script %}
+    <script>
+
+        _thisurl = location.href;
+
+        $(function () {
+            $('#body').on("click", "div.alphabet a.ajax", function () {
+                $('div.alphabet a.ajax').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            $('#body').on("click", "a.ajax", function () {
+                var _target = $(this).attr('ajax-target');
+                var _src = $(this).attr('ajax-src');
+                var _location = $(this).attr('href');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+
+                startloader();
+
+                $(_target).load(_location + _src, null, function () {
+                    stoploader();
+                    setCheckboxes();
+                });
+                _thisurl = _location;
+                return false;
+            });
+
+        });
+
+    </script>
+{% endblock script %}
+
+
+<div class="listtable">
+
+    <div class="title">
+
+        <div class="listtitle">
+
+            {# title #}
+            <span class="icon_1"
+                  style="background-image: url(/css/img/icons/32x32-icons/product.png)"></span>
+
+            <h1 class="{{ title|lower|replace(' ', '_') }}">{{ title }}</h1>
+
+        </div>
+
+        <div class="buttons">
+
+            {# links #}
+            {% if links %}
+                {% for icon_key, link in links %}
+                    <a class="btn-icon {{ icon_key }}"
+                       href="{{ url( link.route, link.routeparams, { 'query': link.queryparams|merge( { 'back': saurlhash } ) } ) }}">{{ translate( link.label ) }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {# search form #}
+            <div id="titleSearch" class="titleSearch">
+                <form class="search_form"
+                      action="{{ url( null, viewboxparams|removeKey( [ 'q', 'p' ] ), { 'query': queryparams|merge( { 'back': saurlhash } ) } ) }}"
+                      method="get" name="list_search">
+                    <input class="long_placehldr" type="text" name="q"
+                           value="{{ search_query }}"
+                           placeholder="Search in &quot;{{ title }}&quot;"/>
+
+                    <div class="searchico"></div>
+                </form>
+            </div>
+
+        </div>
+
+        {# clear filters q or letter #}
+        {% if search_query or letter %}
+            <div class="buttons" style="padding-left: 8px;">
+                <a href="{{ url( null, viewboxparams|removeKey( [ 'q', 'p' ] ), { 'query': queryparams|removeKey( [ 'letter', 'p', 'q' ] )|merge( { 'back': saurlhash } ) } ) }}">Show
+                    all records</a>
+            </div>
+        {% endif %}
+
+        {# letter placeholder #}
+        <div
+            style='display: inline; font-size: larger; font-style: italic;color:#999999; vertical-align: super;'
+            id="letter"></div>
+
+        {# container for right sight buttons #}
+        <div class="buttons right"></div>
+
+    </div>
+
+    <div id="tableBody">
+
+        <table id="data" class="data">
+            <thead>
+            <tr class="tableHeader">
+                {% for value in fields %}
+                    <th class="{% if column.sort == value %}checked{% endif %}">
+                        <a href="{{ url( null, viewboxparams|merge({ 'sort':value, 'desc':column.desc==0?1:0 }), { 'query': queryparams } ) }}">{{ attribute( labels, value ) }}</a>
+                        {% if column.sort == value %}
+                            <span
+                                class="{{ column.desc != 0 ? 'down':'up' }}"></span>
+                        {% endif %}
+                    </th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody id="tbody">
+            {% for akey,avalue in paginator.getCurrentItems %}
+                <tr>
+                    {% for key in fields %}
+                        <td class="{% if column.sort == value %}checked{% endif %}{{ key }}">
+                            {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="tableBottomToolbar">
+
+            <div class="buttons right">
+                {% if paginator.count > 1 %}
+                    {% include 'partial/pagination.twig' with { 'pages':paginator.getPages, 'route': null, 'params':viewboxparams } %}
+                {% endif %}
+            </div>
+
+            <div class="buttons">
+                {% if paginator.getTotalItemCount > 5 %}
+                    <div class="selectRows" id="selectRows">
+                        <div class="msg"><span>Rows on the page:</span></div>
+                        {% for i in rows %}
+                            <a href="{{ url( null, viewboxparams, { 'query': queryparams | merge({ 'rowcount': i }) } ) }}"
+                               class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                            {#<a onclick="changeRow({{ i }})" class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>#}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if paginator.getTotalItemCount > 0 %}
+                <div style="float: right; padding-top: 2px;" class="msg"
+                     id="total_count">Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}</div>
+            {% endif %}
+
+            <div class="alphabet">
+                <a id="#All" ajax-src="#tableBody" ajax-target="#tableBody"
+                   class="ajax {% if not letter %}active{% endif %}"
+                   href="{{ url( null, viewboxparams|removeKey( [ 'p' ] ), { 'query': queryparams|removeKey( [ 'letter', 'p' ] )|merge( { 'back': saurlhash } ) } ) }}">All</a>
+                {% for _letter in 'A'..'Z' %}
+                    <a id="#{{ _letter }}" ajax-src="#tableBody"
+                       ajax-target="#tableBody"
+                       class="ajax {% if letter == _letter %}active{% endif %}"
+                       href="{{ url( null, viewboxparams, { 'query': { 'letter':_letter, 'back': saurlhash, 'q': search_query } } ) }}">{{ _letter }}</a>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+
+</div>

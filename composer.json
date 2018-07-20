@@ -1,0 +1,39 @@
+{
+    "name": "hexgen/hexgen-crm",
+    "description": "Wepo Application for ZF2",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "framework",
+        "zf2"
+    ],
+    "homepage": "http://framework.zend.com/",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://gitlab.com/wepo/twigext.git"
+        },
+        {
+            "type": "git",
+            "url": "https://gitlab.com/wepo/mailservice.git"
+        },
+        {
+            "type": "git",
+            "url": "https://gitlab.com/wepo/modelframework.git"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "zendframework/zendframework": "2.*",
+        "zf-commons/zfc-twig": "dev-master",
+        "pasechnik/mongozend": "dev-master",
+        "hexgen/twigext": "dev-master",
+        "hexgen/mailservice": "dev-master",
+        "hexgen/modelframework": "dev-master",
+        "los/lospdf": "dev-master",
+        "mpdf/mpdf": "*",
+        "bushbaby/flysystem": "1.0.*@dev",
+        "guzzlehttp/streams": "~3.0",
+        "guzzlehttp/guzzle": "*",
+        "league/flysystem-cached-adapter": "dev-master"
+    }
+}

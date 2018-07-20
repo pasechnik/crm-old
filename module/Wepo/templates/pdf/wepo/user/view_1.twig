@@ -1,0 +1,95 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('User profile') %}
+{% set reglink = translate('Register') %}
+{% set recycle = 'false' %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block content %}
+<h1>{{title}}</h1>
+<div>
+    <table border=2 width=300>
+        <tr>
+           <th colspan="2" align="center">
+            {% if user.role_id==constant('\\Wepo\\Model\\Role::USER') %}
+               {{translate('Status: user')}}
+            {% elseif user.role_id==constant('\\Wepo\\Model\\Role::ADMIN') %}
+               {{translate('Status: admin')}}
+            {% elseif user.role_id==constant('\\Wepo\\Model\\Role::SENIOR') %}
+               {{translate('Status: senior')}}
+            {% endif %}
+           </th>
+       </tr>
+    {% for key, value in user.toView %}
+       <tr align="left">
+           {% if key!= 'role_id' and key!= 'password'%}
+           <th>&nbsp&nbsp{{field_labels[key]}}</th>
+           <td>&nbsp;&nbsp;{{value}}</td>
+           {%endif%}
+       </tr>
+           {%if key == 'status' and value == 'deleted' %}
+                {% set recycle = 'true' %}
+           {%endif%}
+    {% endfor %}
+       <tr>
+           <th colspan='2'><a href="{{ url( 'user', { 'action': 'edit','id':user.id } )~saurl }}">{{translate('Edit')}}</a></th>
+       </tr>
+        </table>
+    </div>
+           {% if recycle ==  'true' %}
+                <a href="{{ url( 'user', { 'action': 'recyclelist' } ) }}">{{translate('Back to recycle')}}</a>
+           {% elseif recycle ==  'false' %}
+                {% if saurlback != '/' %}
+                    <a href="{{ saurlback }}">{{translate('Back')}}</a>
+                {% else %}
+                    <a href="{{ url( 'user', { 'action': 'list' } ) }}">{{translate('Back to user profiles')}}</a>
+                {% endif %}
+           {% endif %}   <br/><br/><br/>
+{% if (paginator.getTotalItemCount) %}
+<div>
+
+    <table border=2 width=100%>
+        <tr align=center>
+                {% for key,value in labels %}
+                {% if (params.desc!=0) %}
+                <td align="center"><b><a href="{{ url( 'user', { 'action': 'view','sort':key, 'id':user.id } ) }}">{{value}}</a></b>
+                    {% if params.sort==key%}
+                        <img src="/img/up.png">
+                    {% endif%}
+                </td>
+                {%  else %}
+                <td align="center"><b><a href="{{ url( 'user', { 'action': 'view','sort':key,'desc':1, 'id':user.id } ) }}">{{value}}</a></b>
+                {% if params.sort==key%}<img src="/img/down.png">{% endif %}
+                </td>
+                {% endif %}
+                {% endfor %}
+        </tr>
+
+    {% for akey,avalue in paginator.getCurrentItems %}
+        <tr>
+            {% for key,value in labels %}
+                 <td align="center">
+                        {% if key == 'date'%}
+                            {{attribute(avalue, key)|date('m.d.y H:i:s')}}
+                        {% else %}
+                            {{attribute(avalue, key)}}
+                        {%endif%}
+                 </td>
+            {% endfor%}
+        </tr>
+    {% endfor %}
+    </table>
+    {% if (paginator.count > 1) %}
+         {{ paginationControl(paginator, 'Elastic', 'partial/pagination', { 'route': 'user', 'params':params} ) }}
+    {% endif %}
+</div>
+           {% if recycle ==  'true' %}
+                <a href="{{ url( 'user', { 'action': 'recyclelist' } ) }}">{{translate('Back to recycle')}}</a>
+           {% elseif recycle ==  'false' %}
+                {% if saurlback != '/' %}
+                    <a href="{{ saurlback }}">{{translate('Back')}}</a>
+                {% else %}
+                    <a href="{{ url( 'user', { 'action': 'list' } ) }}">{{translate('Back to user profiles')}}</a>
+                {% endif %}
+           {% endif %}
+{% endif %}
+{% endblock content %}

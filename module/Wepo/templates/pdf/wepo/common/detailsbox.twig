@@ -1,0 +1,25 @@
+{% extends 'pdf/layout/layout.twig' %}
+
+{% block content %}
+
+    {% for dash in data.view %}
+        {% set tpl='pdf/wepo/'~dash.template %}
+        {% include tpl with dash %}
+    {% endfor %}
+
+    {% for list in data.details %}
+        {% set tpl='pdf/wepo/'~list.template %}
+        {% include tpl with list %}
+    {% endfor %}
+
+    <a align="center" id="scrollTop" href="#" onclick="top.goTop();return false;"></a>
+
+{% endblock content %}
+
+{% block script %}
+    <script>
+        $(function () {
+            Reload_widgets();
+        });
+    </script>
+{% endblock script %}

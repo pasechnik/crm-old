@@ -1,0 +1,127 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Lead profile') %}
+{% block style %}
+<style type="text/css">
+        <!--
+        .mainInfo {
+            float: left;
+            width: 600px;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid black;
+        }
+        .mainInfo table
+        {
+            width: 100%;
+        }
+        .activity {
+            float: right;
+            width: 400px;
+            padding: 10px;
+            border: 1px solid black;
+            margin: 10px;
+        }
+        .activity table
+        {
+            width: 100%;
+        }
+
+        .events
+        {
+            float: right;
+            width:400px;
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .events table
+        {
+            width: 100%;
+        }
+        .navigation
+        {
+            text-align: left;
+            margin: 10px 2px 2px 2px;
+        }
+        .pagination
+        {
+            text-align: center;
+        }
+
+        -->
+    </style>
+{% endblock style %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <div class="mainInfo">
+        <table border="2">
+            <tr>
+                <th colspan="2" align="center">{{translate('Status: lead')}}</th>
+            </tr>
+            {% for key, value in lead.toView %}
+            <tr align="left">
+                <th>&nbsp&nbsp{{field_labels[key]}}</th>
+                <td>&nbsp;&nbsp;{{value}}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <th colspan='2'>
+                    <a href="{{ url( 'lead', { 'action': 'edit','id':lead.id } )~saurl }}">{{translate('Edit')}}</a> &nbsp;
+                    <a href="{{ url( 'activity', { 'action': 'add', 'activity': 'call', 'id':lead.id,'tableid':3 } )~saurl }}">{{translate('Call')}}</a> &nbsp;
+                    <a href="{{ url( 'activity', { 'action': 'add', 'activity': 'task', 'id':lead.id,'tableid':3 } )~saurl }}">{{translate('Task')}}</a> &nbsp;
+                    <a href="{{ url( 'activity', { 'action': 'add', 'activity': 'event', 'id':lead.id,'tableid':3 } )~saurl }}">{{translate('Event')}}</a> &nbsp;
+                </th>
+            </tr>
+        </table>
+
+        <div class="navigation">
+            <a align="right" href="{{ url( 'lead', { 'action': 'list' } ) }}">{{translate('Back to leads')}}</a>
+        </div>
+    </div>
+
+    <div class="activity">{{activityWidget(user.id, null, 3, lead.id)}}</div>
+
+    <div class="events">
+{% if (paginator.getTotalItemCount) %}
+            <table border=2 >
+                <tr align=center>
+                {% for key,value in labels %}
+                {% if (params.desc!=0) %}
+                        <td align="center"><b><a href="{{ url( 'lead', { 'action': 'view','id': lead.id,'sort':key} )~saurl }}">{{value}}</a></b>
+                    {% if params.sort==key%}
+                                        <img src="/img/up.png">
+                    {% endif%}
+                                    </td>
+                {%  else %}
+                                    <td align="center"><b><a href="{{ url( 'lead', { 'action': 'view','id': lead.id,'sort':key,'desc':1 } )~saurl }}">{{value}}</a></b>
+                {% if params.sort==key%}<img src="/img/down.png">{% endif %}
+                                        </td>
+                {% endif %}
+                {% endfor %}
+                                    </tr>
+
+    {% for akey,avalue in paginator.getCurrentItems %}
+                                    <tr>
+            {% for key,value in labels %}
+                                            <td align="center">
+                        {% if key == 'event_dtm'%}
+                            {{attribute(avalue, key)|date('m.d.y H:i:s')}}
+                        {% else %}
+                            {{attribute(avalue, key)}}
+                        {%endif%}
+                                                </td>
+            {% endfor%}
+                                            </tr>
+    {% endfor %}
+                                        </table>
+    {% if (paginator.count > 1) %}
+         {{ paginationControl(paginator, 'Elastic', 'partial/pagination', { 'route': 'lead', 'params':params} ) }}
+    {% endif %}
+
+{% endif %}
+                                    </div>
+                                    <div class="clearfix"></div>
+{% endblock content %}

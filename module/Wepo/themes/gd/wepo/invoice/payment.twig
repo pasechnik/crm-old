@@ -1,0 +1,94 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Invoice : ' ~ model.subject %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block edit %}
+{% endblock edit %}
+{% block actions %}
+{% endblock actions %}
+{% block detailinfo %}
+    <form action="{{ url( route, { 'action': 'payment' } ) }}" method="post">
+        <div class="clearfix">
+            <div class="table">
+                <h2>Payment information</h2>
+                <div class="form_info">* Required Field(s)</div>
+                <div class="form">
+                    <div class="col">
+                        <div class="input">
+                            <label class="required">Description</label>
+                            <textarea name="description" type="text" required="required" value=""></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix">
+            <div class="table">
+                <h2>Detail information</h2>
+                <div class="buttons" style="padding: 10px;">
+                    <a id="details_button" href="" onClick="show(); return false;">Show</a>
+                    <input type="hidden" name="id" value="{{ model.id() }}" />
+                    <a href="#" class="green_but submitLink">{{ translate('Confirm payment') }}</a>
+                </div>
+                <div id="details" class="hide">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="30"><b>№</b></th>
+                                {% for key, value in details|first.toView %}
+                                    {% if (key != 'order_id') and (key != 'invoice') %}
+                                        <th><b>&nbsp;&nbsp;{{translate(detail_labels[key])}}</b></th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for detail in details %}
+                               <tr>
+                               <td width=30>{{loop.index}}</td>
+                                   {% for key, value in detail.toView %}
+                                       {% if key!= 'order_id'%}
+                                               {% if (key != 'order_id') and (key != 'invoice') %}
+                                                   <td>&nbsp;&nbsp;{{value}}</td>
+                                               {% endif %}
+                                       {% endif %}
+                                   {% endfor %}
+                               </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock detailinfo %}
+{% block script %}
+    <script>
+        var flag = true;
+        function show()
+        {
+            if ( flag === true )
+            {
+                document.getElementById('details').style.display='block';
+                document.getElementById('details_button').textContent='Hide'
+                flag = false;
+            }
+            else
+            {
+                document.getElementById('details').style.display='none';
+                document.getElementById('details_button').textContent='Show'
+                flag = true;
+            }
+        }
+    </script>
+{% endblock script %}
+{% block style %}
+    <style type="text/css">
+            <!--
+            .hide {
+                overflow:hidden;
+                display: none;
+            }
+    </style>
+{% endblock style %}

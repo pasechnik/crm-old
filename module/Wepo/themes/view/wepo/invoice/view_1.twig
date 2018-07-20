@@ -1,0 +1,80 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Invoice info') %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<h1>{{title}}</h1>
+<div>
+    <table border=2 width=600>
+        <tr>
+           <th colspan="2" align="center">
+        <h3><p><b>Invoice № {{invoice.id}}. Total Price: {{invoice.total_price}}</b></p></h3>
+           </th>
+       </tr>
+    {% for key, value in invoice.toView %}
+       <tr align="left">
+           <th>&nbsp&nbsp{{field_labels[key]}}</th>
+           <td>&nbsp;&nbsp;{{value}}</td>
+       </tr>
+    {% endfor %}
+        </table>
+        <br/>
+    </div>
+<div class="wform">
+    <div>
+        <input type="button" value="Details" onClick="show();"/>&nbsp;&nbsp;
+            <div id="details" class="hide">
+            <table border=2>
+                <tr align="left">
+                    <td align="center" width=30><b>№</b></td>
+                    {% for key, value in details|first.toView %}
+                        {% if (key != 'order_id') and (key != 'invoice') %}
+                            <td align="left" width=110><b>&nbsp;&nbsp;{{translate(detail_labels[key])}}</b></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                   {% for detail in details %}
+                           <tr align="left">
+                           <td align="center" width=30>{{loop.index}}</td>
+                       {% for key, value in detail.toView %}
+                           {% if key!= 'order_id'%}
+                                   {% if (key != 'order_id') and (key != 'invoice') %}
+                                       <td align="left" width="30">&nbsp;&nbsp;{{value}}</td>
+                                   {% endif %}
+                           {% endif %}
+                       {% endfor %}
+                           </tr>
+                   {% endfor %}
+            </table>
+            <br/>
+            </div>
+    </div>
+</div>
+<a href="{{ url( 'invoice', { 'action': 'list' } ) }}">{{translate('Back to invoices')}}</a>
+{% endblock content %}
+{% block script %}
+    <script>
+        var flag = true;
+        function show()
+        {
+            if ( flag === true )
+            {
+                document.getElementById('details').style.display='block';
+                flag = false;
+            }
+            else
+            {
+                document.getElementById('details').style.display='none';
+                flag = true;
+            }
+        }
+    </script>
+{% endblock script %}
+{% block style %}
+    <style type="text/css">
+            <!--
+            .hide {
+                overflow:hidden;
+                display: none;
+            }
+    </style>
+{% endblock style %}

@@ -1,0 +1,209 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Model Admin') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+
+{% block style %}
+    {{ parent() }}
+    <style>
+        .ui-sortable-helper {
+            border: 0;
+            height: 15px !important;
+        }
+
+        .sortable ul.header{
+            background-color: #ebeaea;
+            background-image: none;
+            padding: 0;
+            height: 57px;
+            border-bottom: #e0e0e0 1px solid;
+            font-weight: bold;
+        }
+
+        .sortable ul.header li{
+            float: left;
+            width: 49%;
+            padding: 20px 0 0 1%;
+            color:#1191d4;
+            text-decoration: none;
+        }
+
+        .sortable .body ul{
+            float: left;
+            width: 50%;
+        }
+
+        .sortable .body ul .cell{
+            border-top:1px solid #f0f0f0;
+            height: 37px;
+            width: 98%;
+            padding: 10px 1%;
+        }
+
+        .placeholder{
+            background-color: lightyellow;
+        }
+
+        .sortable .body ul .cell:hover{
+            background-color: #e1f5fe;
+            border-left: #b3e5fc 1px solid;
+            border-right: #b3e5fc 1px solid;
+        }
+
+        .sortable .body ul li{
+            padding: 10px 10px 0 0;
+            float: left;
+        }
+        .remove{
+            padding: 10px 10px 0 0;
+            float: right;
+            color: #cd5c5c;
+        }
+
+        .serialization1 .selectize-control{
+            float: right;
+        }
+
+        .remove:hover{
+            color: #ff0000;
+            cursor: pointer;
+        }
+    </style>
+{% endblock style %}
+{% block script %}
+    <script>
+//        var group1, group2;
+        var selectizeTEMP = [];
+        var modelList = {{ wepo|json_encode|raw }};
+        var idList = {{ oldIds|json_encode|raw }};
+        var selectedModelList = [];
+        var previousIdSettings = {{ previous_ids|json_encode|raw }};
+        var previousModelSettings = {{ previous_settings|json_encode|raw }};
+        $(function(){
+//            console.log(previousModelSettings);
+            $('.serialization2 select').each(function( index, element ){
+                var elementName = $(element).parent().attr('name');
+                selectizeTEMP[$(element).parent().attr('name')] = $(element).selectize({
+                    dropdownParent: 'body',
+                    options: modelList,
+                    onChange: function(value) {
+                        var currentElement = $(element).parent().attr('name');
+                        var restoreElement = selectedModelList[currentElement];
+                        selectedModelList[currentElement] = modelList[value];
+                        delete modelList[value];
+                        for(var index in selectizeTEMP)
+                        {
+                            if(index!=currentElement)
+                            {
+                                selectizeTEMP[index][0].selectize.removeOption(value);
+                                if(restoreElement != undefined) {
+                                    selectizeTEMP[index][0].selectize.addOption(restoreElement);
+                                }
+                            }
+                        }
+                    }
+                });
+//                console.log(elementName);
+//                console.log(previousModelSettings.elementName);
+                if(previousModelSettings[elementName] != undefined) {
+                    selectizeTEMP[elementName][0].selectize.setValue(previousModelSettings[elementName]);
+                }
+            });
+
+            $('.serialization1 select').each(function( index, element ){
+                var elementName = $(element).parent().attr('id');
+                console.log(elementName);
+                var temp = $(element).selectize({
+                    dropdownParent: 'body',
+                    options: idList[elementName]
+                });
+                if(previousIdSettings[elementName] != undefined) {
+                    temp[0].selectize.setValue(previousIdSettings[elementName]);
+                }
+            });
+
+            $(".remove").click(function(){
+                var element = $(this).parent();
+                var name = element.attr('name');
+//                console.log(selectizeTEMP[name]);
+                selectizeTEMP[name][0].selectize.destroy();
+                delete selectizeTEMP[name];
+                $('#'+name).remove();
+                $(element).remove();
+            });
+        });
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <form action="{{ url( null, { 'action': action, 'db': db } )~back }}" method="post" name="cheked">
+        <div class="listtable">
+            <div class="title">
+                <div class="listtitle">
+                    <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/{{ modelname }}.png)"></span>
+                    <h1 class="{{ title|lower|replace(' ', '_') }}">
+                        {{ title }}
+                    </h1>
+                </div>
+                <div class="buttons">
+                    {% block leftlink %}
+                        <a class="add btn-icon submitLink" href="#" title="{{ translate('Save') }}">{{ translate('Save') }}</a>
+                    {% endblock leftlink %}
+                </div>
+            </div>
+            </div>
+            <div class="table mainTable">
+                <div class="tableGrid">
+                    <div class="sortable">
+                        <ul class="header">
+                            <li>ZohoCRM</li>
+                            <li>WepoCRM</li>
+                        </ul>
+                        {#{% set rowcount = max(zoho|length, wepo|length)  %}#}
+                        {% set rowcount = zoho|length  %}
+                        <div class="body">
+                            <ul class = "serialization1">
+                                {% for key,value in 1..rowcount %}
+                                    {#<div id="{{ [value,'+',wepo[key]]|join }}" class="cell">#}
+                                    <div id="{{ zoho[key] }}" class="cell">
+                                        {#{% if wepo[key] is defined  %}#}
+                                            <li>{{ zoho[key] }}</li>
+                                            <select name="modelsIds[{{ zoho[key] }}]" id="field" tabindex="-1" class="selectized" style="display: none;"></select>
+                                            {#<div class="remove">remove</div>#}
+                                        {#{% endif %}#}
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                            <ul class = "serialization2">
+                                {% for key,value in 1..rowcount %}
+                                    {#<div  id="{{ [value,'+',zoho[key]]|join }}" class="cell">#}
+                                    <div  name = "{{ zoho[key] }}" class="cell">
+                                        {#{% if zoho[key] is defined  %}#}
+                                            {#<li>{{ zoho[key] }}</li>#}
+                                            <select name="modelCMPR[{{ zoho[key] }}]" id="field" tabindex="-1" class="selectized" style="display: none;"></select>
+                                            <div class="remove">remove</div>
+                                        {#{% endif %}#}
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                            {#<ul class = "serialization2">#}
+                                {#{% for key,value in 1..rowcount %}#}
+                                    {#<div  id="{{ [value,'+',zoho[key]]|join }}" class="cell">#}
+                                        {#{% if zoho[key] is defined  %}#}
+                                            {#<li>{{ zoho[key] }}</li>#}
+                                            {#<div class="remove">remove</div>#}
+                                        {#{% endif %}#}
+                                    {#</div>#}
+                                {#{% endfor %}#}
+                            {#</ul>#}
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input name="from" value="{{ from }}" type="hidden">
+        <input name="to" value="{{ to }}" type="hidden">
+        {#<input name="LocStack" value="" id="output1" type="hidden">#}
+        {#<input name="ExtStack" value="" id="output2" type="hidden">#}
+    </form>
+{% endblock content %}

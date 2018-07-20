@@ -1,0 +1,13 @@
+{% if key == 'pricebook_id' %}
+    <a href="{{ url( 'pricebook', { 'action': 'view','id':''~attribute(avalue, 'pricebook_id')} )~saurl }}" >{{ avalue.pricebook }}</a>
+{% elseif key == 'product_id' %}
+    <a href="{{ url( 'pricebookdetail', { 'action': 'view','pricebookid':''~attribute(avalue, 'pricebook_id'), 'id':''~attribute(avalue, '_id')} )~saurl }}" >{{ attribute(avalue, "product") }}</a>
+{% elseif key[-4:] == '_dtm' %}
+    {{attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT'))}}
+{% elseif key[-5:] == '_date' %}
+    {{attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT'))}}
+{% elseif key[-6:] == '_price' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}

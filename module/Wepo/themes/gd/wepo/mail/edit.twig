@@ -1,0 +1,13 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Edit Payment') %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<h1>{{title}}</h1>
+<div class="wform">
+    {{form().openTag(form)|raw}}
+    {{formCollection(form)}}
+    {{form().closeTag(form)|raw}}
+</div>
+<div>{{message}}</div>
+<a href="{{ url( 'payment', { 'action': 'list' } ) }}">{{translate('Back to Payment')}}</a>
+{% endblock content %}

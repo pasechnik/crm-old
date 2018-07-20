@@ -1,0 +1,153 @@
+{% extends 'partial/add.twig' %}
+{% block upperform %}
+    <div class="table" {#onKeyUp="updateTotalPrice();" onKeyPress="PutToPrice();" onClick="PutToPrice();#}">
+        <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b>0 $</b></span></h2>
+        {#<div class="hide">
+            <select name="prices"  id="prices">
+                {% for key,value in prices %}
+                    <option value={{key}}>{{value}}</option>
+                {% endfor %}
+            </select>
+        </div>#}
+    </div>
+{% endblock upperform %}
+{% block script %}
+    <script>
+        var prices = null;
+        var select_product, select_pricebook;
+        $(function(){
+            var xhr;
+            var $select_pricebook;
+            var $select_product;
+
+
+            $select_product = $('#product_id').selectize({
+                valueField: 'id',
+                labelField: 'name',
+                searchField: ['name'],
+                sortField: 'id',
+                dropdownParent:'body',
+                onChange:PutToPrice
+            });
+
+
+            select_product  = $select_product[0].selectize;
+
+            $select_pricebook = $('#pricebook_id').selectize({
+                onInitialize: function() {
+                    var value = $('#pricebook_id').val();
+                    select_product.disable();
+                    select_product.clearOptions();
+                    select_product.load(function(callback) {
+                        xhr && xhr.abort();
+                        xhr = $.ajax({
+                            url: window.location.pathname,
+                            type: 'post',
+                            data: {
+                                'fields[pricebook_id]':value
+                            },
+                            success: function(results) {
+                                select_product.enable();
+                                callback(results.names);
+                                prices = results.prices;
+                                select_product.setValue(0);
+                            },
+                            error: function() {
+                                callback();
+                            }
+                        })
+                    });
+                },
+                onChange: function(value) {
+
+                    if (!value.length) return;
+                    select_product.disable();
+                    select_product.clearOptions();
+                    select_product.load(function(callback) {
+                        xhr && xhr.abort();
+                        xhr = $.ajax({
+                            url: window.location.pathname,
+                            type: 'post',
+                            data: {
+                                'fields[pricebook_id]':value
+                            },
+                            success: function(results) {
+                                select_product.enable();
+                                callback(results.names);
+                                prices = results.prices;
+                                select_product.setValue(0);
+                            },
+                            error: function() {
+                                callback();
+                            }
+                        })
+                    });
+                }
+            });
+
+
+
+            select_pricebook = $select_pricebook[0].selectize;
+
+{#            PutToPrice()#}
+{#            $( '#product_id' ).change( PutToPrice );#}
+{#            $( '.selectBox-dropdown-menu li').click( PutToPrice )#}
+            $( '#price,#disc,#qty' ).change( updateTotalPrice );
+        });
+
+
+        function updateTotalPrice()
+        {
+            var price = 0;
+            var disc = 0;
+            var qty = 1;
+            var res = NaN;
+
+            price = parseFloat( document.getElementById( "price" ).value );
+            document.getElementById( 'price' ).value = price;
+            disc = parseFloat( document.getElementById( "disc" ).value );
+            qty = parseFloat( document.getElementById( "qty" ).value );
+            if ( isNaN( price ) )
+            {
+                document.getElementById( "showTotalPrice" ).innerHTML = "<b>0 $ </b>";
+            }
+            if ( !isNaN( price ) )
+            {
+                disc = disc<0?0:disc;
+                disc = disc>100?100:disc;
+                res = (price/100)*(100 - disc)*qty;
+                document.getElementById("disc").value = ""+disc+"";
+                res = res.toFixed(2);
+                document.getElementById( "showTotalPrice" ).innerHTML = "<b>" + res + " $ </b>";
+            }
+        }
+
+        function PutToPrice()
+        {
+            $('#qty').val($('#qty').val()===""?"1":$('#qty').val());
+            $('#disc').val($('#disc').val()===""?"0":$('#disc').val());
+            var id = select_product.getValue();
+            console.log(id);
+            if (id && (id !== "0")) {
+                var price = prices[id];
+                console.log(price);
+{#                $('#price').val($('#prices option[value=' + id + ']').text());#}
+                $('#price').val(price);
+            }
+            else {
+                $('#price').val('0');
+            }
+            updateTotalPrice();
+        }
+    </script>
+{% endblock script %}
+{% block style %}
+      {{parent()}}
+    <style type="text/css">
+        <!--
+        .hide {
+            overflow:hidden;
+            display: none;
+        }
+    </style>
+{% endblock style %}

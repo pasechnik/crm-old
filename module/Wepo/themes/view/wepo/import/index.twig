@@ -1,0 +1,14 @@
+<a href="{{ url( 'import', { }, { 'query':{ } } ) }}">list</a>
+&nbsp;//&nbsp; <a href="{{ url( 'import', { }, { 'query':{ 'c':'all' } } ) }}">import all</a>
+&nbsp;//&nbsp; <a href="{{ url( 'import', { }, { 'query':{ 'd':'all' } } ) }}">drop all</a>
+
+<ol>
+    {% for tab in tables %}
+        <li>
+            <a href="{{ url( 'import', { }, { 'query':{ 'c':loop.index}} ) }}">{{ tab.shortName }}</a>
+            <a href="{{ url( 'import', { }, { 'query':{ 'd':loop.index}} ) }}"><sup>drop</sup></a>
+        </li>
+    {% endfor %}
+</ol>
+
+<a href="/import/index.html?z=31">bookmarks_2_10_15.html</a>

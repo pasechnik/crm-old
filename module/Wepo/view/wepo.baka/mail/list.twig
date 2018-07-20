@@ -1,0 +1,8 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Mails') %}
+
+{% block titleLinks %}
+        <a class="titleRefreshIcon" href="{{ url( null, { 'action': 'sync' } ) }}" title="{{translate('Sync')}}"></a>
+        <a class="titleAddIcon" href="{{ url( null, { 'action': 'send' } ) }}" title="{{translate('Send Mail')}}"></a>
+{% endblock titleLinks %}

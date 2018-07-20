@@ -1,0 +1,114 @@
+<div class="lead_info">
+    {#<h3>{{ translate( model.getModelName()~' information' ) }}</h3>#}
+    <h3>{{ translate( title ~' information' ) }}</h3>
+    <table>
+        <tbody>
+        {% block output %}
+            {% for field_key in fields %}
+                <tr>
+                    <th class="info_{{ field_key }}">{{ labels[field_key] }}</th>
+                    <td data-value="{{ field_key }}">
+                        {% if field_key == 'email' and model.toArray['email_id'] is defined %}
+                            {% if attribute( model, field_key ) is not empty %}
+                                <a href="{{ url( 'mail', { 'action': 'add','to':''~attribute(model, 'email_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a>
+                            {% else %}
+                                <span class="empty_field">{{ translate('empty') }}</span>
+                            {% endif %}
+                        {% elseif field_key=='mobile' %}
+                            <span class="phone">{{ attribute( model, field_key ) }}</span>
+                        {% elseif field_key=='phone' %}
+                            <span class="phone">{{ attribute( model, field_key ) }}</span>
+                        {% elseif field_key=='user_id' %}
+                            <span class="phone"><a
+                                    href="{{ url( null, { 'data': 'user', 'view': 'view','id':""~attribute( model, field_key ) } )~saurl }}">{{ attribute( model, user ) }}</a></span>
+                        {% elseif field_key=='client_id' %}
+                            <span class="phone"><a
+                                    href="{{ url( null, { 'data': 'account' ,'view': 'view','id':''~attribute( model, field_key )} )~saurl }}">{{ attribute( model, account_title) }}</a></span>
+                        {% elseif field_key=='status_id' %}
+                            {{ attribute ( model, status_title )|capitalize }}
+                        {% elseif field_key=='type_id' %}
+                            {{ attribute( model, type_title ) }}
+                        {% elseif field_key=='table_id' %}
+                            {{ attribute( model, table_title ) }}
+                        {% elseif field_key=='role_id' %}
+                            {{ attribute( model, role_title ) }}
+                        {% elseif field_key=='order_id' %}
+                            <a href="{{ url( null, { 'data': 'order', 'view': 'view','id':''~attribute( model, field_key )} )~saurl }}">{{ attribute( model, order_title ) }}</a>
+                        {% elseif field_key=='invoice_id' %}
+                            <a href="{{ url( null, { 'data': 'invoice', 'view': 'view','id':''~attribute( model, field_key )} )~saurl }}">{{ attribute( model, invoice_title ) }}</a>
+                        {% elseif field_key=='contact' %}
+                            <span class="phone">
+                                                <a href="{{ url( null, { 'data': 'contact', 'view': 'view','id':''~attribute( model, field_key ) } )~saurl }}">
+                                                    {{ attribute (model, contact_title) }}
+                                                </a>
+                                            </span>
+                        {% elseif field_key=='order' %}
+                            <span class="phone"><a
+                                    href="{{ url( null, { 'data': 'orderdetail', 'view': 'list','orderid':''~attribute( model, field_key ) } )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                        {% elseif field_key == 'quote_id' and attribute( model, field_key ) is not empty %}
+                            <a href="{{ url( 'quote', { 'data': 'quote', 'view': 'view','id':''~attribute( model, field_key ) } )~saurl }}">
+                                {{ attribute( model, quote_title ) }}
+                            </a>
+                        {% elseif field_key=='pricebook' %}
+                            <span class="phone"><a
+                                    {# href="{{ url( null, { 'data': 'pricebookdetail', 'view': 'list','pricebookid':''~attribute(model, 'pricebook_id')} )~saurl }}"#}  >{{ attribute( model, field_key ) }}</a></span>
+                        {% elseif field_key=='product' %}
+                            <span class="phone"><a
+                                    href="{{ url( null, { 'data': 'product', 'view': 'view','id':''~attribute(model, 'product_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                        {% elseif field_key=='invoice' %}
+                            <span class="phone"><a
+                                    href="{{ url( 'invoice', { 'data': 'invoice', 'view': 'view','id':''~attribute(model, 'invoice_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                        {% elseif field_key=='target_id' %}
+                            <span class="phone"><a
+                                    href="{{ url(tableHandler.getTransportName( attribute( model, table_id ) )|lower, { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ model.target }}</a></span>
+                        {% elseif field_key=='target' %}
+                            <span class="phone"><a
+                                    href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a></span>
+                        {% elseif field_key[-4:] == '_dtm' %}
+                            {{ attribute( model, field_key )|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+                        {% elseif field_key[-5:] == '_date' %}
+                            {{ attribute( model, field_key )|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+                        {% elseif field_key[-5:] == 'price' %}
+                            ${{ attribute( model, field_key )|number_format(2, '.', ',') }}
+                        {% elseif field_key[-3:] == 'sum' %}
+                            ${{ attribute( model, field_key )|number_format(2, '.', ',') }}
+                        {% elseif field_key == 'total_tax' %}
+                            ${{ attribute( model, field_key )|number_format(2, '.', ',') }}
+                        {% elseif field_key == 'total_discount' %}
+                            ${{ attribute( model, field_key )|number_format(2, '.', ',') }}
+                        {% elseif field_key == 'total_adjustment' %}
+                            {% if attribute( model, field_key ) < 0 %}
+                                - ${{ attribute( model, field_key )|abs|number_format(2, '.', ',') }}
+                            {% else %}
+                                ${{ attribute( model, field_key )|number_format(2, '.', ',') }}
+                            {% endif %}
+                        {% elseif field_key == 'changer_id' and attribute(model, 'changer_id') is not empty %}
+                            <a href="{{ url( null, { 'data': 'user', 'view': 'view','id':''~attribute( model, field_key ) } )~saurl }}">
+                                {{ model.changer_title }}
+                            </a>
+                        {% elseif field_key == 'owner_id' and attribute(model, 'owner_id') is not empty %}
+                            <a href="{{ url( null, { 'data': 'user', 'view': 'view','id':''~attribute( model, field_key ) } )~saurl }}">
+                                {{ model.owner_title }}
+                            </a>
+                        {% elseif field_key == 'pricebook_id' and attribute(model, 'pricebook_id') is not empty %}
+                            <a href="{{ url( 'pricebook', { 'action': 'view','id':''~attribute( model, field_key ) } )~saurl }}">
+                                {{ attribute( model, pricebook_title ) }}
+                            </a>
+                        {% elseif field_key == 'product_id' and attribute(model, 'product_id') is not empty %}
+                            <a href="{{ url( null, { 'data': 'product', 'view': 'view','id':''~attribute( model, field_key ) } )~saurl }}">
+                                {{ attribute( model, product_title ) }}
+                            </a>
+                        {% elseif field_key == 'status_stastus' %}
+                            {{ attribute( model, field_key )|capitalize }}
+                        {% elseif field_key == 'call_type' %}
+                            {{ attribute( model, field_key )|capitalize }}
+                        {% else %}
+                            {{ attribute( model, field_key ) }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endblock output %}
+        </tbody>
+    </table>
+</div>

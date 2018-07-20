@@ -1,0 +1,19 @@
+{% extends 'partial/form.twig' %}
+{% set title = translate('Create an account') %}
+
+{% block content %}
+    {% if user.id %}
+    {# when suddenly an unauthorized user see this template - give him links to dashboard and logout #}
+        <a href="{{ url( 'dashboard') }}">{{translate('Dashboard')}}</a>
+        <a href="{{ url( 'index', { 'action': 'logout' } ) }}">{{translate('Sign out')}}</a><br/>
+    {% else %}
+        {{parent()}}
+    {% endif %}
+    {% block script %}
+        <script>
+            $(function(){
+              $( "a[value='save_and_new']" ).hide();
+            });
+        </script>
+    {% endblock script %}
+{% endblock content %}

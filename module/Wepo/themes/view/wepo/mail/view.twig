@@ -1,0 +1,124 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Email: ' ~ model.title %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block content %}
+    <div class="viewtable">
+        <div class="view_header">
+            {% block headeractions %}
+                <div class="buttons left">
+                    <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+                </div>
+                <div class="title"><h1>{{ title }}</h1></div>
+                <span class="edited">
+                    {% if model.toView["changer"] is defined %}
+                        Last Update: {{ model.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }} by {{ model.changerfname }} {{model.changerlname}}
+                    {% endif %}
+                </span>
+                <div class="buttons right">
+                    <a href="#" class="btn-small previous" title="Previous"></a>
+                    <a href="#" class="btn-small next" title="Next"></a>
+                </div>
+            {% endblock headeractions %}
+        </div>
+
+
+
+        <div class="view_block listtable">
+            <div class="buttons">
+
+             {% if model.status !='deleted' %}
+                <a class="btn-icon delete" href="{{ url( null, { 'action': 'delete','id':''~model.id() } )~saurl }}">{{translate('Delete')}}</a> &nbsp;
+             {% elseif model.status == 'deleted' %}
+                <a href="{{ url( null, { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}" class="restore btn-icon green_but submitLink">{{translate('Restore')}}</a> &nbsp;
+             {% endif %}
+
+                {% if model.type == 'inbox' %}
+                    <a class="btn-icon reply" href="{{ url( null, { 'action': 'add','inReplyTo':''~model.id(),'email':model.from } )~saurl }}">{{translate('Reply')}}</a> &nbsp;
+                {% endif %}
+            </div>
+            <div class="mail_info">
+                <h3 class = 'mail_title'>{{ translate( model.getModelName~' text' ) }}</h3>
+                <div class = "text">{{ model.text }}</div>
+                {#<table>#}
+                    {#<tbody>#}
+                    {#&#123;&#35;/////////////////////////////////////////////write heare////////////////////////////////////////////////////////////////////////////////////////&#35;&#125;#}
+                    {#</tbody>#}
+                {#</table>#}
+
+            </div>
+
+            {% block otherinfo %}
+            {% endblock otherinfo %}
+        </div>
+    </div>
+    {% block detailinfo %}
+    {% endblock detailinfo %}
+
+    <div class="fullwidth_area drop_area">
+        {% for wname, widget in widgets %}
+            {% include 'partial/widget.twig' with {'name':wname, 'widget': widget} %}
+            {% if loop.index == (loop.length/2)|round(0,'ceil') %}
+
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="left_area half_area drop_area"></div>
+    <div class="right_area half_area drop_area"></div>
+    <div class="clear"></div>
+    </div>
+
+    <a align="center" id="scrollTop" href="#"></a>
+
+    {% if (paginator.getTotalItemCount) %}
+        <div class="clearfix">
+            <div class="table">
+                <h2>Events</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        {% for key,value in labels %}
+                            {% if (params.desc!=0) %}
+                                <th>
+                                    <b><a href="{{ url( null, { 'action': 'view','id': model.id(),'sort':key} )~saurl }}">{{ value }}</a></b>
+                                    {% if params.sort==key %}
+                                        &#9650;
+                                    {% endif %}
+                                </th>
+                            {% else %}
+                                <th>
+                                    <b><a href="{{ url( null, { 'action': 'view','id': model.id(),'sort':key,'desc':1 } )~saurl }}">{{ value }}</a></b>
+                                    {% if params.sort==key %}
+                                        &#9660;
+                                    {% endif %}
+                                </th>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for akey,avalue in paginator.getCurrentItems %}
+                        <tr>
+                            {% for key,value in labels %}
+                                <td>
+                                    {% if key == 'event_dtm' %}
+                                        {{ attribute(avalue, key)|date('m.d.y H:i:s') }}
+                                    {% else %}
+                                        {{ attribute(avalue, key) }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <div class="buttons clearfix">
+                        {% if paginator.count > 1 %}
+                            {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+                        {% endif %}
+                    </div>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock content %}

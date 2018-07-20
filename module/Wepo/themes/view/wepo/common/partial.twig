@@ -1,0 +1,286 @@
+{% block style %}
+    <style>
+
+        #cardList{
+            max-height: 198px;
+            overflow: auto;
+        }
+
+        a#addCart{
+            margin-left: 20px;
+            background-color: #fafafa;
+            color: #1191d4 !important;
+            -webkit-border-radius: 6px;
+            border: 1px solid #d7d7d7;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 5px 9px;
+        }
+
+        a#addCart:hover {
+            border-color: #1191d4;
+        }
+
+        a.card > img{
+            height: 17px;
+            vertical-align: sub;
+        }
+
+        .ui-dialog-content{
+            height: auto !important;
+        }
+        .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons{
+            height: auto !important ;
+        }
+
+        .card-add-dialog{
+            text-align: -webkit-right !important;
+        }
+
+        .select2{
+            text-align: -webkit-auto !important;
+        }
+
+        .card-add-dialog label{
+            margin-right: 6px;
+        }
+
+        .splabel:after{
+            content: " * ";
+            color: red;
+        }
+
+        .input > .select2{
+            margin-top: 9px !important;
+        }
+
+        .input > input{
+            width: 295px !important;
+            height: 35px !important;
+            margin-top: 9px !important;
+            padding-left: 5px !important;
+            background: #fff;
+            border: none;
+            box-shadow: inset 0 1px 3px #ccc;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+
+        function valid_credit_card(value)
+        {
+            // accept only digits, dashes or spaces
+            if (/[^0-9-\s]+/.test(value)) return false;
+
+            // The Luhn Algorithm.
+            var nCheck = 0, nDigit = 0, bEven = false;
+            value = value.replace(/\D/g, "");
+
+            for (var n = value.length - 1; n >= 0; n--) {
+                var cDigit = value.charAt(n),
+                        nDigit = parseInt(cDigit, 10);
+
+                if (bEven) {
+                    if ((nDigit *= 2) > 9) nDigit -= 9;
+                }
+                nCheck += nDigit;
+                bEven = !bEven;
+            }
+            return (nCheck % 10) == 0;
+        }
+
+        $(function()
+        {
+            twoscrolls('#cardList');
+
+            $('#body').on("click", ".tooltip", function () {
+                return false;
+            });
+
+            $('#body').on("click", "a#addCart", function (event)
+            {
+                event.preventDefault();
+                $('#body').css('cursor','wait');
+
+                var loadUrl = location.href;
+                    loadUrl = loadUrl.substring(0, loadUrl.indexOf('?'));
+                    loadUrl = loadUrl +' '+"div.other_widget table";
+
+                var formGet = $.get($(this).attr('href'),function(data){
+                    $('.card-add-dialog').html($(data).find('div.form').html());
+                });
+
+                formGet.done(function()
+                {
+                    $('#body').css('cursor','default');
+                    $('div.col:first').find('div.input:first').remove();
+                    $('div.col:last').find('select').closest('div').remove();
+
+                    $('.card-add-dialog').find('select').select2();
+
+                        $('.card-add-dialog').dialog(
+                        {
+                            open: function ()
+                            {
+                                $(window).on('scroll resize', function ()
+                                {
+                                    $('.card-add-dialog').dialog("option", "position", $('.card-add-dialog').dialog("option", "position"));
+                                });
+                                $('.ui-widget-overlay').addClass('custom-overlay');
+                            },
+
+                            close: function () {
+                                $('.ui-widget-overlay').removeClass('custom-overlay');
+                            },
+
+                            show: {effect: '', duration: 600, my: "top", at: "center", of: window},
+                            hide: {effect: '', duration: 400},
+                            title: "Do you want to add new card ?",
+                            width: '500',resizable: false, draggable: false, closeOnEscape: true,
+                            buttons:
+                            {
+                                Yes: function ()
+                                {
+                                    var required = true;
+
+                                    $.when($('div.col').each(function()
+                                    {
+                                      $(this).find('select,input').each(function()
+                                      {
+                                          if ($(this).val() == '')
+                                          {
+                                              required = false;
+                                          }
+                                      });
+
+                                    })).then(function()
+                                    {
+                                        if (required)
+                                        {
+                                            if ( valid_credit_card($('input[name="fields[card_number]"]').val()) )
+                                            {
+                                                $('a#addCart').addClass('disabled');
+                                                $("div.other_widget table").html
+                                                (
+                                                   '<td align = "center" colspan="15">' +
+                                                     ' <img style = "padding:10px; padding-top: 30px;padding-right: 20px" src =/css/img/icons/32x32-icons/ajax-loader1.gif>' +
+                                                   ' </td>'
+                                                );
+                                                startloader();
+
+                                                $.ajax({
+                                                    url:  $('a#addCart').attr('href'),
+                                                    type: 'POST',
+                                                    traditional: true,
+                                                    data:{
+                                                        'fields[lead_id]'        :  $('a#addCart').attr('data-lead'),
+                                                        'fields[patient_id]'     :  $('a#addCart').attr('data-lead'),
+                                                        'fields[card_status_id]' :  $('select[name="fields[card_status_id]"]').val(),
+                                                        'fields[card_type_id]'   :  $('select[name="fields[card_type_id]"]').val(),
+                                                        'fields[card_number]'    :  $('input[name="fields[card_number]"]').val(),
+                                                        'fields[sec_code]'       :  $('input[name="fields[sec_code]"]').val(),
+                                                        'fields[exp_date]'       :  $('input[name="fields[exp_date]"]').val()
+                                                    },
+                                                    success: function () {
+                                                        $("div.other_widget table").load(loadUrl);
+                                                    },
+                                                    error: function() {
+                                                        alert('An ERROR has occurred!');
+                                                        location.reload();
+                                                    }
+                                                });
+
+                                                $(document).ajaxStop(function ()
+                                                {
+                                                    stoploader();
+                                                    $('a#addCart').removeClass('disabled');
+                                                    if ($('div.other_widget table tbody').children().length > 0){
+                                                        $('a#addCart').next('span.viewRecord').hide();
+                                                    }
+                                                });
+                                                $('.card-add-dialog.ui-dialog-content.ui-widget-content').dialog("close");
+                                            }
+                                            else{
+                                                alert('Invalid card number !');
+                                            }
+                                        }
+                                        else{
+                                            alert('All fields are required !');
+                                        }
+                                    });
+                                },
+                                No: function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        });
+                });
+            });
+
+            $('#body').on("click", "a.card img.delete", function (event)
+            {
+                window.id    = $(this).closest('a').attr('data-id');
+                window.title = $(this).closest('tr').find('.d_title').text();
+                window.scope = 'card'+$('div.title').attr('data-scope');
+                apiDialog('single');
+                return false;
+            });
+        });
+    </script>
+{% endblock script %}
+
+<div class="lead_info other_widget">
+  <div class="title">
+    <div class="listtitle">
+      <h3>{{ translate( title ) }}</h3>
+         {% if links %}
+               {% for icon_key, link in links %}
+                  <a data-lead="{{ link.queryparams[model.getModelName|lower] }}" id="addCart" href="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">
+                      {{ translate(link.label) }}
+                  </a>
+               {% endfor %}
+         {% endif %}
+    </div>
+  </div>
+
+<div id="cardList">
+    <table>
+        <tbody class="has_record">
+        {% for item in paginator.getCurrentItems %}
+            <tr>
+                {% for value in fields %}
+                    <th>{{ attribute( labels, value ) }}</th>
+                    <td>
+                        {% if value == 'title' %}
+                            <span class = "d_title">
+                                {{ attribute( item, value )   }}
+                            </span>
+                        {% else %}
+                                {{ attribute( item, value )   }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+                {% if actions %}
+                    <td>
+                        {% for action, conf in actions %}
+                            <a class="actionview card"
+                                    data-id="{{ attribute(item, conf.id) }}"
+                                    href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~attribute(item, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                    src="/img/1.png" class="{{ action }}"
+                                    alt="{{ action }}"/><span
+                                    class="tooltip top">{{ action|capitalize }}</span></a>
+                        {% endfor %}
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<div class="card-add-dialog"></div>
+<div class="dialog-message"></div>

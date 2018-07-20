@@ -1,0 +1,28 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Emails') %}
+
+{% block leftlink %}
+    <a class="mail btn-icon" href="{{ url( null, { 'action': 'add' } )~saurl }}" title="{{ translate('Send Email') }}">{{translate("Send Email")}}</a>
+    <a class="refresh btn-icon" href="{{ url( null, { 'action': 'sync' } ) }}" title="{{ translate('Sync Emails') }}">{{translate("Sync Emails")}}</a>
+{% endblock leftlink %}
+
+{% block data %}
+    {% include 'partial/mail-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+    <a class="actionview" href="{{ url( null, { 'action': 'view','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="view" /><span class="tooltip top">View</span></a>&nbsp;
+{#    <a class="actionview" href="{{ url( null, { 'action': 'delete','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="delete" /><span class="tooltip top">Delete</span></a>#}
+    <a class="actionview"><img src="/img/1.png" class="delete single_del" /><span class="tooltip top">Delete</span></a>
+{% endblock action %}
+
+{#{% block downButtons %}#}
+    {#<div class="buttons clearfix">#}
+        {#<a href="#" class="red_but submitLink">{{ translate('Delete selected') }}</a>#}
+        {#<noscript><input type="submit" name="delete" value="{{ translate('Delete selected') }}"/></noscript>#}
+        {#{% if paginator.count > 1 %}#}
+            {#{% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}#}
+        {#{% endif %}#}
+    {#</div>#}
+{#{% endblock downButtons %}#}

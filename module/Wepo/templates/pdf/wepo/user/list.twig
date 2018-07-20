@@ -1,0 +1,19 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Users') %}
+
+{% block data %}
+    {% include 'partial/user-list.twig' %}
+{% endblock data %}
+
+{% block right_top_links %}
+    <div style = "float: right; margin:0 0 0 12px;">
+        <div  class="buttons clearfix" >
+            {% if saurlback !='/' %}
+                <a href="{{ saurlback }}">{{ translate('Cancel') }}</a>
+            {% else %}
+                <a href="{{ url( 'setup', { 'action': 'list' } ) }}">{{translate('Cancel')}}</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock right_top_links %}

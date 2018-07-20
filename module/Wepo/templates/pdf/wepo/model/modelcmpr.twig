@@ -1,0 +1,292 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Model Admin') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+
+{% block style %}
+    {{ parent() }}
+    <style>
+        .ui-sortable-helper {
+            border: 0;
+            height: 15px !important;
+        }
+
+        .sortable ul.header{
+            background-color: #ebeaea;
+            background-image: none;
+            padding: 0;
+            height: 57px;
+            border-bottom: #e0e0e0 1px solid;
+            font-weight: bold;
+        }
+
+        .sortable ul.header li{
+            float: left;
+            width: 40%;
+            padding: 20px 0 0 0;
+            /*color:#1191d4;*/
+            text-decoration: none;
+        }
+
+        .sortable ul.header li span{
+            padding: 0 0 0 10px;
+            color:#1191d4;
+            text-decoration: none;
+        }
+
+        .sortable ul.header li.checkable{
+            float: left;
+            width: 10%;
+            padding: 1% 0 0 0;
+            color:#1191d4;
+            text-decoration: none;
+        }
+
+        .sortable .body ul{
+            float: left;
+            width: 40%;
+        }
+
+        /*.is-disabled {*/
+            /*opacity: .5;*/
+            /*pointer-events: none;*/
+        /*}*/
+
+        .sortable .body ul.checkable{
+            float: left;
+            width: 10%;
+        }
+
+        .sortable .body ul .cell{
+            border-top:1px solid #f0f0f0;
+            height: 37px;
+            width: 98%;
+            padding: 10px 1% 10px 1%;
+        }
+
+
+        .placeholder{
+            background-color: lightyellow;
+        }
+
+        .sortable .body ul .cell:hover{
+            background-color: #e1f5fe;
+            border-left: #b3e5fc 1px solid;
+            border-right: #b3e5fc 1px solid;
+        }
+
+        .sortable .body ul li{
+            padding: 10px 10px 0 0;
+            float: left;
+        }
+
+        .remove{
+            padding: 10px 10px 0 0;
+            float: right;
+            color: #cd5c5c;
+        }
+
+        .remove:hover{
+            color: #ff0000;
+            cursor: pointer;
+        }
+
+        .serialization1 .selectize-control{
+            float: right;
+        }
+
+        .checkboxArea{
+            margin:10px !important;
+        }
+    </style>
+{% endblock style %}
+{% block script %}
+    <script>
+        var selectizeControls = [];
+        var selectizeTEMP = [];
+        var modelList = {{ wepo|json_encode|raw }};
+        var selectedModelList = [];
+        var previousModelSettings = {{ previous_settings|json_encode|raw }};
+        $(function(){
+            $('select').each(function( index, element ){
+                var elementName = $(element).parent().attr('name');
+//                console.log(elementName);
+                selectizeTEMP[$(element).parent().attr('name')] = $(element).selectize({
+                    dropdownParent: 'body',
+                    options: modelList,
+                    onChange: function(value) {
+                        var currentElement = $(element).parent().attr('name');
+                        var restoreElement = selectedModelList[currentElement];
+                        selectedModelList[currentElement] = modelList[value];
+                        delete modelList[value];
+                        for(var index in selectizeTEMP)
+                        {
+                            if(index!=currentElement)
+                            {
+                                selectizeTEMP[index][0].selectize.removeOption(value);
+                                if(restoreElement != undefined) {
+                                    selectizeTEMP[index][0].selectize.addOption(restoreElement);
+                                }
+                            }
+                        }
+                    }
+                });
+//                console.log(elementName);
+//                console.log(previousModelSettings);
+                if(previousModelSettings[elementName] != undefined) {
+//                    console.log(elementName);
+                    selectizeTEMP[elementName][0].selectize.setValue(previousModelSettings[elementName]);
+                }
+            });
+
+
+            $(".remove").click(function(){
+                var element = $(this).parent();
+                var name = element.attr('name');
+//                console.log(name);
+                selectizeTEMP[name][0].selectize.destroy();
+                delete selectizeTEMP[name];
+                $(element).remove();
+                $('[name='+name+']').remove();
+            });
+
+            $(".isId .checkboxArea").click(function(){
+                var number = $(this).next().attr('id');
+                var name = $(this).parent().attr('name');
+//                console.log($(this).parent().attr('name'));
+//                console.log('hello');
+//                console.log(number);
+//                var cell = $($(group2.children()[number]).find('li'));
+                var cell = $($($('.serialization1').children()[number]).find('li'));
+                var staticCell = $($($('.isStatic').children()[number]).find('div'));
+//                console.log(cell);
+                if($(this).hasClass('checked')) {
+                    var modelList = {{ zoho_models|json_encode|raw }};
+                    cell.after(
+                        '<select name="idlinks['+name+']" id="field" tabindex="-1" class="selectized" style="display: none;"></select>'
+                    );
+
+                    selectizeControls[name] = cell.next().selectize({
+                        dropdownParent: 'body',
+                        options: modelList
+                    });
+                    selectizeControls[name][0].selectize.setValue(0);
+                    staticCell.removeClass('hidden')
+                }
+                else
+                {
+                    selectizeControls[name][0].selectize.destroy();
+                    cell.next().remove();
+                    staticCell.addClass('hidden')
+                }
+            });
+
+            $(".isStatic .checkboxArea").click(function(){
+//                var number = $(this).next().attr('id');
+                var name = $(this).parent().parent().attr('name');
+                if($(this).hasClass('checked')) {
+                    var modelList = {{ zoho_static_models|json_encode|raw }};
+                }
+                else
+                {
+                    var modelList = {{ zoho_models|json_encode|raw }};
+                }
+                selectizeControls[name][0].selectize.clear();
+                selectizeControls[name][0].selectize.clearOptions();
+                selectizeControls[name][0].selectize.load(function(callback){
+                    callback(modelList);
+                });
+            });
+
+
+            for(var field in previousModelSettings) {
+                var name = field.toLowerCase().replace(/\s+/g, '');
+                if(typeof previousModelSettings[field] == 'object') {
+                    $('.isId [name=' + name + '] .checkboxArea').trigger('click');
+                    if(previousModelSettings[field].type=='static_lookup')
+                    {
+                        $('.isStatic [name=' + name + '] .checkboxArea').trigger('click');
+                    }
+                    var value = previousModelSettings[field].from.split('.')[0];
+                    selectizeControls[name][0].selectize.setValue(value);
+                    selectizeTEMP[name][0].selectize.setValue(previousModelSettings[field].to);
+                }
+                else{
+                    selectizeTEMP[name][0].selectize.setValue(previousModelSettings[field]);
+                }
+            }
+        });
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <form action="{{ url( null, { 'action': action, 'db': db } )~back }}" method="post" name="checked">
+        <div class="listtable">
+            <div class="title">
+                <div class="listtitle">
+                    <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/{{ modelname }}.png)"></span>
+                    <h1 class="{{ title|lower|replace(' ', '_') }}">
+                        {{ title }}
+                    </h1>
+                </div>
+                <div class="buttons">
+                    {% block leftlink %}
+                        <a class="add btn-icon submitLink" href="#" title="{{ translate('Save') }}">{{ translate('Save') }}</a>
+                    {% endblock leftlink %}
+                </div>
+            </div>
+            <div class="table mainTable">
+                <div class="tableGrid">
+                    <div class="sortable">
+                        <ul class="header">
+                            <li><span>ZohoCRM</span></li>
+                            <li><span>WepoCRM</span></li>
+                            <li class="checkable"><span>Lookup</span></li>
+                            <li class="checkable"><span>Is Static</span></li>
+                        </ul>
+                        {#{% set rowcount = max(zoho|length, wepo|length)  %}#}
+                        {% set rowcount = zoho|length %}
+                        <div class="body">
+                            <ul class = "serialization1">
+                                {% for key,value in 1..rowcount %}
+                                    <div  name="{{ zoho[key]|lower|replace({' ':''}) }}" class="cell movable">
+                                        <li>{{ zoho[key] }}</li>
+                                        {#<div class="remove">remove</div>#}
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                            <ul class = "serialization2">
+                                {% for key,value in 1..rowcount %}
+                                    <div name = "{{ zoho[key]|lower|replace({' ':''}) }}" class="cell">
+                                        <select name="modelCMPR[{{ zoho[key] }}]" id="field" tabindex="-1" class="selectized" style="display: none;"></select>
+                                        <div class="remove">remove</div>
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                            <ul class = "isId checkable">
+                                {% for key,value in 1..rowcount %}
+                                    <div class="checkbox cell" name = "{{ zoho[key]|lower|replace({' ':''}) }}">
+                                        <input title="" type="checkbox" name="isId[{{ zoho[key]|lower|replace({' ':''}) }}]" id="{{ key }}"
+                                               value="true" class="check" />
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                            <ul class = "isStatic checkable">
+                                {% for key,value in 1..rowcount %}
+                                    <div class="checkbox cell" name = "{{ zoho[key]|lower|replace({' ':''}) }}">
+                                        <div class="hidden">
+                                            <input title="" type="checkbox" name="isStatic[{{ zoho[key]|lower|replace({' ':''}) }}]" id="{{ key }}"
+                                                   value="true" class="check" />
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input name="from" value="{{ from }}" type="hidden">
+        <input name="to" value="{{ to }}" type="hidden">
+    </form>
+{% endblock content %}

@@ -1,0 +1,134 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Fields')%}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+
+<script type="text/javascript" src="/js/libs/shapeshift.js"></script>
+
+<div class="title">
+     <div style="padding-top: 5px;" class="listtitle">
+         <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/setup.png)"></span>
+              <h1>Setup</h1>
+     </div>
+</div>
+
+<div class="container">
+
+    <div class="div_info">
+        <img class="setup_img" src="/css/img/icons/other-icons/setup1.png"/>
+        <span class="setup_span"><h2 class="setup_h2">Personal settings</h2></span>
+          <br/>
+
+      <a class="setup_a" href="{{ url( 'common', { 'data': 'user', 'view': 'view', 'id':user.id() } )~saurl }}">My profile</a>
+            <span class="separator">|</span>
+      <a class="setup_a" href="{{ url( 'common', { 'data': 'profile', 'view': 'password' } )~saurl }}">Password change</a>
+    <hr/>
+    </div>
+
+
+    <div class="div_info_long">
+        <img class="setup_img" src="/css/img/icons/other-icons/setup2.png"/>
+        <span class="setup_span"><h2 class="setup_h2">Users & Permissions</h2></span>
+          <br/>
+
+      <a class="setup_a" href="{{ url( 'common', { 'data': 'user', 'view': 'list' } )~saurl }}">Users</a>
+           <span class="separator">|</span>
+      <a class="setup_a" href="{{ url( 'common', { 'data':'mailSendSetting', 'view': 'list' } )~saurl }}">Users Email send settings</a>
+           <span class="separator">|</span>
+        <a class="setup_a" href="{{ url( 'common', { 'data':'mailReceiveSetting', 'view': 'list' } )~saurl }}">Users Email receive settings</a>
+      <hr/>
+    </div>
+
+    <div class="div_info_long">
+        <img class="setup_img" src="/css/img/icons/other-icons/setup3.png"/>
+        <span class="setup_span"><h2 class="setup_h2">Customization</h2></span>
+         <br/>
+
+      <a class="setup_a" href="#">Modules (Models + Forms)</a>
+          <span class="separator">|</span>
+      <a class="setup_a" href="#">Views</a>
+          <span class="separator">|</span>
+      <a class="setup_a" href="#">Widgets</a>
+      <hr/>
+    </div>
+
+    <div class="div_info_long">
+        <img class="setup_img" src="/css/img/icons/other-icons/setup4.png"/>
+        <span class="setup_span"><h2 class="setup_h2">Templates</h2></span>
+        <br/>
+
+        <a class="setup_a" href="{{ url( 'common', { 'data': 'templatepdf', 'view': 'list' } )~saurl }}">PDF Templates</a>
+        <span class="separator">|</span>
+        <a class="setup_a" href="{{ url( 'common', { 'data': 'templateemailfolder', 'view': 'list' } )~saurl }}">Email Folder Templates</a>
+        <span class="separator">|</span>
+        <a class="setup_a" href="{{ url( 'common', { 'data': 'templateemail', 'view': 'list' } )~saurl }}">Email Templates</a>
+        <hr/>
+    </div>
+</div>
+
+<a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}
+
+{% block script %}
+<script>
+
+$(function(){
+
+  $(".container").shapeshift({
+    minColumns: 1,
+    enableDrag: false
+  });
+
+});
+</script>
+{% endblock script %}
+
+{% block style %}
+    <style>
+.setup_table{
+   border: 1px solid black;
+}
+
+.setup_span{
+    font-size: 20px;
+    color:#e32b06
+}
+
+.setup_a{
+    display: inline-block;
+    font-size: 15px;
+    padding-left: 3px;
+    padding-bottom: 4px;
+}
+
+.setup_h2{
+    padding-top: 3px;
+    padding-left: 3px;
+}
+
+.separator{
+   color: #999999;
+   font-size: 16px;
+}
+
+.container{
+  position: relative;
+  width: 100%;
+}
+
+.div_info{
+   width: 200px;
+   height: 180px;
+   padding-right: 50px;
+}
+
+.div_info_long{
+   width: 249px;
+   height: 180px;
+}
+
+.container div{
+   position: absolute;
+}
+    </style>
+{% endblock style %}

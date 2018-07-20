@@ -1,0 +1,234 @@
+{% extends 'wepo/common/form.twig' %}
+
+{% block script %}
+    {{ parent() }}
+
+    <script>
+
+        function deleteTemplate ()
+        {
+            $('select[name="fields[template_id]"]').next('.select2').find('span.select2-selection__clear').mousedown(function ()
+            {
+                tinyMCE.activeEditor.setContent('');
+                $('input[name="fields[title]"]').val(null).trigger('change');
+
+                if( $('select[name="fields[from]"] option').length > 1 )
+                {
+                    $('select[name="fields[from]"] option:last').remove();
+                }
+            });
+        }
+
+        $(function ()
+        {
+            $('input[type="hidden"]').parent('div').css('display','none');
+
+            $('select[name="fields[to][]"]').change(function()
+            {
+                var interval = setInterval(function ()
+                {
+                    if ($(window).scrollTop() < $('#header').height() - $('#mainMenu').height()) {
+                        fixedMenu();
+                        clearInterval(interval);
+                    }
+                }, 1)
+            });
+
+            if ( $('input[name="fields[info_hide]"]').val() !='' )
+            {
+                var optMass = [];
+                var emails  = $('input[name="fields[info_hide]"]').val();
+                    emails  = emails.replace(/[,]/g, '');
+                $('#email').append(emails);
+
+
+                $('#email option').each(function(){
+                    optMass.push($(this).val());
+                });
+
+                $('#email').val(optMass).trigger("change");
+            }
+
+            //tinyMCE design fix
+            $('select[name="fields[to][]"]').change(function(){
+                $('#mceu_21').fadeTo(1,0.9).fadeTo(1,1);
+            });
+            //end tinyMCE design fix
+
+            if ($('select[name="fields[template_id]"]').length)
+            {
+                if ($('select[name="fields[template_id]"]').val())
+                {
+                    CopyFromTemplate();
+                    deleteTemplate();
+                }
+
+                $('select[name="fields[template_id]"]').change(function ()
+                {
+                    CopyFromTemplate();
+                    deleteTemplate();
+                });
+            }
+
+            $('select.email-select2').each(function (index)
+            {
+                var scope = $(this).attr('data-scope');
+                var query = $(this).attr('data-query')||'';
+                $(this).select2(
+                {
+                    ajax: {
+                        url: '/api/v2/data/'+scope,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            data = {
+                                q: params.term, // search term
+                                p: params.page
+                            };
+
+                            if (query.length)
+                            {
+                                data.query = query;
+                            }
+                            return data;
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+                            var resData = data.data;
+                            $.each(resData, function (index, value) {
+                                    value.id = value.email;
+                                    resData[index] = value;
+                                }
+                            );
+                            return {
+                                results: resData,
+                                pagination: {
+                                    more: (params.page * 10) < data.count
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    templateResult: function (item) {
+                        if (item.loading) return item.text;
+                        return $('<div />').text(item.title).html();
+                    },
+                    templateSelection: function (item) {
+                        return $('<div />').text(item.title || item.text).html();
+                    }
+                });
+            });
+        });
+
+    </script>
+    <script>
+        function CopyFromTemplate()
+        {
+           var template_id = $("select[name='fields[template_id]'] option:selected").val();
+
+            if (template_id != '')
+            {
+                apiGet('templateemail', template_id, function (item) {
+                    $("input[name='fields[title]']").val(item['data']['subject']);
+
+                    if ($("select[name='fields[from]'] option").size() > 1) {
+                        $("select[name='fields[from]'] :last").remove();
+                    }
+                    if (item['data']['from_id'] != '') {
+                        $("select[name='fields[from]']").append($('<option value="' + item['data']['from_id'] + '">' + item['data']['reply_to'] + '</option>'));
+                    }
+                    tinyMCE.get('mailtext[text]').setContent(item['data']['body'] + item['data']['footer']);
+                    twoscrolls('#mceu_34');
+                });
+            }
+        }
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <div class="viewtable">
+        <div class="form_header">
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+        {% do form.setAttribute('class',form.getAttribute('class')) %}
+        {{ form().openTag(form)|raw }}
+        {% block upperform %}
+        {% endblock upperform %}
+        {% block formDetails %}
+            {% for fkey, fieldset in form %}
+                {% if fieldset.getAttribute('class')=='table' and fieldset is not empty %}
+                    <div class='table fieldset'>
+                        <h2>{{ fieldset.getLabel }}</h2>
+
+                        <div class="form_info">* Required Field(s)</div>
+                        <div id="fields" class="form">
+                            <div class="col">
+                                {% for ekey, element in fieldset %}
+                                {#{% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}#}
+                                {% if ekey == fieldset|length//2 - 1 %}
+                            </div>
+                            <div class="col">
+                                {% endif %}
+                                <div class="input">
+                                    <label
+                                        for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}
+                                    >
+                                    {% if element.Label!=NULL %}
+                                        <span class="splabel">{{ element.getLabel }}:</span>
+                                    {% endif %}
+                                    </label>
+                                    {% if element.getAttribute('type')=='checkbox' %}
+                                        <div class="checkbox">{{ formElement(element) }}</div>
+                                    {% else %}
+                                        {{ formElement(element) }}
+                                    {% endif %}
+                                    <label for="id{{ element.getName }}"
+                                           class="error {% if element.getMessages and element.valueOptions is empty %}{% else %}hidden{% endif %}">{% for message in element.getMessages %}{{ message }}{% endfor %}</label>
+                                    {#{ WepoElementErrors(element) }#}
+                                </div>
+                                {% endfor %}
+                                <div class="input">
+                                    <label for="iderror" class="error">{{ message }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='buttons' %}
+                    <div class="listtable">
+                        <div class="buttons clearfix {{ fieldset.getName }}">
+                            {% for ekey, element in fieldset %}
+                                <a href="#" class="submitLink btn-icon send" type='submit'
+                                   value='{{ element.getLabel }}'
+                                   title='{{ element.getValue }}'>{{ element.getValue }}</a>
+                                <noscript>{{ formRow(element) }}</noscript>
+                            {% endfor %}
+                            <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                               class="btn-icon cancel" title="Cancel">{{ translate("Cancel") }}</a>
+
+                            <div class="success_msg hidden"><i class="imgTxt txtError"></i>
+
+                                <div>some global error message</div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='additional' %}
+                    {% block additionalFieldset %}
+                    {% endblock additionalFieldset %}
+                {% else %}
+                    <div class="">
+                        {% for ekey, element in fieldset %}
+                            {{ formElement(element) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock formDetails %}
+        {{ form().closeTag(form)|raw }}
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

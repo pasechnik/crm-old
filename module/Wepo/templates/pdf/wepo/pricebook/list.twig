@@ -1,0 +1,13 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Pricebooks') %}
+
+{% block data %}
+    {% include 'partial/pricebook-list.twig' %}
+{% endblock data %}
+
+{#{% block action %}
+    <a href="{{ url( null, { 'action': 'view','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="view" /></a>&nbsp;
+    <a href="{{ url( null, { 'action': 'edit','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="edit" /></a>&nbsp;
+    <a href="{{ url( null, { 'action': 'delete','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="delete" /></a>
+{% endblock action %}#}

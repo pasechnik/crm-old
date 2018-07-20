@@ -1,0 +1,7 @@
+{% extends 'layout/layout.twig' %}
+
+{% block content %}
+    {% for field in data.field %}
+        {% include field.template with field %}
+    {% endfor %}
+{% endblock content %}

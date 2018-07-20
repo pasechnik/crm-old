@@ -1,0 +1,18 @@
+{% extends 'layout/layout.twig' %}
+{% set seconds = seconds|default(1) %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+{% block meta %}
+    <META HTTP-EQUIV="refresh" CONTENT="{{ seconds }}; url={{ toUrl|default('/') }}">{% endblock meta %}
+{% block content %}
+    <div style="text-align: center;">
+        <div class='view_header'>
+            <div class='title'><h1>{{ message }}</h1></div>
+        </div>
+        <div class="table">
+            <div style="text-align:center">
+                After {{ seconds }} seconds you will be sent to the address {{ toUrl }}, if it doesn't happen, use this
+                <a href="{{ toUrl|default('/') }}">link</a>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

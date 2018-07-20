@@ -1,0 +1,23 @@
+{% extends 'partial/recyclelist.twig' %}
+
+{% set title = translate('Pricebooks') %}
+
+{% block data %}
+    {% include 'partial/pricebook-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+    <a class="actionview"
+       href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~avalue.id() } )~saurl }}">
+        <img src="/img/1.png" class="view" alt="{{ translate('View') }}"/>
+        <span class="tooltip top">View</span>
+    </a>&nbsp;
+    <a class="actionview">
+        <img src="/img/1.png" class="restore single_res" alt="{{ translate('Restore') }}"/>
+        <span class="tooltip top">Restore</span>
+    </a>&nbsp;
+    <a class="actionview">
+        <img src="/img/1.png" class="clean single_cln" alt="{{ translate('Clean') }}"/>
+        <span class="tooltip top">Clean</span>
+    </a>
+{% endblock action %}

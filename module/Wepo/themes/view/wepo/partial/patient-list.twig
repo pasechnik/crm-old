@@ -1,0 +1,66 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'common', { 'data':'patient', 'view':'view',  'id':avalue.id() }, { 'query': { 'back':saurlhash } } ) }}" ><span class="d_title">{{ avalue.fname ~ ' ' ~ avalue.lname }}</span></a>
+
+{% elseif key == 'email' %}
+    <a data-to="{{ attribute(avalue, 'email') }}" href="{{ url( 'common', { 'data': 'mail','view':'send','to':''~attribute(avalue, 'email')} )~saurl }}">
+        {{ attribute(avalue, key) }}
+    </a>
+
+{% elseif key == 'sec_email' and attribute(avalue, 'sec_email') is not empty %}
+    <a href="{{ url( 'common', { 'data': 'mail','view':'send','to':''~attribute(avalue, 'sec_email')} )~saurl }}" >{{attribute(avalue, key)}}</a>
+
+{% elseif key == 'birth_date'%}
+    {{attribute(avalue, key)|date('m/d/y')}}
+
+{% elseif key == 'changer_title' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.changer_title }}
+    </a>
+
+{% elseif key == 'creator_title' and attribute(avalue, 'creator_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'creator_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.creator_title }}
+    </a>
+
+{% elseif key == 'changer' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'changer_id') }, { 'query': { 'back':saurlhash } } ) }}" >
+        {{ avalue.changer}}
+    </a>
+
+{% elseif key == 'status_id' %}
+    {{ attribute(avalue, "status") }}
+
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+
+{% elseif key == 'owner' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}" >
+        {{ avalue.owner}}
+    </a>
+
+{#{% elseif key == 'account_id' %}#}
+    {#<a href="{{ url( 'common', { 'data':'account', 'view':'view',  'id':''~attribute(avalue, 'account_id') }, { 'query': { 'back':saurlhash } } ) }}" >{{attribute(avalue, "account")}}</a>#}
+
+{% elseif key == 'account_title' %}
+    <a href="{{ url( 'common', { 'data':'account', 'view':'view',  'id':''~attribute(avalue, 'account_id') }, { 'query': { 'back':saurlhash } } ) }}" >{{attribute(avalue, "account_title")}}</a>
+{% elseif key == 'doctor_title' %}
+    <a href="{{ url( 'common', { 'data':'doctor', 'view':'view',  'id':''~attribute(avalue, 'doctor_id') }, { 'query': { 'back':saurlhash } } ) }}" >{{attribute(avalue, "doctor_title")}}</a>
+
+{% elseif key == 'phone' or key=='mobile' %}
+    <span class="phone">{{ attribute(avalue, key) }}</span>
+
+{% elseif key == 'email_unsubscr' %}
+    {% if  attribute(avalue, key) == 'true' %}<img src="/img/checked.png" alt="Yes" />{% endif %}
+
+{% elseif key == 'website'  %}
+    <a href="{{ attribute(avalue, key) }}" target="_blank">{{ attribute(avalue, key) }}</a>
+
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% else %}
+    {{attribute(avalue, key)}}
+{% endif %}

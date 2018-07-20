@@ -1,0 +1,146 @@
+<!-- Quote Template -->
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" style="background:#fff;padding:2px;">
+    <tbody>
+    <tr>
+        <td>
+            <table border="0" cellspacing="0" cellpadding="0" width="100%"
+                   style="border-left:1px solid #dadada;border-right:4px solid #dadada;border-top:1px solid #dadada;border-bottom:4px solid #dadada;padding:10px;background-color:white;">
+                <tbody>
+                <tr>
+                    <td valign="top">
+                        <table border="0" cellspacing="0" cellpadding="0" width="100%" style="font-size:18px;">
+                            <tbody>
+                            <tr>
+                                <td valign="top" align="left">${companyLogo}</td>
+                                <td style="font-size:12px;color:black;" valign="Bottom" align="left"><span
+                                        style="font-size:16px;color:black;font-weight:bold;">${Organization.Organization Name}</span><br>${Organization.Street}<br>${Organization.City}<br>${Organization.State}<br>${Organization.Country}
+                                    ${Organization.Zip Code}
+                                </td>
+                                <td style="font-size:12px;color:black;" valign="Bottom" align="right"><span
+                                        style="font-size:20px;font-weight:bold;">Quote</span><br><span
+                                        style="font-size:12px;color:black;">Valid Till: ${Quotes.Valid Till}</span><br><span
+                                        style="font-size:12px;color:black;">Quote Number : ${Quotes.Quote Number}</span><br>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td width="50%" valign="top" style="border:2px solid #E8E8E8;color:#000;"><b>BILL
+                                        TO:</b><br><br><b>${Quotes.Billing Street}</b><br>${Quotes.Billing City}<br>${Quotes.Billing
+                                    State}<br>${Quotes.Billing Country}<br>${Quotes.Billing Code}<br></td>
+                                <td width="50%" valign="top" style="border:2px solid #E8E8E8;color:#000;"><b>SHIP
+                                        TO:</b><br><br><b>${Quotes.Shipping Street}</b><br>${Quotes.Shipping City}<br>${Quotes.Shipping
+                                    State}<br>${Quotes.Shipping Country}<br>${Quotes.Shipping Code}<br></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br><br>
+                        <table border="0" cellspacing="0" cellpadding="0" width="100%"
+                               style="font-family: Arial, Helvetica, sans-serif;font-size:11px;color:#000;">
+                            <tbody>
+                            <tr>
+                                <td style="border-top:2px solid gray;text-align:right;width:20%;background-color:#f2f2f2;">
+                                    Account Name:
+                                </td>
+                                <td style="border-top:2px solid gray;width:30%;font-weight:bold;font-color:gray;border-bottom:1px solid #eaeaea;">
+                                    ${Quotes.Account Name}
+                                </td>
+                                <td style="border-top:2px solid gray;text-align:right;width:20%;background-color:#f2f2f2;">
+                                    Quote Stage:
+                                </td>
+                                <td style="border-top:2px solid gray;width:30%;font-weight:bold;font-color:gray;border-bottom:1px solid #eaeaea;">
+                                    ${Quotes.Quote Stage} 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:right;width:20%;background-color:#f2f2f2;">Contact Name:</td>
+                                <td style="width:30%;font-weight:bold;font-color:gray;border-bottom:1px solid #eaeaea;">
+                                    ${Quotes.Contact Name} 
+                                </td>
+                                <td style="text-align:right;width:20%;background-color:#f2f2f2;"></td>
+                                <td style="width:30%;font-weight:bold;font-color:gray;border-bottom:1px solid #eaeaea;">
+                                     
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br><br>
+                        <table border="0" cellspacing="0" cellpadding="0" width="100%"
+                               style="font-family: Arial, Helvetica, sans-serif;font-size:11px;color:#000;">
+                            <thead>
+                            <tr>
+                                <td style="font-weight:bold;background-color:#eaeaea;border-top:2px solid gray;">Product
+                                    Name
+                                </td>
+                                <td style="font-weight:bold;background-color:#eaeaea;border-top:2px solid gray;">Product
+                                    Code
+                                </td>
+                                <td style="font-weight:bold;background-color:#eaeaea;border-top:2px solid gray;">Qty
+                                </td>
+                                <td align="right"
+                                    style="font-weight:bold;background-color:#eaeaea;border-top:2px solid gray;">List
+                                    Price
+                                </td>
+                                <td align="right"
+                                    style="font-weight:bold;background-color:#eaeaea;border-top:2px solid gray;">Total
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody id="lineItem">
+                            <tr>
+                                <td style="border-bottom:2px dotted #dadada"><b>${Products.Product Name}</b></td>
+                                <td valign="top" style="border-bottom:2px dotted #dadada"> ${Products.Product Code}</td>
+                                <td valign="top" style="border-bottom:2px dotted #dadada">${Quotes.Qty}</td>
+                                <td valign="top" align="right" style="border-bottom:2px dotted #dadada">${Quotes.List
+                                    Price}
+                                </td>
+                                <td valign="top" align="right" style="border-bottom:2px dotted #dadada">
+                                    ${Quotes.Total}
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tbody>
+                            <tr>
+                                <td align="right" colspan="4">Sub Total</td>
+                                <td align="right"><b>${Quotes.Sub Total}</b></td>
+                            </tr>
+                            <tr>
+                                <td align="right" colspan="4">Tax</td>
+                                <td align="right">${Quotes.Tax}</td>
+                            </tr>
+                            <tr>
+                                <td align="right" colspan="4">Adjustment</td>
+                                <td align="right">${Quotes.Adjustment}</td>
+                            </tr>
+                            <tr>
+                                <td align="right" colspan="4" style="border-bottom:2px solid #ccc"><b>Grand Total</b>
+                                </td>
+                                <td align="right" style="border-bottom:2px solid #ccc;border-top:2px solid #dadada;"><b>${Quotes.Grand
+                                        Total}</b></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br><br>
+                        <table border="0" cellspacing="0" cellpadding="5" width="100%">
+                            <tbody>
+                            <tr>
+                                <td style="color:gray;border-top:2px solid gray;"><b>Terms and Conditions </b></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="color:gray" wrap="soft">${Quotes.Terms and Conditions}</pre>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>

@@ -1,0 +1,18 @@
+{%if activity%}
+    <table>
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Remind</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for akey,avalue in activity %}
+                <tr>
+                    <th><a href="{{ url( 'activity', { 'action': 'view','id':avalue.id() } ) }}"><b>{{avalue.type}}:</b> {{avalue.subject}}</a></th>
+                    <td>{{ avalue.remind_dtm }}</td>
+                </tr>
+            {% endfor%}
+        </tbody>
+    </table>
+{%endif%}

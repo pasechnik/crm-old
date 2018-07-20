@@ -1,0 +1,110 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Orders') %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<h1>{{title}}</h1>
+<br/>
+<div>
+    <a href="{{ url( 'order', { 'action': 'add' } ) }}">{{translate('Add new order')}}</a> &nbsp;
+    <a href="{{ url( 'field', { 'action': 'list', 'table':table.id } )~saurl }}">{{translate('Choose output fields')}}</a> &nbsp;<br/><br/>
+    {%if paginator.getTotalItemCount%}
+    <form action="{{ url( 'order', { 'action': 'delete' } ) }}" method="post" name="cheked">
+    <table border=2 width=100%>
+        <tr align=center>
+                <td><input name="all" type="checkbox" value="all" onClick="check();"/></td>
+                {% for key,value in labels %}
+                {% if (params.desc!=0) %}
+                <td align="center"><b><a href="{{ url( 'order', { 'action': 'list','sort':key} ) }}">{{value}}</a></b>
+                    {% if params.sort==key%}
+                        <img src="/img/up.png">
+                    {% endif%}
+                </td>
+                {%  else %}
+                <td align="center"><b><a href="{{ url( 'order', { 'action': 'list','sort':key,'desc':1 } ) }}">{{value}}</a></b>
+                {% if params.sort==key%}<img src="/img/down.png">{% endif %}
+                </td>
+                {% endif %}
+                {% endfor %}
+                <td colspan="4"><b>Actions</b></td>
+        </tr>
+    {% for akey,avalue in paginator.getCurrentItems %}
+        <tr>
+            <td align="center"><input name="checkedid[]" type="checkbox" value="{{avalue.id}}"  id="{{avalue.id}}" class="check" /></td>
+            {% for key,value in labels %}
+                <td align="center">
+                        {% if key == 'changer' %}
+                            {% if attribute(avalue, 'changer_id') != 0 %}
+                                <a href="{{ url( 'user', { 'action': 'view','id':attribute(avalue, 'changer_id')} ) }}" >{{ attribute(avalue, key) }}</a>
+                            {%else%}
+                                {{ attribute(avalue, key) }}
+                            {%endif%}
+                        {% elseif key == 'owner' %}
+                            {% if attribute(avalue, 'owner_id') != 0 %}
+                                <a href="{{ url( 'user', { 'action': 'view','id':attribute(avalue, 'owner_id')} ) }}" >{{ attribute(avalue, key) }}</a>
+                            {% else %}
+                                {{ attribute(avalue, key) }}
+                            {% endif %}
+                        {% elseif key == 'contact' %}
+                            {% if attribute(avalue, 'contact_id') != 0 %}
+                                <a href="{{ url( 'contact', { 'action': 'view','id':attribute(avalue, 'contact_id')} ) }}" >{{ attribute(avalue, key) }}</a>
+                            {% else %}
+                                {{ attribute(avalue, key) }}
+                            {% endif %}
+                        {% else %}
+                            {{ attribute(avalue, key) }}
+                        {% endif %}
+                </td>
+            {% endfor%}
+            <td align="center"><a href="{{ url( 'orderdetail', { 'action': 'list','orderid':avalue.id } ) }}">details</a></td>
+            <td align="center"><a href="{{ url( 'order', { 'action': 'edit','id':avalue.id } ) }}">edit</a></td>
+            <td align="center"><a href="{{ url( 'order', { 'action': 'delete','id':avalue.id } ) }}">delete</a></td>
+            <td align="center"><a href="{{ url( 'order', { 'action': 'invoice','id':avalue.id } ) }}">invoice</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    <input name="submit" type="submit" value="Remove checked" />
+    </form>
+    <form action="{{ url( 'order', { 'action': 'rowscount' } ) }}" method="post" name="countrows">
+       <input type="hidden" name="sort" value="{{ params.sort }}" />
+       <input type="hidden" name="rout" value="list" />
+       <input type="hidden" name="s" value="{{ params.desc }}" />
+       <p>Rows on the page<br/>
+           <select name="rows">
+                {% for i in rows %}
+                    <option value="{{ i }}" {{ paginator.getItemCountPerPage == i ? 'selected="selected"' : '' }}>{{ i }}</option>
+                {% endfor %}
+           </select>
+           <input type="submit" value="Set view">
+       </p>
+    </form>
+    {%if paginator.count > 1%}
+         {{ paginationControl(paginator, 'Elastic', 'partial/pagination', { 'route': 'order', 'params':params} ) }}
+    {%endif%}
+    {%endif%}
+</div>
+<a href="{{ url( 'dashboard', { 'action': 'index' } ) }}">{{translate('Back to dashboard')}}</a><br/><br/>
+{% endblock content %}
+{% block script %}
+            <script>
+                var option = true;
+                function check()
+                {
+                    if(option==true)
+                    {
+                       for(i=0; i<document.getElementsByClassName("check").length; i++)
+                       {
+                           document.getElementsByClassName("check")[i].checked = true;
+                       }
+                       option=false;
+                    }
+                    else
+                    {
+                       for(j=0; j<document.getElementsByClassName("check").length; j++)
+                       {
+                           document.getElementsByClassName("check")[j].checked = false;
+                       }
+                       option=true;
+                    }
+                }
+            </script>
+{% endblock script %}

@@ -1,0 +1,12 @@
+{% extends 'layout/layout.twig' %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+    <div class='view_header'>
+    <div class="title"><h1>Error</h1></div>
+{#        <div class="buttons">#}
+            <a class="titleDashboard" href="{{ url( 'dashboard', { 'action': 'index' } ) }}" title="{{translate('To dashboard')}}"></a>
+            <a class="titleNext" href="{{ url( modelname, { 'action': 'list' } ) }}" title="{{translate('Continue')}}"></a>
+{#        </div>#}
+    </div>
+    <div class="table" style="padding: 10px;">{{message}}</div>
+{% endblock content %}

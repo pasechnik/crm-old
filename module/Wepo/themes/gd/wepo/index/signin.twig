@@ -1,0 +1,172 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Sign in') %}
+
+{% block header %}
+{% endblock header %}
+
+{% block globalfooter %}
+{% endblock globalfooter %}
+
+{% block style %}
+    <style>
+
+      .content { text-align: center;}
+
+      .wepolabel
+        {
+            display: inline-block;
+            background: #4c8ab0;
+            color:white;text-align: center; margin-top:200px;
+            padding-left: 5px;
+            padding-right:  5px;
+        }
+
+       html, body, .wepo{background-color: #4c8ab0;}
+
+        #weposubmit{
+            font: italic;
+            -webkit-box-shadow: 0 8px 8px -7px green;
+            font-size: 19px;
+            background-color: #6ac965;
+            border-radius: 5px;
+            width: 300px;
+            color: white;
+            margin-top: 20px;
+            border: 0px;
+            height: 39px;
+        }
+
+        #wepologin:hover{cursor: pointer;}
+        #wepologin{
+            font: italic;
+            font-size: 14px;
+            background-repeat: no-repeat;
+            background-position-x:10px;
+            background-position-y:13px;
+            border-radius: 2px;
+            height: 26px;
+            width: 280px;
+            border: 1px transparent;
+        }
+        #wepologin:focus, #wepopassword:focus
+        {
+            padding: 8px 10px;
+        }
+        #wepopassword:hover{cursor: pointer;}
+        #wepopassword{
+            font: italic;
+            font-size: 12px;
+            border-radius: 2px;
+            margin-top: 20px;
+            width: 280px;
+            height: 26px;
+            border: 0px;
+        }
+
+        #loginico
+        {
+            position: absolute;
+            background-image: url(/css/img/icons/32x32-icons/username.png);
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+            z-index: 10;
+            top:12px;
+            left:12px;
+        }
+
+        #passwdico
+        {
+            position: absolute;
+            top:34px;
+            left:12px;
+            background-image: url(/css/img/icons/32x32-icons/key.png);
+            background-repeat: no-repeat;
+            width: 20px;
+            height: 20px;
+            z-index: 10;
+        }
+
+        .winput
+        {
+            position: relative;
+        }
+
+        .placehold:focus::-webkit-input-placeholder {opacity: 0; transition: opacity 1.0s ease;}
+
+        .placehold::-webkit-input-placeholder {color:black; font-size: larger;}
+        .placehold{text-align: center;}
+
+        .bord{border: 1px solid #84b8db;padding: 43px; border-radius: 6px; width: 297px;opacity: 1;margin: auto;margin-top: -11px; text-align: left;height:'';}
+
+    </style>
+{% endblock style %}
+
+{% block content %}
+
+    <h3 class="wepolabel"><a href="/" class="imgTxt txtLogo"></a></h3>
+
+<div class="bord">
+
+
+        {% do form.setAttribute('class','validate') %}
+        {{ form().openTag(form)|raw }}
+
+        <table style="margin: auto;">
+                    {% set element = form.getBaseFieldset.get('login')%}
+                    <tr>
+                        <td>
+                            <div class="winput">
+                            <input name="fields[login]" type="email" id="wepologin" required="true" placeholder="Username" class="placehold" value="{{element.value}}" />
+                            <div id="loginico"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="winput">
+                            <input name="fields[password]" type="password" id="wepopassword" required="true" placeholder="**********" class="placehold" value="" />
+                            <div id="passwdico"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td>
+                            <input type="submit" name="submit" value="Sign in" id="weposubmit" />
+                        </td>
+                    </tr>
+            {#{% for fkey, fieldset in form %}#}
+              {#{% for ekey, element in fieldset %}#}
+                    {#<tr>#}
+                        {#<td>#}
+                            {#{{ formElement(element) }}#}
+                        {#</td>#}
+                    {#</tr>#}
+                 {#{%endfor%}#}
+            {#{%endfor%}#}
+
+                <tr><td><br/></td></tr>
+
+                <tr>
+{#                    <td><span style="color:white;font-size:smaller;"> Forgot password? </span></td>#}
+                        <td colspan="2">
+                            <a style="float:left;color:#e0ffff;font-size: larger; ont:normal; " href="{{ url('index',{action:'signup'})}}">Forgot password?</a>
+                            <a style="float:right;color:#6bc784;font-size: larger;ont:normal; " href="{{ url('index',{action:'signup'})}}">Create an account</a>
+                        </td>
+{#                    <td><span style="color:#42bd41;font-size:smaller;margin-left:-110px"> Create an account</span></td>#}
+                </tr>
+
+        </table>
+
+        {{ form().closeTag(form)|raw }}
+
+  </div>
+
+        <table style="margin: auto;">
+                <tr>
+                    <td><br/><br/><br/><span style="color:#e0ffff;font-size:11px;font-size: small;"> &#169; 2014 by Cron Agency Inc.All rights reserved </span></td>
+                </tr>
+        </table>
+
+{% endblock content %}

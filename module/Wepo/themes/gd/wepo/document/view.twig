@@ -1,0 +1,87 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Document: ' ~ model.document_name %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block output %}
+    {% for key, value in model.toArray if key != 'document_way' and key!= 'document_real_name' and key!= 'changerlname' and key!= 'changerfname' and key!= 'ownerlname' and key!= 'ownerfname' %}
+        {#<tr>
+            {% if key == 'attach_to_names' %}
+                <th>Attached to</th>
+            {% else %}
+                <th>{{ field_labels[key] }}</th>
+            {% endif %}
+            <td>
+                    {% if key == 'changer' and attribute(model, 'changer_id') is not empty %}
+                        <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(model, 'changer_id')} )~saurl }}" >
+                            {{ model.changerfname}}
+                            {{ model.changerlname}}
+                        </a>
+                    {% elseif key == 'owner' and attribute(model, 'owner_id') is not empty %}
+                        <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(model, 'owner_id')} )~saurl }}" >
+                            {{ model.ownerfname}}
+                            {{ model.ownerlname}}
+                        </a>
+                    {% elseif key=='attach_to_names' %}
+                        <span class="phone">
+                            {% for target, ids in value %}
+                                {% if ids is not empty %}
+                                <div><span style="display: block">{{target}}s:</span>
+                                    {% for  key , id in ids%}
+                                <span style="margin-left: 60px; display: block">
+                                    <a href="{{ url( target|lower, { 'action': 'view','id':model.attach_to[target][key]} )~saurl }}">{{id}}</a>
+                                </span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+            </td>
+        </tr>#}
+        <tr>
+            {% if key == 'attach_to_names' %}
+                <th>Attached to</th>
+            {% else %}
+                <th>{{ field_labels[key] }}</th>
+            {% endif %}
+            <td>
+                    {% if key == "status_id" and attribute(model, "status") is not empty %}
+                        {{model.status}}
+                    {% elseif key == 'changer_id' and attribute(model, 'changer') is not empty %}
+                        <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(model, 'changer_id')} )~saurl }}" >
+                            {{ model.changerfname}}
+                            {{ model.changerlname}}
+                        </a>
+                    {% elseif key == 'owner_id' and attribute(model, 'owner') is not empty %}
+                        <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(model, 'owner_id')} )~saurl }}" >
+                            {{ model.ownerfname}}
+                            {{ model.ownerlname}}
+                        </a>
+                    {% elseif key=='attach_to_names' %}
+                        <span class="phone">
+                            {% for target, ids in value %}
+                                {% if ids is not empty %}
+                                <div><span style="display: block">{{target}}s:</span>
+                                    {% for  key , id in ids%}
+                                <span style="margin-left: 60px; display: block">
+                                    <a href="{{ url( target|lower, { 'action': 'view','id':model.attach_to[target][key]} )~saurl }}">{{id}}</a>
+                                </span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock output %}
+
+
+
+{#<a href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a>#}

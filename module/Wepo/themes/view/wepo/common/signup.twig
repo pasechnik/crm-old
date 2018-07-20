@@ -1,0 +1,97 @@
+<div class='shake_it'>
+
+    <h3 class="wepolabel"><a href="{{ url( 'home' ) }}" class="imgTxt txtLogo"></a></h3>
+
+    <div class="bord">
+
+        {{ form().openTag(form)|raw }}
+
+        <table style="margin: auto;">
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="user[login]" type="email" id="SU_login" placeholder="Login(Email)"
+                               class="placehold" value="{{ element.value }}" required="required"/>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="user[password]" type="password" id="SU_password" placeholder="Password"
+                               class="placehold" value="" required="required"/>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="user[password2]" type="password" id="SU_password2" placeholder="Confirm Password"
+                               class="placehold" value="" required="required"/>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="user[fname]" type="text" id="SU_fname" placeholder="First Name" class="placehold"
+                               value="" required="required"/>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="user[lname]" type="text" id="SU_lname" placeholder="Last Name" class="placehold"
+                               value="" required="required"/>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="company[company]" type="text" id="SU_company" placeholder="Company Name"
+                               class="placehold" value="" required="required"/>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <input class="submitLink" type="submit" value="Create" id="SU_submit"/>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <br/>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <a style="color:#6bc784;float: right;" href="{{ url('common',{ 'data':'signin'})}}">Sign in</a>
+                </td>
+            </tr>
+
+        </table>
+
+        {{ form().closeTag(form)|raw }}
+    </div>
+</div>
+
+<table style="margin: auto;">
+    <tr>
+        <td>
+            <br/>
+            <br/>
+            <br/>
+            <span style="color:#e0ffff;font-size: small;"> &#169; {{ "now"|date("Y") }} by Wepo Inc. All rights reserved </span>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,191 @@
+{% extends 'layout/layout.twig' %}
+{% set title = 'Lead: ' ~ model.fname ~ ' ' ~model.lname %}
+{% block title %}{{ parent() }}{% endblock title %}
+
+{% block content %}
+    <div class="view_header">
+        {# <div class="buttons left">
+         {% if saurlback !='/' %}
+             <a href="{{ saurlback }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+                 {% else %}
+             <a href="{{ url( null, { 'action': 'list' } ) }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+                 {% endif %}
+         </div>#}
+        {% block headeractions %}
+            {% if saurlback !='/' %}
+                <a href="{{ saurlback }}" class="titleBack" title="Back"></a>
+            {% else %}
+                <a href="{{ url( null, { 'action': 'list' } ) }}" class="titleBack" title="Back"></a>
+            {% endif %}
+            <div class="title"><h1>{{ title }}</h1></div>
+            <span class="edited">
+        {% if model.toArray["changer"] is defined %}
+            Last Update: {{model.changed_dtm}} by {{model.changer}}
+        {% else %}
+        {% endif %}
+    </span>
+            {#<div class="buttons">
+                <a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}" class="edit"><span class="icon small"></span>{{ translate('Edit') }}</a>
+            </div>#}
+            {#<div class="buttons right">
+                <a href="#" class="previous">
+                    <span class="icon small"></span>
+                </a>
+                <a href="#" class="next">
+                    <span class="icon small"></span>
+                </a>
+            </div>#}
+            <a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}" class="titleEdit" title="Edit"></a>
+            <a href="#" class="titleNext" title="Next"> </a>
+            <a href="#" class="titlePrevious" title="Previous"> </a>
+        {% endblock headeractions %}
+    </div>
+
+
+
+    <div class="view_block">
+        <div class="buttons">
+            {% block actions %}
+                {#{% if model.status not in [ 'deleted', 'converted' ] %}#}
+                <a href="{{ url( 'activity', { 'action': 'add', 'activity': 'call', 'id':''~model.id(),'tableid':table_id } )~saurl }}" class="call"><span class="icon small"></span>{{translate('Call')}}</a> &nbsp;
+                <a href="{{ url( 'activity', { 'action': 'add', 'activity': 'task', 'id':''~model.id(),'tableid':table_id } )~saurl }}" class="task"><span class="icon small"></span>{{translate('Task')}}</a> &nbsp;
+                <a href="{{ url( 'activity', { 'action': 'add', 'activity': 'event', 'id':''~model.id(),'tableid':table_id } )~saurl }}" class="event"><span class="icon small"></span>{{translate('Event')}}</a> &nbsp;
+                <a href="{{ url( 'document', { 'action': 'add',  'id':''~model.id(),'tableid':table_id } )~saurl }}" class="attach"><span class="icon small"></span>{{translate('Attach')}}</a> &nbsp;
+                <a href="{{ url( 'lead', { 'action': 'delete', 'id':''~model.id() } )~saurl }}" class="delete"><span class="icon small"></span>{{translate('Delete')}}</a> &nbsp;
+                <a href="{{ url( 'lead', { 'action': 'convert', 'id':'' ~model.id()} )~saurl }}" class="convert_to"><span class="icon small"></span>{{translate('Convert to contact')}}</a> &nbsp;
+                {#{% elseif model.status == 'deleted' %}#}
+                {#<a href="{{ url( 'lead', { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}" class="restore"><span class="icon small"></span>{{translate('Restore')}}</a> &nbsp;#}
+                {#{% if permission == 1 %} #}
+                <a href="{{ url( 'lead', { 'action': 'clean', 'id':'' ~model.id()} )~delsaurl }}" class="clean"><span class="icon small"></span>{{translate('Clean')}}</a> &nbsp;
+                {#{% endif %}     #}
+                {#{% endif %}  #}
+            {% endblock actions %}
+        </div>
+        {% block photo %}
+            <div class="lead_photo">
+                <div class="photo">
+                    {#{% block avatar %}#}
+                        {#<img src="{{ WepoLink(mainuser.company_id, model, 'avatar', 'Leads') }}" alt="" style="max-width:120px;max-height:120px;">#}
+                    {#{% endblock avatar %}#}
+                </div>
+                <div class="social clarfix">
+                    {#<a href="{{ model.flink|default('#') }}" class="imgTxt txtFacebook{% if model.flink is empty %}Disabled{% endif %}"></a>#}
+                    {#<a href="{{ model.tlink|default('#') }}" class="imgTxt txtTwitter{% if model.tlink is empty %}Disabled{% endif %}"></a>#}
+                    {#<a href="{{ model.llink|default('#') }}" class="imgTxt txtLinkedin{% if model.llink is empty %}Disabled{% endif %}"></a>#}
+                    {#<a href="{{ model.glink }}" class="imgTxt txtGPlus{% if model.glink is empty %}Disabled{% endif %}"></a>#}
+                </div>
+            </div>
+        {% endblock photo %}
+        <div class="lead_info">
+            <h3>{{ translate( model.getModelName~' information' ) }}</h3>
+            <table>
+                <tbody>
+                {% block output %}
+                    {% for field_key in fields %}
+                        <tr>
+                            <th>{{ labels[field_key] }}</th>
+                            <td>
+                                {% if key=='email' %}
+                                    <a href="mailto:{{ attribute( model, field_key ) }}">{{ attribute( model, field_key ) }}</a>
+                                {% elseif key=='mobile' %}
+                                    <span class="phone">{{ attribute( model, field_key ) }}</span>
+                                {% elseif key=='phone' %}
+                                    <span class="phone">{{ attribute( model, field_key ) }}</span>
+                                {% elseif key=='owner' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'owner_id') } )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='user' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'user_id') } )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='changer' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'changer_id') } )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='client' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'client', { 'action': 'view','id':''~attribute(model, 'client_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='contact' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'contact', { 'action': 'view','id':''~attribute(model, 'contact_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='order' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'orderdetail', { 'action': 'list','orderid':''~attribute(model, 'order_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='quote_id' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'quotedetail', { 'action': 'list','quoteid':''~attribute(model, 'quote_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='pricebook' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~attribute(model, 'pricebook_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='product' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'product', { 'action': 'view','id':''~attribute(model, 'product_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='invoice' %}
+                                    <span class="phone"><a
+                                            href="{{ url( 'invoice', { 'action': 'view','id':''~attribute(model, 'invoice_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='target_id' %}
+                                    <span class="phone"><a
+                                            href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% elseif key=='target' %}
+                                    <span class="phone"><a
+                                            href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ attribute( model, field_key ) }}</a></span>
+                                {% else %}
+                                    {{ attribute( model, field_key ) }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endblock output %}
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="lead_other_info">
+            <h3>Address Information</h3>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Country:</th>
+                        <td>Canada</td>
+                    </tr>
+                    <tr class="">
+                        <th>ZIP:</th>
+                        <td>045134</td>
+                    </tr>
+                    <tr class="">
+                        <th>State:</th>
+                        <td>Alabama</td>
+                    </tr>
+                    <tr class="">
+                        <th>City:</th>
+                        <td>New York</td>
+                    </tr>
+                    <tr class="">
+                        <th>Address:</th>
+                        <td>Jersy Street, 7 / 18</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Description Information:</h3>
+            <div class="info">
+                <p>please contact me about your product.</p>
+            </div>
+        </div>
+
+    </div>
+
+    {% block detailinfo %}
+    {% endblock detailinfo %}
+
+    <div class="fullwidth_area drop_area">
+        {% for wname, widget in widgets %}
+            {% include 'partial/widget.twig' with {'name':wname, 'widget': widget} %}
+            {% if loop.index == (loop.length/2)|round(0,'ceil') %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="left_area half_area drop_area"></div>
+    <div class="right_area half_area drop_area"></div>
+    <div class="clear"></div>
+    </div>
+
+{% endblock content %}

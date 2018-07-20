@@ -1,0 +1,20 @@
+{% extends 'partial/list.twig' %}
+
+{% set title = translate('Quotes') %}
+
+{% block rightlink %}
+    <a href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">{{translate('Output fields')}}</a>
+{% endblock rightlink %}
+
+{% block data %}
+    {% include 'partial/quote-list.twig' %}
+{% endblock data %}
+
+{% block action %}
+    <a class="actionview" href="{{ url( 'quotedetail', { 'action': 'list','quoteid':avalue.id() } )~saurl }}"><img src="/img/1.png" class="view"  alt="{{translate('View')}}" /><span class="tooltip top">View</span></a>&nbsp;
+    <a class="actionview" href="{{ url( 'quote', { 'action': 'edit','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="edit"  alt="{{translate('Edit')}}" /><span class="tooltip top">Edit</span></a>&nbsp;
+{#    <a class="actionview" href="{{ url( 'quote', { 'action': 'delete','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="delete"  alt="{{translate('Delete')}}" /><span class="tooltip top">Delete</span></a>&nbsp;#}
+    <a class="actionview" href="{{ url( 'quote', { 'action': 'convert','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="convert"  alt="{{translate('Order')}}" /><span class="tooltip top">Generate sales order</span></a>
+    <a class="actionview" ><img src="/img/1.png" class="delete single_del"  alt="{{translate('Delete')}}" /><span class="tooltip top">Delete</span></a>&nbsp;
+{#    <a class="actionview" href="{{ url( 'quote', { 'action': 'order','id':avalue.id() } )~saurl }}"><img src="/img/1.png" class="convert"  alt="{{translate('Order')}}" /><span class="tooltip top">Convert to sales order</span></a>#}
+{% endblock action %}

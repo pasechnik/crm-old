@@ -1,0 +1,412 @@
+{% extends 'layout/layout.twig' %}
+
+{% block title %}{{ parent() }}{% endblock title %}
+
+{% block content %}
+<div class="view_header">
+   {# <div class="buttons left">
+    {% if saurlback !='/' %}
+        <a href="{{ saurlback }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+            {% else %}
+        <a href="{{ url( null, { 'action': 'list' } ) }}" class="back"><span class="small icon"></span>{{ translate('Back') }}</a>
+            {% endif %}
+    </div>#}
+   {% block headeractions %}
+    {% if saurlback !='/' %}
+        <a href="{{ saurlback }}" class="titleBack" title="Back"></a>
+            {% else %}
+        <a href="{{ url( null, { 'action': 'list' } ) }}" class="titleBack" title="Back"></a>
+            {% endif %}
+    <div class="title"><h1>{{ title }}</h1></div>
+    <span class="edited">
+        {% if model.toArray["changer"] is defined %}
+            Last Update: {{model.changed_dtm}} by {{model.changer}}
+        {% else %}
+        {% endif %}
+    </span>
+    {#<div class="buttons">
+        <a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}" class="edit"><span class="icon small"></span>{{ translate('Edit') }}</a>
+    </div>#}
+    {#<div class="buttons right">
+        <a href="#" class="previous">
+            <span class="icon small"></span>
+        </a>
+        <a href="#" class="next">
+            <span class="icon small"></span>
+        </a>
+    </div>#}
+        <a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}" class="titleEdit" title="Edit"></a>
+        <a href="#" class="titleNext" title="Next"> </a>
+        <a href="#" class="titlePrevious" title="Previous"> </a>
+    {% endblock headeractions %}
+</div>
+
+
+
+<div class="view_block">
+    <div class="buttons">
+                {% block actions %}
+                    {#{% if model.status != 'deleted' %}#}
+        {##}
+        {#<a href="{{ url( null, { 'action': 'delete','id':''~model.id() } )~saurl }}" class="delete"><span class="icon small"></span>{{ translate('Delete') }}</a> &nbsp;#}
+                    {#{% elseif model.status == 'deleted' %}#}
+        {#<a class="green_but submitLink"#}
+           {#href="{{ url( null, { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}" class="restore"><span class="icon small"></span>{{ translate('Restore') }}</a> &nbsp;#}
+                        {#{% if permission == 1 %}#}
+        <a class="red_but submitLink"
+           href="{{ url( null, { 'action': 'clean', 'id':'' ~model.id()} )~delsaurl }}" class="clean"><span class="icon small"></span>{{ translate('Clean') }}</a> &nbsp;
+                        {#{% endif %}#}
+                    {#{% endif %}#}
+                {% endblock actions %}
+    </div>
+        {% block photo %}
+    <div class="lead_photo">
+        <div class="photo">
+                    {% block avatar %}
+            <img src="{{ WepoLink(mainuser.company_id, model, 'avatar', model.id()) }}" alt=""
+                 style="max-width:120px;max-height:120px;">
+                    {% endblock avatar %}
+        </div>
+        <div class="social clarfix">
+            {#<a href="{{ model.flink|default('#') }}" class="imgTxt txtFacebook{% if model.flink is empty %}Disabled{% endif %}"></a>#}
+            {#<a href="{{ model.tlink|default('#') }}" class="imgTxt txtTwitter{% if model.tlink is empty %}Disabled{% endif %}"></a>#}
+            {#<a href="{{ model.llink|default('#') }}" class="imgTxt txtLinkedin{% if model.llink is empty %}Disabled{% endif %}"></a>#}
+                    {#<a href="{{ model.glink }}" class="imgTxt txtGPlus{% if model.glink is empty %}Disabled{% endif %}"></a>#}
+        </div>
+    </div>
+        {% endblock photo %}
+    <div class="lead_info">
+        <h3>{{ translate( model.getModelName~' information' ) }}</h3>
+        <table>
+            <tbody>
+                {% block output %}
+                    {% for key, value in model.toArray if key != 'main_id' and key != 'id' and key != 'avatar' and key != 'password' and key != "company_id"%}
+                <tr>
+                    <th>{{ field_labels[key] }}</th>
+                    <td>
+                                {% if key=='email' %}
+                        <a href="mailto:{{ value }}">{{ value }}</a>
+                                {% elseif key=='mobile' %}
+                        <span class="phone">{{ value }}</span>
+                                {% elseif key=='phone' %}
+                        <span class="phone">{{ value }}</span>
+                                {% elseif key=='owner' %}
+                        <span class="phone"><a
+                                href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'owner_id') } )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='user' %}
+                        <span class="phone"><a
+                                href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'user_id') } )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='changer' %}
+                        <span class="phone"><a
+                                href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'changer_id') } )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='client' %}
+                        <span class="phone"><a
+                                href="{{ url( 'client', { 'action': 'view','id':''~attribute(model, 'client_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='contact' %}
+                        <span class="phone"><a
+                                href="{{ url( 'contact', { 'action': 'view','id':''~attribute(model, 'contact_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='order' %}
+                        <span class="phone"><a
+                                href="{{ url( 'orderdetail', { 'action': 'list','orderid':''~attribute(model, 'order_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='quote_id' %}
+                        <span class="phone"><a
+                                href="{{ url( 'quotedetail', { 'action': 'list','quoteid':''~attribute(model, 'quote_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='pricebook' %}
+                        <span class="phone"><a
+                                href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~attribute(model, 'pricebook_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='product' %}
+                        <span class="phone"><a
+                                href="{{ url( 'product', { 'action': 'view','id':''~attribute(model, 'product_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='invoice' %}
+                        <span class="phone"><a
+                                href="{{ url( 'invoice', { 'action': 'view','id':''~attribute(model, 'invoice_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='target_id' %}
+                        <span class="phone"><a
+                                href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a></span>
+                                {% elseif key=='target' %}
+                        <span class="phone"><a
+                                href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a></span>
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                    </td>
+                </tr>
+                    {% endfor %}
+                {% endblock output %}
+            </tbody>
+        </table>
+
+    </div>
+
+        {#<div class="lead_other_info">
+            <h3>Address Information</h3>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Country:</th>
+                        <td>Canada</td>
+                    </tr>
+                    <tr class="">
+                        <th>ZIP:</th>
+                        <td>045134</td>
+                    </tr>
+                    <tr class="">
+                        <th>State:</th>
+                        <td>Alabama</td>
+                    </tr>
+                    <tr class="">
+                        <th>City:</th>
+                        <td>New York</td>
+                    </tr>
+                    <tr class="">
+                        <th>Address:</th>
+                        <td>Jersy Street, 7 / 18</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Description Information:</h3>
+            <div class="info">
+                <p>please contact me about your product.</p>
+            </div>
+        </div>#}
+
+</div>
+
+    {% block detailinfo %}
+    {% endblock detailinfo %}
+
+<div class="fullwidth_area drop_area">
+            {% for wname, widget in widgets %}
+            {% include 'partial/widget.twig' with {'name':wname, 'widget': widget} %}
+            {% if loop.index == (loop.length/2)|round(0,'ceil') %}
+
+            {% endif %}
+            {% endfor %}
+</div>
+<div class="left_area half_area drop_area"></div>
+<div class="right_area half_area drop_area"></div>
+<div class="clear"></div>
+</div>
+
+<a align="center" id="scrollTop" href="#" onclick="top.goTop();
+        return false;"></a>
+
+    {#    {% if activityWidget(user.id(), null, table_id, model.id()) %}
+            <div class="clearfix">
+                <div class="table">
+                    <h2>Recently opened activities</h2>
+                    {#<div class="table_links">
+                        <a class="table_head_link" href="#new_task_popup">New Task</a>
+                        <div id="new_task_popup" class="table_popup">
+                            <div class="popup_deco imgTxt"></div>
+                            <div class="steps_popup">
+                                <div id="popup_step_1" class="active">
+                                    <h3>New task</h3>
+                                    <form>
+                                        <div class="input">
+                                            <label for="form_name">First Name*:</label>
+                                            <input type="text" name="form_name" id="form_name">
+                                        </div>
+                                        <div class="double_input clearfix">
+                                            <div class="input">
+                                                <label for="form_date">Due date:</label>
+                                                <input type="text" name="form_date" id="form_date" class="hasDatepicker">
+                                            </div>
+                                            <div class="input">
+                                                <label for="form_priority">Priority:</label>
+                                                <select name="form_priority" id="form_priority" class="selectBox" style="display: none;">
+                                                    <option>None</option>
+                                                    <option>Low</option>
+                                                    <option>Normal</option>
+                                                    <option>Height</option>
+                                                </select><a class="selectBox selectBox-dropdown" title="" tabindex="NaN" style="width: 0px; display: inline-block;"><span class="selectBox-label" style="width: 0px;">None</span><span class="selectBox-arrow"></span></a>
+                                            </div>
+                                        </div>
+                                        <div class="input">
+                                            <label for="form_owner">Owner:</label>
+                                            <select name="form_owner" id="form_owner" class="selectBox" style="display: none;">
+                                                <option>Cron admin</option>
+                                                <option>Low</option>
+                                                <option>Normal</option>
+                                                <option>Height</option>
+                                            </select><a class="selectBox selectBox-dropdown" title="" tabindex="NaN" style="width: 0px; display: inline-block;"><span class="selectBox-label" style="width: 0px;">Cron admin</span><span class="selectBox-arrow"></span></a>
+                                        </div>
+                                        <div class="popup_nav">
+                                            <a href="#popup_step_1" class="active">Remind at</a>
+                                            <a href="#popup_step_2">Recurring activity</a>
+                                            <a href="#popup_step_3">More options</a>
+                                        </div>
+                                        <div class="buttons clearfix">
+                                            <a href="#" class="green_but">Save</a>
+                                            <a href="#" class="cancel">Cancel</a>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="popup_step_2">
+                                    <h3>New task 2</h3>
+                                    <form>
+                                        <div class="input">
+                                            <label for="form_name">First Name*:</label>
+                                            <input type="text" name="form_name" id="form_name">
+                                        </div>
+                                        <div class="double_input clearfix">
+                                            <div class="input">
+                                                <label for="form_date">Due date:</label>
+                                                <input type="text" name="form_date" id="form_date" class="hasDatepicker">
+                                            </div>
+                                            <div class="input">
+                                                <label for="form_priority">Priority:</label>
+                                                <select name="form_priority" id="form_priority" class="selectBox" style="display: none;">
+                                                    <option>None</option>
+                                                    <option>Low</option>
+                                                    <option>Normal</option>
+                                                    <option>Height</option>
+                                                </select><a class="selectBox selectBox-dropdown" title="" tabindex="NaN" style="width: 0px; display: inline-block;"><span class="selectBox-label" style="width: 0px;">None</span><span class="selectBox-arrow"></span></a>
+                                            </div>
+                                        </div>
+                                        <div class="input">
+                                            <label for="form_owner">Owner:</label>
+                                            <select name="form_owner" id="form_owner" class="selectBox" style="display: none;">
+                                                <option>Cron admin</option>
+                                                <option>Low</option>
+                                                <option>Normal</option>
+                                                <option>Height</option>
+                                            </select><a class="selectBox selectBox-dropdown" title="" tabindex="NaN" style="width: 0px; display: inline-block;"><span class="selectBox-label" style="width: 0px;">Cron admin</span><span class="selectBox-arrow"></span></a>
+                                        </div>
+                                        <div class="popup_nav">
+                                            <a href="#popup_step_1">Remind at</a>
+                                            <a href="#popup_step_2" class="active">Recurring activity</a>
+                                            <a href="#popup_step_3">More options</a>
+                                        </div>
+                                        <div class="buttons clearfix">
+                                            <a href="#" class="green_but">Save</a>
+                                            <a href="#" class="cancel">Cancel</a>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="popup_step_3">
+                                    <h3>New task 3</h3>
+                                    <form>
+                                        <div class="input">
+                                            <label for="form_name">First Name*:</label>
+                                            <input type="text" name="form_name" id="form_name">
+                                        </div>
+                                        <div class="double_input clearfix">
+                                            <div class="input">
+                                                <label for="form_date">Due date:</label>
+                                                <input type="text" name="form_date" id="form_date" class="hasDatepicker">
+                                            </div>
+                                            <div class="input">
+                                                <label for="form_priority">Priority:</label>
+                                                <select name="form_priority" id="form_priority" class="selectBox" style="display: none;">
+                                                    <option>None</option>
+                                                    <option>Low</option>
+                                                    <option>Normal</option>
+                                                    <option>Height</option>
+                                                </select><a class="selectBox selectBox-dropdown" title="" tabindex="NaN" style="width: 0px; display: inline-block;"><span class="selectBox-label" style="width: 0px;">None</span><span class="selectBox-arrow"></span></a>
+                                            </div>
+                                        </div>
+                                        <div class="input">
+                                            <label for="form_owner">Owner:</label>
+                                            <select name="form_owner" id="form_owner" class="selectBox" style="display: none;">
+                                                <option>Cron admin</option>
+                                                <option>Low</option>
+                                                <option>Normal</option>
+                                                <option>Height</option>
+                                            </select><a class="selectBox selectBox-dropdown" title="" tabindex="NaN" style="width: 0px; display: inline-block;"><span class="selectBox-label" style="width: 0px;">Cron admin</span><span class="selectBox-arrow"></span></a>
+                                        </div>
+                                        <div class="popup_nav">
+                                            <a href="#popup_step_1">Remind at</a>
+                                            <a href="#popup_step_2">Recurring activity</a>
+                                            <a href="#popup_step_3" class="active">More options</a>
+                                        </div>
+                                        <div class="buttons clearfix">
+                                            <a href="#" class="green_but">Save</a>
+                                            <a href="#" class="cancel">Cancel</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="table_head_link" href="#">New Event</a>
+                        <a class="table_head_link" href="#">Log a Call</a>
+                    </div>
+                    <div class="right_buttons">
+                        <a class="ico_button" href="#"><i class="imgTxt txtClose">Close</i></a>
+                        <a class="ico_button" href="#"><i class="imgTxt txtRefresh">Refresh</i></a>
+                    </div>
+                    <div class="activity">{{ activityWidget( user.id(), null, table_id, model.id()) }}</div>
+                </div>
+            </div>
+        {% endif %}
+         {% if documentWidget(params.id, permission) %}
+            <div class="clearfix">
+                <div class="table">
+                    <h2>Recently uploaded documents</h2>
+                    <div class="right_buttons">
+                        <a class="ico_button" href="#"><i class="imgTxt txtClose">Close</i></a>
+                        <a class="ico_button" href="#"><i class="imgTxt txtRefresh">Refresh</i></a>
+                    </div>
+                    <div class="activity">{{documentWidget(params.id, permission)}}</div>
+                </div>
+            </div>
+        {% endif %}#}
+
+    {% if (paginator.getTotalItemCount) %}
+<div class="clearfix">
+    <div class="table">
+        <h2>Events</h2>
+                {#<div class="right_buttons">
+                    <a class="ico_button" href="#"><i class="imgTxt txtClose">Close</i></a>
+                    <a class="ico_button" href="#"><i class="imgTxt txtRefresh">Refresh</i></a>
+                </div>#}
+        <table>
+            <thead>
+                <tr>
+                        {% for key,value in labels %}
+                            {% if (params.desc!=0) %}
+                    <th>
+                        <b><a href="{{ url( null, { 'action': 'view','id': model.id(),'sort':key} )~saurl }}">{{ value }}</a></b>
+                                    {% if params.sort==key %}
+                        &#9650;
+                                    {% endif %}
+                    </th>
+                            {% else %}
+                    <th>
+                        <b><a href="{{ url( null, { 'action': 'view','id': model.id(),'sort':key,'desc':1 } )~saurl }}">{{ value }}</a></b>
+                                    {% if params.sort==key %}
+                        &#9660;
+                                    {% endif %}
+                    </th>
+                            {% endif %}
+                        {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                    {% for akey,avalue in paginator.getCurrentItems %}
+                <tr>
+                            {% for key,value in labels %}
+                    <td>
+                                    {% if key == 'event_dtm' %}
+                                        {{ attribute(avalue, key)|date('m.d.y H:i:s') }}
+                                    {% else %}
+                                        {{ attribute(avalue, key) }}
+                                    {% endif %}
+                    </td>
+                            {% endfor %}
+                </tr>
+                    {% endfor %}
+            </tbody>
+            <div class="buttons clearfix">
+                        {% if paginator.count > 1 %}
+                            {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+                        {% endif %}
+            </div>
+        </table>
+    </div>
+</div>
+    {% endif %}
+
+<a align="center" id="scrollTop" href="#" onclick="top.goTop();
+        return false;"></a>
+{% endblock content %}

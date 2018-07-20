@@ -1,0 +1,82 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate(action|capitalize~' '~modellabel~'') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+{% block content %}
+
+    <div class="viewtable">
+        <form action="{{ url( modelname, { 'action': action } )~saurl }}" method="post">
+
+            <div class="view_header">
+
+                <div class="buttons">
+                    <a href="{{ nosaurlback !='/' ? nosaurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+                </div>
+
+                <div class="title">
+                    <h1 class="{{ title|lower|replace(' ', '_') }}">
+                        {{ title }}
+                    </h1>
+                </div>
+
+            </div>
+
+            <div class="view_block" style="margin: 0 auto;" >
+
+                <div class="viewData">
+
+                    <input type="hidden" name="eventtype" value="{{ eventtype }}"/>
+                    {% for id in ids %}
+                        <input type="hidden" name="checkedid[]" value="{{ id }}"/>
+                    {% endfor %}
+                    <input type="hidden" name="delyes" value="{{ translate('Yes') }}"/>
+
+                    <div class="viewlist">
+{#                        <h3> {{ translate('Are you sure that you want to '~action~' '~modelname~'?') }}</h3>#}
+
+{#                          <h3> {{ translate('Are you sure that you want to '~action~' '~modellabel|lower~' ?') }}</h3>#}
+                        {#<h2>{% block message %}{{ translate('Are you sure that you want to '~action~' '~modelname~'(s)?')}}{% endblock message %}</h2>#}
+
+                        {% for item in items %}
+
+                          <h3 style="text-align: center;"> {{ translate('Are you sure that you want to '~action~' '~modellabel|lower~' ') }}"{{item.title }}" ?</h3>
+
+{#                         <table class="data" width="100%">#}
+{#                            <thead>#}
+
+                            {#<tr>#}
+                            {#<td colspan="2"><h1>{{ translate('Are you sure that you want to '~action~' '~modelname~'?')}}</h1></td>#}
+                            {#</tr>#}
+{#                            <tr>#}
+{#                                <th class="width_4p">#</th>#}
+{#                              <th>{{ modelname|capitalize }}</th>#}
+{#                                <th>{{ modellabel|capitalize }}</th>#}
+{#                            </tr>#}
+{#                            </thead>#}
+{#                            <tbody>#}
+{#                            {% for item in items %}#}
+{#                                <tr>#}
+                                    {#<td class="width_4p">
+                                        {{ loop.index }}
+                                    </td>#}
+{#                                    <td>#}
+{#                                      {{ item.getName }}#}
+{#                                        {{ item.title }}#}
+{#                                    </td>#}
+{#                                </tr>#}
+                            {% endfor %}
+{#                            </tbody>#}
+{#                        </table>#}
+{#                    </div>#}
+                </div>
+
+                <div class="buttons" style="text-align: center;">
+                    <a  style="float:none; width: 35px; background-position-x: 10px; background-position-y: 5px;" href="" class="green_but submitLink yes btn-icon" title="Yes">{{ translate('Yes') }}</a>
+                    <a  style="float:none; width: 35px; background-position-x: 10px;" href="{{ nosaurlback !='/' ? nosaurlback : url( null, { 'action': 'list' } ) }}" class="btn-icon no" title="No">{{ translate("No") }}</a>
+                </div>
+
+            </div>
+    </div>
+        </form>
+                </div>
+       <br/>
+{% endblock content %}

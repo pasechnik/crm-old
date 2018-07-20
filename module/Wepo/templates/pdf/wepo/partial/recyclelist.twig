@@ -1,0 +1,310 @@
+{% extends 'layout/layout.twig' %}
+
+{% block script %}
+    <script>
+        _thisurl = location.href;
+        restoreurl = "{{ url( null, { 'action': 'restore' } ) }}";
+        cleanurl = "{{ url( null, { 'action': 'clean' } ) }}";
+        deleteurl = "{{ url( null, { 'action': 'delete' } ) }}";
+
+        $(function() {
+
+            $('#body').on("click","div.alphabet a.ajax",function() {
+                $('div.alphabet a.ajax').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            $('#body').on("click","a.ajax", function() {
+                var _target = $(this).attr('ajax-target');
+                var _src = $(this).attr('ajax-src');
+                var _location = $(this).attr('href');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+                $("#tbody").html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+
+                $(_target).load(_location + _src, null, function () {
+                    setCheckboxes();
+                });
+                _thisurl = _location;
+                return false;
+            });
+
+              $('#refresh').click(function() {
+                var _target = $('a.ajax.active').attr('ajax-target');
+                var _location = $('a.ajax.active').attr('href');
+                var _src = $('a.ajax.active').attr('ajax-src');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+
+                $('#tbody').html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+                 $(_target).load(_thisurl + _src, null, function() {
+                    setCheckboxes();
+                });
+
+                return false;
+            });
+        });
+
+        function actionChange(action) {
+            if (!( action === 'clean' || action === 'restore' ))
+                return false;
+            $('#mainForm').get(0).setAttribute('action', "/{{modelname}}/" + action + "/index.html{{saurl}}");
+            return true;
+        }
+        $(function () {
+//            $('select').selectBox();
+            $('#body').on("click","#c_all",function(){
+                if ($('div.checked', this).size()) {
+                    $('input.check').prop('checked', true);
+                    $('div.checkboxArea').addClass('checked');
+                    $('tr', "#tbody").addClass('checked');
+                    $('#deletebtn').removeClass('disabled');
+                    $('#restorebtn').removeClass('disabled');
+                    $('#clearbtn').removeClass('disabled');
+                }
+                else {
+                    $('input.check').prop('checked', false);
+                    $('div.checkboxArea').removeClass('checked');
+                    $('tr', "#tbody").removeClass('checked');
+                    $('#deletebtn').addClass('disabled');
+                    $('#restorebtn').addClass('disabled');
+                    $('#clearbtn').addClass('disabled');
+                }
+            });
+            $('#titleSearchIcon').click(function () {
+                if ($('#titleSearch').is(':visible')) {
+                    $('#titleSearch').stop().animate({ width: '0px', height: '0px', opacity: 0 }, 200
+                        , function () {
+                            $(this).hide();
+                        }
+                    );
+                }
+                else {
+                    $('#titleSearch').show(200,
+                        function () {
+                            $('#titleSearch').stop().animate({ width: '220px', height: '31px', opacity: 1 }, 200);
+                        }
+                    );
+                }
+                return false;
+            });
+        });
+
+    </script>
+
+    <script>
+     $(function(){
+          $('#body').on("click","#restorebtn", function() {
+                dialogfnct('restore');
+            });
+
+          $('#body').on("click","#clearbtn", function() {
+                dialogfnct('clean');
+            });
+
+         $('#body').on("click", ".single_res", function(){
+              single_action = true;
+              title =  $(this).closest( 'tr' ).find('.d_title').text();
+              id = $(this).closest( 'tr' ).find('.check').val();
+              dialogfnct('restore');
+            });
+
+          $('#body').on("click", ".single_cln", function(){
+              single_action = true;
+              title =  $(this).closest( 'tr' ).find('.d_title').text();
+              id = $(this).closest( 'tr' ).find('.check').val();
+              dialogfnct('clean');
+            });
+        });
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <div class="listtable recyclelst">
+        <div class="title tableToolbar ">
+            <div class="listtitle recyclelist">
+                {% block headericon %}    <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/{{ modelname }}.png)"></span> {% endblock %}
+                <h1 class="{{ title|lower|replace(' ', '_') }}">
+                    {{ title }}: {{ translate('Recycle') }}
+                </h1>
+            </div>
+            <div class="buttons">
+                {% block leftlink %}
+                    <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}"
+                       class="back btn-icon recyclelist" title="Back">{{ translate("Back") }}</a>
+                    <div id="titleSearch" class="titleSearch" style="">
+                        <form class="search_form"
+                              action="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}"
+                              method="get" name="list_search">
+
+                            <input class="long_placehldr" type="text" name="q" value="{{ search_query }}"
+                                   placeholder="Search in &quot;{{ title }}&nbsp;recycle&quot;">
+
+                            <div class="searchico"></div>
+                           {# {% if search_query %}
+                                <span style="font-style: italic; color: #999999; "> (
+                                    {% if  paginator.getTotalItemCount == 0 %}
+                                        nothing
+                                    {% elseif paginator.getTotalItemCount == 1 %}
+                                        {{ paginator.getTotalItemCount }} match
+                                    {% else %}
+                                        {{ paginator.getTotalItemCount }} matches
+                                    {% endif %}
+                                    )</span>
+                            {% endif %}#}
+                        </form>
+                    </div>
+                {% endblock leftlink %}
+            </div>
+
+                 <div class="buttons right">
+                    <a id="refresh" class="refresh btn-icon" href="">
+                            {{ translate('Refresh') }}
+                    </a>
+                 </div>
+
+              {% if search_query %}
+                 <div class="buttons" style="padding-left: 8px;">
+                      <a href="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}">Show all records</a>
+                 </div>
+              {% endif %}
+              <div style='display: inline; font-size: larger; font-style: italic;color:#999999; vertical-align: super;' id="letter"></div>
+
+       </div>
+
+        <div class="mainTable recyclelist_table" id ="tableBody">
+{#            {% if paginator.getTotalItemCount %}#}
+                <form id="restoreForm" action="{{ url( modelname, { 'action': 'restore' } )~saurl }}" method="post"
+                      name="checked">
+                    <div class="tableGrid">
+                        <table class="data">
+                            <thead>
+                            <tr class="tableHeader">
+                                <th class="width_4p">
+                                    <div id="c_all" class="checkbox">
+                                        <input type="checkbox" name="c_all_input" value=""/>
+                                    </div>
+                                </th>
+                                {% block sortUrlConstruction %}
+                                    {% for key,value in labels %}
+                                        <th class="{% if params.sort==key %}checked{% endif %}">
+                                            <a href="{{ url( modelname, { 'action': 'recyclelist','sort':key, 'desc':params.desc==0?1:0 } ) }}">{{ value }}</a>
+                                            {% if params.sort==key %}
+                                                <span class="{{ params.desc!=0 ? 'down':'up' }}"></span>
+                                            {% endif %}
+                                        </th>
+                                    {% endfor %}
+                                {% endblock sortUrlConstruction %}
+                                <th class="width_10p"><b>Actions</b></th>
+                            </tr>
+                            </thead>
+                            <tbody id="tbody">
+                            {% for akey,avalue in paginator.getCurrentItems %}
+                                <tr>
+                                    <td>
+                                        {# <input name="checkedid[]" type="checkbox" value="{{avalue.id}}"  id="{{avalue.id}}" class="check" /> #}
+                                        <div class="checkbox">
+                                            <input type="checkbox" name="checkedid[]" id="{{ avalue.id() }}"
+                                                   value="{{ avalue.id() }}" class="check"/>
+                                        </div>
+                                    </td>
+                                    {% for key,value in labels %}
+                                        <td class="{% if params.sort==key %}checked{% endif %}">
+                                            {% block data %}
+                                                {{ attribute(avalue, key) }}
+                                            {% endblock data %}
+                                        </td>
+                                    {% endfor %}
+                                    <td class="width_10p">
+                                        {% block action %}
+                                            <a class="actionview"
+                                               href="{{ url( null, { 'action': 'view','id':''~avalue.id() } )~saurl }}">
+                                                <img src="/img/1.png" class="view" alt="{{ translate('View') }}"/>
+                                                <span class="tooltip top">View</span>
+                                            </a>&nbsp;
+                                            <a class="actionview">
+{#                                               href="{{ url( null, { 'action': 'restore','id':''~avalue.id() } )~saurl }}">#}
+                                                <img src="/img/1.png" class="restore single_res" alt="{{ translate('Restore') }}"/>
+                                                <span class="tooltip top">Restore</span>
+                                            </a>&nbsp;
+                                            <a class="actionview">
+{#                                               href="{{ url( null, { 'action': 'clean','id':''~avalue.id() } )~saurl }}">#}
+                                                <img src="/img/1.png" class="clean single_cln" alt="{{ translate('Clean') }}"/>
+                                                <span class="tooltip top">Clean</span>
+                                            </a>
+                                        {% endblock action %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tableBottomToolbar">
+                        {% block downButtons %}
+                            <div class="buttons left">
+                                <a id="restorebtn" class="restore btn-icon disabled">
+                                    {#                            <a href="#" class="restore submitLink btn-icon" onClick="actionChange( 'restore' );">#}
+                                    {{ translate('Restore selected') }}
+                                </a>
+                                <a id="clearbtn" class="clean btn-icon disabled">
+                                    {#                            <a href="#" class="clean submitLink btn-icon" onClick="actionChange( 'clean' );">#}
+                                    {{ translate('Clean selected') }}
+                                </a>
+                            </div>
+                            <div class="buttons right">
+                                {% if paginator.count > 1 %}
+                                    {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+                                {% endif %}
+                            </div>
+                            <div class="buttons">
+                                {% if paginator.getTotalItemCount > 5 %}
+                                    <div class="selectRows">
+                                        <div class="msg"><span>Rows on the page:</span></div>
+                                        {% for i in rows %}
+                                            <a href="{{ url( null, { 'action': 'rowscount' } )~saurl }}&rows={{ i }}"
+                                               class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <div style="float: right; padding-top: 2px;" class="msg">
+                             <table>
+                                 <tbody>
+                                     <tr>
+                                        <td id = "total_count">
+                                          {% if paginator.getTotalItemCount > 0 %}
+                                            Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                                          {% endif %}
+                                        </td>
+                                     </tr>
+                                 </tbody>
+                             </table>
+                            </div>
+
+                            <div class="alphabet">
+                                <a id="#All" ajax-src="#tableBody" ajax-target="#tableBody"
+                                   class="ajax {% if not letter %}active{% endif %}"
+                                   href="{{ url( null, params, { 'query': { 'back': back, 'q': search_query } } ) }}">All</a>
+                                {% for _letter in 'A'..'Z' %}
+                                    <a id="#{{ _letter }}" ajax-src="#tableBody" ajax-target="#tableBody"
+                                       class="ajax {% if letter == _letter %}active{% endif %}"
+                                       href="{{ url( null, params, { 'query': { 'letter':_letter, 'back': back, 'q': search_query } } ) }}">{{ _letter }}</a>
+                                {% endfor %}
+                            </div>
+
+                        {% endblock downButtons %}
+                    </div>
+                </form>
+{#            {% endif %}#}
+        </div>
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+    <div class="dialog-message"></div>
+
+{% endblock content %}

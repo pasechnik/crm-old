@@ -1,0 +1,58 @@
+{% extends 'layout/layout.twig' %}
+{% block script %}
+<script>
+    $(
+        function() {
+//            $( 'select' ).selectBox();
+            $( '#c_all' ).click(
+                function() {
+                    if ( $( 'div.checked', this ).size() ) {
+                        $( 'input.check' ).prop( 'checked', true );
+                        $( 'div.checkboxArea' ).addClass( 'checked' );
+                    }
+                    else {
+                        $( 'input.check' ).prop( 'checked', false );
+                        $( 'div.checkboxArea' ).removeClass( 'checked' );
+                    }
+                } );
+        }
+    );
+</script>
+{% endblock script %}
+{% block style %}
+<style type="text/css">
+    #scrollTop {
+        background: url(/img/totop.png) 0 0 no-repeat;
+        display: block;
+        width: 30px;
+        height: 30px;
+        position: fixed;
+        bottom: 10px;
+        right: 2%;
+        z-index: 2000;
+    }
+</style>
+{% endblock style %}
+{% set title = translate('Search results for term') ~ ' "' ~ search_query ~ '"' %}
+{% block content %}
+    <div class="view_header" style="margin-bottom: 12px">
+        <div class="title" ><h1 style="line-height: 1;word-break: break-word;">{{ title }}</h1></div>
+    </div>
+<div class="clearfix">
+    <div class="fullwidth_area drop_area">
+    {% for wname, widget in widgets %}
+            {% include 'partial/searchwidget.twig' with {'name':wname, 'widget': widget} %}
+
+            {% endfor %}
+        {% if widgets|length < 1 %}
+        Nothing Found
+        {% endif %}
+    </div>
+    <div class="left_area half_area drop_area">
+    </div>
+    <div class="right_area half_area drop_area">
+    </div>
+
+</div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

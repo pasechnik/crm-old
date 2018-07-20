@@ -1,0 +1,31 @@
+{% extends 'partial/detaillist.twig' %}
+
+{% set masterName = master.getModelName|lower %}
+{% set MasterName = master.getModelName %}
+{% set title = translate(MasterName) ~ ': '~ master.subject %}
+{% set detailName = details %}
+{% set detailsName = details ~ 's' %}
+
+{% block table_link %}
+    onclick='location.href="{{ url( null, { 'action': 'view', 'quoteid':avalue.quote_id, 'id':''~avalue.id() } )~saurl }}"'
+{% endblock table_link %}
+
+{#{% block data %}#}
+    {#{{ parent() }}#}
+{#{% endblock data %}#}
+
+{% block data %}
+    {% if key == 'product_id' and attribute(avalue, 'product_id') is not empty %}
+        <a href="{{ url( 'product', { 'action': 'view','id':''~attribute(avalue, 'product_id')} )~saurl }}">{{ attribute(avalue, "product") }}</a>
+    {% elseif key == 'quote_id' and attribute(avalue, 'product_id') is not empty %}
+        <a href="{{ url( 'quote', { 'action': 'view','id':''~attribute(avalue, 'quote_id')} )~saurl }}">{{ attribute(avalue, "quote") }}</a>
+    {% elseif key[-6:] == '_price' %}
+        ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+    {% else %}
+        {{ attribute(avalue, key) }}
+    {% endif %}
+{% endblock data %}
+
+{% block action %}
+    {{ parent() }}
+{% endblock action %}

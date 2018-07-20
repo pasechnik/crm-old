@@ -1,0 +1,4 @@
+{% extends 'partial/form.twig' %}
+{% if title is not defined %}
+    {% set title = translate('Edit ' ~ modelLabel|capitalize)%}
+{% endif %}

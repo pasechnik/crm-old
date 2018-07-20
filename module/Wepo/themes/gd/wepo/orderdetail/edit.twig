@@ -1,0 +1,83 @@
+{% extends 'partial/edit.twig' %}
+{% block upperform %}
+    <div class="table" onKeyUp="updateTotalPrice();" onKeyPress="PutToPrice();" onClick="PutToPrice();">
+    <h2>{{ translate('Product : ') }} {{name}}</h2>
+        <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b>0 $</b></span></h2>
+        <div class="hide">
+            <select name="prices"  id="prices">
+                {% for key,value in prices %}
+                    <option value={{key}}>{{value}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endblock upperform %}
+{% block script %}
+    {{ parent() }}
+    <script>
+        $( function() {
+            updateTotalPrice()
+            $('.selectBox-dropdown-menu li').click(PutToPrice);
+            $( '#disc,#qty,#price' ).change( updateTotalPrice );
+        } );
+
+        function updateTotalPrice()
+        {
+            var price = 0;
+            var disc = 0;
+            var qty = 1;
+            var res = NaN;
+
+            price = parseFloat( document.getElementById( "price" ).value );
+            disc = parseFloat( document.getElementById( "disc" ).value );
+            qty = parseFloat( document.getElementById( "qty" ).value );
+            if ( isNaN( price ) )
+            {
+                document.getElementById( "showTotalPrice" ).innerHTML = "<b>0 $ </b>";
+            }
+            if ( !isNaN( price ) )
+            {
+                disc = disc<0?0:disc;
+                disc = disc>100?100:disc;
+                res = (price/100)*(100 - disc)*qty;
+                document.getElementById("disc").value = ""+disc+"";
+                res = res.toFixed(2);
+                document.getElementById( "showTotalPrice" ).innerHTML = "<b>" + res + " $ </b>";
+            }
+        }
+
+        function PutToPrice()
+        {
+            console.log('ptp');
+            var pricebooks;
+            var prices;
+            var price;
+            var qty;
+            var disc;
+            var id;
+
+            qty = document.getElementById('qty');
+            disc = document.getElementById('disc');
+            price = document.getElementById( 'price' );
+
+            qty.value = qty.value===""?"1":qty.value;
+            disc.value = disc.value===""?"0":disc.value;
+
+
+            pricebooks = document.getElementById( 'pricebook_id' );
+            prices = document.getElementById( 'prices' );
+            id = pricebooks.options[pricebooks.selectedIndex].value;
+            price.value = prices.options[pricebooks.selectedIndex].text;
+            updateTotalPrice();
+        }
+    </script>
+{% endblock script %}
+{% block style %}
+    <style type="text/css">
+        <!--
+        .hide {
+            overflow:hidden;
+            display: none;
+        }
+    </style>
+{% endblock style %}

@@ -1,0 +1,76 @@
+{% extends 'partial/pdfview.twig' %}
+{% set title = 'Invoice : ' ~ subject %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block detailinfo %}
+    <div class="clearfix">
+        <div class="table">
+            <h2>Detail information</h2>
+                <div id="details"  >
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width=30><b>N&#176;</b></th>
+                                <th><b>&nbsp;Name</b></th>
+                                <th><b>&nbsp;Description</b></th>
+                                <th><b>&nbsp;List Price</b></th>
+                                <th><b>&nbsp;Quantity</b></th>
+                                <th><b>&nbsp;Amount</b></th>
+                                <th><b>&nbsp;Discount</b></th>
+                                <th><b>&nbsp;Tax</b></th>
+                                <th><b>&nbsp;Total</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for product in products %}
+                               <tr>
+                                   <td width=30>{{loop.index}}</td>
+                                   <td>{{product.title}}</td>
+                                   <td>{{product.description}}</td>
+                                   <td>{{product.list_price}}</td>
+                                   <td>{{product.qty}}</td>
+                                   <td>{{product.amount}}</td>
+                                   <td>{{product.discount}}</td>
+                                   <td>{{product.tax}}</td>
+                                   <td>{{product.total}}</td>
+                               </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th width=30><b>N&#176;</b></th>
+                            {% for key, value in detail_labels %}
+                                {% if (key != 'order_id') and (key != 'invoice') %}
+                                    {#<pre>{{ dump(key) }}</pre>#}
+                                    <th><b>&nbsp;&nbsp;{{translate(value)}}</b></th>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for avalue in details %}
+                            <tr>
+                                {#<pre>{{ dump(detail.toView) }}</pre>#}
+                                <td width=30>{{loop.index}}</td>
+                                {#{% for key, value in detail.toView %}#}
+                                {% for key, value in detail_labels %}
+                                    <td>{% include 'partial/invoicedetail-list.twig' %}</td>
+                                    {#{% if key!= 'order_id'%}#}
+                                    {#{% if (key != 'order_id') and (key != 'invoice') %}#}
+                                    {#&#123;&#35;<td>&nbsp;&nbsp;{{value}}</td>&#35;&#125;#}
+                                    {#<td>&nbsp;&nbsp;{{attribute(detail,key)}}</td>#}
+                                    {#{% endif %}#}
+                                    {#{% endif %}#}
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+{% endblock detailinfo %}
+
+{#display='block'#}

@@ -1,0 +1,8 @@
+{% if key == 'isdefault' %}
+    {% if  attribute(avalue, key) == 'true' %}
+        <img src="/img/checked.png" alt="Yes" />
+    {% endif %}
+
+    {% else %}
+        {{ attribute(avalue, key) }}
+{% endif %}

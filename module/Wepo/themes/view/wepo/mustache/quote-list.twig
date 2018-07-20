@@ -1,0 +1,38 @@
+{% if key == 'title' or key == 'subject' %}
+    <a href="{{ url( 'common', { 'data':'quote', 'view':'view',  'id':avalue.id() }, { 'query': { 'back':saurlhash } } ) }}"><span
+            class="d_title">{{ attribute(avalue, key) }}</span></a>
+{% elseif key == 'pricebook_id' and attribute(avalue, 'pricebook_id') is not empty %}
+    <a href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~attribute(avalue, 'pricebook_id')} )~saurl }}">{{ attribute(avalue, "pricebook") }}</a>
+{% elseif key == 'changer_title' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view', 'id':''~attribute(avalue, 'changer_id')}, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.changer_title }}
+    </a>
+{% elseif key == 'owner_title' and attribute(avalue, 'owner_title') is not empty %}
+    <a href="{{ url( 'common', { 'data':'user', 'view':'view',  'id':''~attribute(avalue, 'owner_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.owner_title }}
+    </a>
+{% elseif key == 'status_id' %}
+    {{ attribute(avalue, "status") }}
+{% elseif key == 'patient_title' and attribute(avalue, 'patient_id') is not empty %}
+    <a href="{{ url( 'common', { 'data':'patient', 'view':'view',  'id':''~attribute(avalue, 'patient_id') }, { 'query': { 'back':saurlhash } } ) }}">
+        {{ avalue.patient_title }}
+    </a>
+{% elseif key[-5:] == 'price' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key[-6:] == '_price' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key[-6:] == '_total' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'tax' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'discount' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'adjustment' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}

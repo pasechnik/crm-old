@@ -1,0 +1,17 @@
+{% extends 'layout/layout.twig' %}
+
+{% set title = translate('Welcome') %}
+
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <div class="table">
+            <table>
+                <tr>
+                    <td>{{translate( 'Expand your business. Find and retain more customers. You can do it now with simple, clean and fast Wepo CRM' )}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

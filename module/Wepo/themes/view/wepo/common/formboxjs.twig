@@ -1,0 +1,19 @@
+{% extends 'layout/layout.twig' %}
+
+{% block content %}
+
+ <form action="" data-id="" method="post" name="OrderForm" class="validate apiform" data-scope="order" id="OrderForm" novalidate="novalidate">
+     <div>
+        {% for form in data.form %}
+            {% include form.template with form %}
+        {% endfor %}
+
+        <div class="details" id="OrderDetail">
+            {% for form in data.detail %}
+                {% include form.template with form %}
+            {% endfor %}
+        </div>
+     </div>
+ </form>
+
+{% endblock content %}

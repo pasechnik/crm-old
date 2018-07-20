@@ -1,0 +1,364 @@
+{% block style %}
+    <style>
+
+        .note-dialog{
+            height: auto !important;
+        }
+
+        a#insert_note, a#cancel_note, a#save_note {
+            cursor: pointer;
+        }
+
+        .note_p{
+            font-size:15px;
+            margin-bottom: 5px;
+            margin-left: 10px;
+            white-space: pre-wrap;
+        }
+
+        #contento h3{
+            font-size:16px;
+        }
+
+        ul#contento{
+            margin-top: -25px;
+        }
+
+        #note_title {
+            width: 100%;
+            height: 15px;
+        }
+
+        .note_textarea {
+            resize: none;
+            width: 100%;
+            height: 60px;
+            margin-top: 4px;
+        }
+
+        .notes_list {
+            overflow-y: auto;
+            max-height: 196px;
+            margin-top: 9px;
+        }
+
+        .delete_note {
+            font-size: 13px;
+        }
+
+        .delete_note:hover {
+            color: red;
+        }
+
+        .edit_note {
+            font-size: 13px;
+        }
+
+        .edit_note:hover {
+            color: #80bd57;
+        }
+
+        .ui-dialog-content {
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .note_hide {
+            height: 40%;
+        }
+
+        .note_date{
+            color : #999999;
+            font-size: 12px;
+            display: block;
+        }
+
+        #widget_content {
+            padding: 0px 12px 18px 0px;
+            margin-top: -15px;
+        }
+
+        a.addNotes {
+            margin-left: 20px;
+            background-color: #fafafa;
+            color: #1191d4 !important;
+            -webkit-border-radius: 6px;
+            border: 1px solid #d7d7d7;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 5px 9px;
+        }
+
+        a.addNotes:hover{
+            border-color: #1191d4;
+        }
+
+        .mainDiv{
+            width: 30% !important;
+            min-width: 300px;
+            background: #fafafa;
+            margin: 0 0 20px;
+            float: left;
+            text-align: left;
+            height: 240px !important;
+        }
+
+        .content .view_block .buttons{
+            background: none;
+
+        }
+
+        div.listtitle > h3{
+            color: #cf0505;
+            font-size: 16px;
+            line-height: 30px;
+            padding: 0 0 11px;
+            display: inline-block;
+        }
+
+        a#save_note{
+            margin-left: -15px;
+        }
+
+        .btn-notes{
+            height: 14px;
+            padding-bottom: 7px;
+        }
+
+        #note_Form{
+            max-height: 150px;
+        }
+
+        #load_image{
+           padding:10px;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+
+    <script>
+        $(function ()
+        {
+            var note    = $('.note');
+            var loadUrl = location.href;
+                loadUrl = loadUrl.substring(0, loadUrl.indexOf('?'));
+                loadUrl = loadUrl +' '+"#contento";
+
+            var insertButton = $('#insert_note');
+            var form         = $('#note_Form');
+            var contento     = $('#contento');
+            var count        = $("#contento li").size();
+
+            form.hide();
+
+            if (count == 0) {
+                $('.notes_list li').css('background', 'none');
+            }
+            else if (count <= 1) {
+                $('.notes_list').unbind(twoscrolls());
+            }
+            else {
+                twoscrolls('.notes_list');
+            }
+
+
+            $('#body').on("click","#insert_note", function (event)
+            {
+                event.preventDefault();
+                $(this).addClass('disabled');
+                $("#note_title,#note_input").val('');
+                $('.notes_list').css('overflow','hidden');
+
+                contento.hide({effect : 'blink', duration : 400});
+                setTimeout(function() {
+                    form.removeClass('hidden').show({effect: 'drop',duration:400});
+                },400);
+
+                window.Url = $(this).attr('href');
+            });
+
+            $('#body').on("click", "#cancel_note", function ()
+            {
+                $("#note_title,#note_input").val('');
+                insertButton.removeClass('disabled');
+
+                form.addClass('hidden').hide();
+                contento.show({effect: 'slow', duration: 400});
+                return false;
+            });
+
+            note.on('click', '.note_delete', function (e)
+            {
+                var title   = $(this).closest('li').find('h3').text();
+                var content = $(this).closest('li').find('pre').text();
+
+                if (title.length > 50) {
+                    title = $.trim(title).substring(0, 42); title = title + "...";
+                }
+
+                if (content.length > 50) {
+                    content = $.trim(content).substring(0, 42); content = content + "...";
+                }
+
+                if ( title.length !== 0 ){ window.title = title;  }
+                else                     { window.title = content;}
+
+                window.id    = $(this).closest('a').attr('data-id');
+                window.scope = 'note' + $('div.title').attr('data-scope');
+                apiDialog('single');
+                return false;
+            });
+
+            note.on('click', '.note_update', function (event)
+            {
+                event.preventDefault();
+                form.removeClass('hidden');
+                insertButton.addClass('disabled');
+
+                var title   = $(this).closest('li').find('h3').text();
+                var content = $(this).closest('li').find('pre').text();
+
+                contento.hide({effect: 'slow', duration: 300});
+                setTimeout(function () {
+                    form.show({effect: 'drop', duration: 500});
+                },300);
+
+                $("#note_title").val(title);
+                $("#note_input").val(content);
+
+                window.Url = $(this).closest('a').attr('href');
+            });
+
+            note.on('click', 'a#save_note', function ()
+            {
+                var title   = $('#note_title').val();
+                var content = $('#note_input').val();
+
+                if ( ( content.length >= 3) && ( title.length < 100 ) )
+                {
+                    startloader();
+                    form.hide();
+                    contento.show().html('<li align = "center" colspan="25">' +
+                                                  '<img id="load_image" src =/css/img/icons/32x32-icons/ajax-loader1.gif>' +
+                                         '</li>');
+                    $.ajax({
+                        url: window.Url,
+                        type: 'POST',
+                        traditional: true,
+                        data: {
+                            'fields[title]'  : title,
+                            'fields[content]': content
+                        },
+                        success: function () {
+                            contento.load(loadUrl);
+                        },
+                        error: function (){
+                            alert('An Error has occurred!');
+                            location.reload();
+                        }
+                    });
+
+                    $(document).ajaxStop(function ()
+                    {
+                        stoploader();
+                        insertButton.removeClass('disabled');
+                        $('.notes_list').css('overflow','auto');
+
+                        count = $("#contento li").size();
+
+                        if (count >= 1) {
+                            insertButton.next('span').hide();
+                        }
+                        if (count >= 2) {
+                            twoscrolls('.notes_list');
+                        }
+                    });
+                }
+                else {
+                    alert('Invalid data size !');
+                }
+            });
+        });
+    </script>
+{% endblock script %}
+
+<div class="mainDiv {{ params.data }} note other_widget">
+
+    <div class="title">
+        <div class="listtitle">
+            <h3>{{ title }}</h3>
+                {% if links %}
+                    {% for icon_key, link in links %}
+                        <a id="{{ icon_key }}_note" class="addNotes"
+                           href="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">{{ translate(link.label) }}</a>
+                    {% endfor %}
+                {% endif %}
+        </div>
+    </div>
+
+    <div id="widget_content" class="widget_content">
+        <div id="notes_list" class="notes_list">
+            {{ form().openTag(form)|raw }}
+            {% set element = form.getBaseFieldset.get('reg') %}
+
+            <div id="note_Form" class="hidden">
+                <div class="text">
+                    <input name="for_id" type="hidden" />
+                    <input name="fields[title]" type="text"  id="note_title" placeholder="Write a title"/>
+                    <textarea name="fields[content]"  id="note_input" class="note_textarea" placeholder="Write a note" rows="5"></textarea>
+                </div>
+
+                <div class="buttons">
+                    <a class="btn-notes save" value='Save'   id="save_note"   title='Save'>Save</a>
+                    <a class="btn-notes no"   value='Cancel' id="cancel_note" title='Cancel'>Cancel</a>
+                </div>
+            </div>
+
+            {{ form().closeTag(form)|raw }}
+
+            <ul id='contento' class="has_record">
+                {% for datarow, avalue in paginator.getCurrentItems %}
+                    <li id="note_hide" class="note_hide">
+
+                        {% if avalue.title is not empty %}
+                            <h3>{{ avalue.title }}</h3>
+                        {% endif %}
+
+                        {% if avalue.content is not empty %}
+                            <pre class="note_p">{{ avalue.content }}</pre>
+
+                            {% if avalue.changed_dtm != avalue.created_dtm  %}
+                                <span class="note_person"> Modified by <a href="{{ url( 'common', { 'data':'user', 'view': 'view','id':avalue.changer_id } )~saurl }}">{{ avalue.changer_title }}</a></span>
+                            {% else %}
+                                <span class="note_person"> Created  by <a href="{{ url( 'common', { 'data':'user', 'view': 'view','id':avalue.owner_id } )~saurl }}">{{ avalue.owner_title }}</a></span>
+                            {% endif %}
+
+                            <span class="note_date">{{ avalue.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}</span>
+                        {% endif %}
+
+                          <div class="links">
+                               {% for action, conf in actions %}
+                                    <a class="actionview"
+                                       data-id="{{ attribute(avalue, conf.id) }}"
+                                       href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(avalue, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                       src="/img/1.png" class="{{ action }} note_{{ action }}" alt="{{ action }}"/><span
+                                       class="tooltip top">{{ action|capitalize }}</span></a>&nbsp;
+                               {% endfor %}
+                          </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if widget.paginator.count > 1 %}
+            <div class="tableBottomToolbar">
+                <div class="buttons clearfix">
+                    {% include 'partial/pagination.twig' with {'pages':widget.paginator.getPages, 'route': 'search', 'params':widget.params} %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="note-dialog"></div>
+</div>

@@ -1,0 +1,131 @@
+{% extends 'layout/PDFLayout.twig' %}
+
+{% block title %}{{parent()}}{% endblock title %}
+
+{% block content %}
+    <h1>{{title}}</h1>
+    <div class="view_block clearfix">
+        {#{% block photo %}
+			<div class="lead_photo">
+				<div class="photo">
+					<img src="img/catman.jpg" alt="">
+				</div>
+			</div>
+        {% endblock photo %}#}
+			<div class="lead_info">
+				<h3>{{translate( model.getModelName~' information' )}}</h3>
+				<table>
+					<tbody>
+                        {% block output%}
+                            {% for key, value in model.toView if key in infoFields %}
+                                <tr>
+                                    <th>{{field_labels[key]}}</th>
+                                    {% if key=='email' %}
+                                        <td><a href="mailto:{{ value }}">{{ value }}</a></td>
+                                   {# {% elseif key=='mobile' %}
+                                        <td><span class="phone">{{ value }}</span></td>
+                                    {% elseif key=='owner' %}
+                                        <td><span class="phone"><a href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'owner_id') } )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='user' %}
+                                        <td><span class="phone"><a href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'user_id') } )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='changer' %}
+                                        <td><span class="phone"><a href="{{ url( 'user', { 'action': 'view','id':""~attribute(model, 'changer_id') } )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='client' %}
+                                        <td><span class="phone"><a href="{{ url( 'client', { 'action': 'view','id':''~attribute(model, 'client_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='contact' %}
+                                        <td><span class="phone"><a href="{{ url( 'contact', { 'action': 'view','id':''~attribute(model, 'contact_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='order' %}
+                                        <td><span class="phone"><a href="{{ url( 'orderdetail', { 'action': 'list','orderid':''~attribute(model, 'order_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='quote_id' %}
+                                        <td><span class="phone"><a href="{{ url( 'quotedetail', { 'action': 'list','quoteid':''~attribute(model, 'quote_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='pricebook' %}
+                                        <td><span class="phone"><a href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~attribute(model, 'pricebook_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='product' %}
+                                        <td><span class="phone"><a href="{{ url( 'product', { 'action': 'view','id':''~attribute(model, 'product_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='invoice' %}
+                                        <td><span class="phone"><a href="{{ url( 'invoice', { 'action': 'view','id':''~attribute(model, 'invoice_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='target_id' %}
+                                        <td><span class="phone"><a href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a></span></td>
+                                    {% elseif key=='target' %}
+                                        <td><span class="phone"><a href="{{ url( model.table|lower[:length-1], { 'action': 'view','id':''~attribute(model, 'target_id')} )~saurl }}">{{ value }}</a></span></td>#}
+                                    {% else %}
+                                        <td>{{ value }}</td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        {% endblock output%}
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+
+    {% block detailinfo %}
+    {% endblock detailinfo %}
+
+{#<div class="clearfix">#}
+    {#<div id="leftCol" class="connected">#}
+    {#{% for wname, widget in widgets %}#}
+        {#{% include 'partial/widget.twig' with {'name':wname, 'widget': widget} %}#}
+        {#{% if loop.index == (loop.length/2)|round(0,'ceil') %}#}
+            {#</div><div id="rightCol" class="connected">#}
+        {#{%endif%}#}
+    {#{% endfor %}#}
+                {#</div>#}
+{#</div>#}
+
+
+
+    {#{% if (paginator.getTotalItemCount) %}#}
+        {#<div class="clearfix">#}
+            {#<div class="table">#}
+                {#<h2>Events</h2>#}
+                {#<table>#}
+                    {#<thead>#}
+                        {#<tr> #}
+                            {#{% for key,value in labels %}#}
+                                {#{% if (params.desc!=0) %}#}
+                                    {#<th>#}
+                                        {#<b><a href="{{ url( null, { 'action': 'view','id': model.id(),'sort':key} )~saurl }}">{{value}}</a></b> #}
+                                        {#{% if params.sort==key%}#}
+                                            {#&#9650;#}
+                                        {#{% endif%}  #}
+                                    {#</th>#}
+                                {#{% else %}#}
+                                    {#<th>#}
+                                        {#<b><a href="{{ url( null, { 'action': 'view','id': model.id(),'sort':key,'desc':1 } )~saurl }}">{{value}}</a></b>#}
+                                        {#{% if params.sort==key%}#}
+                                            {#&#9660;#}
+                                        {#{% endif %}#}
+                                    {#</th>    #}
+                                {#{% endif %}  #}
+                            {#{% endfor %}#}
+                        {#</tr>#}
+                    {#</thead>#}
+                    {#<tbody>#}
+                        {#{% for akey,avalue in paginator.getCurrentItems %}#}
+                            {#<tr>#}
+                                {#{% for key,value in labels %}#}
+                                    {#<td>#}
+                                        {#{% if key == 'event_dtm'%}#}
+                                            {#{{attribute(avalue, key)|date('m.d.y H:i:s')}}#}
+                                        {#{% else %}#}
+                                            {#{{attribute(avalue, key)}}#}
+                                        {#{%endif%}#}
+                                    {#</td>#}
+                                {#{% endfor%}#}
+                            {#</tr>#}
+                        {#{% endfor %}#}
+                    {#</tbody>#}
+                {#<div class="buttons clearfix">#}
+                    {#{%if paginator.count > 1%}#}
+                         {#{% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}#}
+                    {#{% endif %}#}
+                {#</div>#}
+                {#</table>#}
+            {#</div>#}
+        {#</div>#}
+    {#{% endif %}#}
+
+    {#<a align="center" id="scrollTop" href="#" onclick="top.goTop(); return false;"></a>#}
+{% endblock content %}

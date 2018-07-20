@@ -1,0 +1,218 @@
+{{ docType() }}
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <title>
+        {#{% block title %}WePO{% endblock title %}#}
+        {% block title %}WePO - {{ title }}{% endblock title %}
+    </title>
+    <meta name="keywords" content="Wepo CRM"/>
+    <meta name="description" content="Wepo CRM"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    {% block meta %}{% endblock meta %}
+
+    <!-- Styles -->
+    {#<link href='http://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>#}
+
+    <!-- Latest compiled and minified CSS -->
+    {#<link rel="stylesheet" href="/css/libs/bootstrap/3.3.2/css/bootstrap.min.css">#}
+
+    <!-- Optional theme -->
+    {#<link rel="stylesheet" href="/css/libs/bootstrap/3.3.2/css/bootstrap-theme.min.css">#}
+
+    <link rel="stylesheet" type="text/css" media="screen" href="/js/libs/jquery-ui/jquery-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/themes/view/style.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/themes/view/wepo.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/js/libs/select2/css/select2.css"/>
+    {#<link rel="stylesheet" type="text/css" media="screen" href="/js/libs/select2-3.5/select2.css"/>#}
+
+
+    {#<link rel="stylesheet" type="text/css" media="screen" href="/css/selectize.bootstrap3.css"/>#}
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/libs/selectize.css"/>
+
+    {# <link href="/css/bootstrap-responsive.min.css" media="screen" rel="stylesheet" type="text/css"> #}
+    {#<link href="/img/wepo_logo_unicorn2.gif" rel="shortcut icon" type="image/vnd.microsoft.icon"/>#}
+    {% block style %}{% endblock style %}
+    <!-- /Styles -->
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="/js/libs/jquery-2.1.0.js"></script>
+    {#<script src="/css/libs/bootstrap/3.3.2/js/bootstrap.min.js"></script>#}
+
+    <script type="text/javascript" src="/js/libs/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/js/libs/jquery.animate-shadow-min.js"></script>
+
+
+    <script type="text/javascript" src="/js/libs/selectize.js"></script>
+    <script type="text/javascript" src="/js/libs/handlebars/handlebars-v2.0.0.js"></script>
+
+    <script type="text/javascript" src="/js/libs/jquery-ui/jquery-ui.min.js"></script>
+
+    <script type="text/javascript" src="/js/libs/select2/js/select2.js"></script>
+    {#<script type="text/javascript" src="/js/libs/select2-3.5/select2.js"></script>#}
+
+    <script type="text/javascript" src="/js/libs/jquery.selectBox.min.js"></script>
+
+    <script type="text/javascript" src="/js/libs/custom_forms_elements.js"></script>
+    <script type="text/javascript" src="/js/libs/jquery.validate.min.js"></script>
+
+    <script type="text/javascript" src="/js/themes/view/common.js"></script>
+    <script type="text/javascript" src="/js/libs/upper.js"></script>
+
+    <script type="text/javascript" src="/js/libs/gridster.js"></script>
+    {#<script type="text/javascript" src="/js/libs/shapeshift.js"></script>#}
+
+    <!--[if lt IE 10]>
+    <script type="text/javascript" src="/js/libs/pie.js"></script>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="/js/libs/html5.js"></script>
+    <![endif]-->
+
+    <script>
+        $(document).ready(function () {
+            $('#search_form').keydown(function (event) {
+                    if (event.keyCode == 13) {
+                        $('#main_search').submit();
+                    }
+                }
+            );
+            $('#search_button').mousedown(function (event) {
+                    $('#main_search').submit();
+                }
+            );
+//                 var inp = $('#search_query')[0].selectize.on( "click", function() { alert( 'On click trigger' ) });
+//                 $('#search_query')[0].selectize.trigger('click');
+        });
+    </script>
+
+
+    {% block script %}
+        <script>
+            //            $(document).ready(function () {
+            //                $('select.sb').selectBox();
+            //            });
+        </script>
+    {% endblock script %}
+    <!-- /Scripts -->
+</head>
+<body>
+{% block header %}
+    <div id="header" class="header">
+        <div id="headerBlock">
+            <div class="left_header">
+                {% if user.id() %}
+                    <div class="logo">
+                        <a href="{{ url( 'common', { 'data':'dashboard' } ) }}"
+                           class="imgTxt txtLogo {#{ checkpermissions('common', { 'data':'dashboard' }) }#}"></a>
+                    </div>
+                    <div class="search_form" id="search_form">
+                        <form
+                            action="{{ url( 'common', { 'data':'search', 'view':'list' }, { 'query': { 'q':search_query, 'back':saurlhash } } ) }}"
+                            method="get" name="main_search"
+                            id="main_search">
+                            <div class="input">
+                                {#<label for="search_query">Search</label>#}
+                                <input class="form-control" type="text" name="q" id="search_query" value=""
+                                       placeholder="Global search {{ viewboxparams.q ? 'for "'~viewboxparams.q~'"': '' }}"/>
+                            </div>
+
+                            <div class="button" id="search_button" style="z-index:10;">
+                                <a href="/" class="imgTxt txtSearch submitLink" title="Global search">Search</a>
+                            </div>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="logo"><a href="{{ url( 'home' ) }}" class="imgTxt txtLogo"></a></div>
+                {% endif %}
+            </div>
+            <div class="right_header" style="z-index: 10">
+
+                {#{% if user.id() %}#}
+                    {#<div class="header_links clearfix">#}
+
+                        {#<div class="with_subLinks">#}
+                            {#<a id="help_link" href="#">Help<span class="link_arr"></span></a>#}
+
+                            {#<div id="help_sublinks" class="subLinks">#}
+                                {#<span class="imgTxt txtArrow"></span>#}
+                                {#<ul>#}
+                                    {#<li><a href="{{ url( 'help', { 'action': 'manual' } ) }}">Manual</a></li>#}
+                                    {#<li><a href="{{ url( 'help', { 'action': 'faq' } ) }}">FAQ</a></li>#}
+                                    {#&#123;&#35;<li><a href="#">Forum</a></li>&#35;&#125;#}
+                                    {#&#123;&#35;<li><a href="#">Blog</a></li>&#35;&#125;#}
+                                    {#&#123;&#35;<li><a href="#">Support</a></li>&#35;&#125;#}
+                                {#</ul>#}
+                            {#</div>#}
+                        {#</div>#}
+                    {#</div>#}
+                {#{% endif %}#}
+                {% if user.id() %}
+                    <div class="login_block">
+                        {#                  <img src="/img/user.jpg" alt="{{ user.fname }} {{ user.lname }}"/>#}
+                        {#<img style="width: auto; max-width: 40px;  height: auto; max-height: 40px"#}
+                        <img style="width: 40px; height: 40px; "
+                             src="{{ WepoLink(user, 'avatar') }}"
+                             alt="{{ user.fname }} {{ user.lname }}"/>
+
+                        <div class="with_subLinks">
+                            {#<a href="{{ url( 'user', { 'action': 'view','id':user.id() } )~saurl }}">{{ user.fname }} {{ user.lname }} <span class="link_arr"></span></a>#}
+                            <a id="owner_link" href="#">{{ user.fname }} {{ user.lname }} <span class="link_arr"></span></a>
+
+                            <div id="owner_sublinks" class="subLinks">
+                                <span class="imgTxt txtArrow"></span>
+                                <ul>
+                                    <li>
+                                        {#                                      <a href="{{ url( null, { 'data':'user', 'view': 'view','id':user.id() } )~saurl }}">{{ translate('View profile') }}</a>#}
+                                        <a href="{{ url( 'common', { 'data':'user', 'view': 'view','id':user.id() } )~saurl }}">{{ translate('View profile') }}</a>
+                                    </li>
+                                    {#<li><a href="{{ url( 'user', { 'action': 'edit','id':user.id() } )~saurl }}">{{ translate('Edit profile') }}</a></li>#}
+                                    <li>
+                                        <a href="{{ url( 'common', { 'data': 'signout' } ) }}">{{ translate('Sign Out') }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div id="mainMenu" class="menu">
+            {% autoescape false %}
+            {{ navigation('Navigation').myMenu.setUlClass('clearfix').setMinDepth(0).escapeLabels(false).setAddClassToListItem( true ).render }}
+            {% endautoescape %}
+        </div>
+    </div>
+    <!-- /div#header.header -->
+{% endblock header %}
+
+<div class="content" id="body">
+    <!-- content|raw is required for phtml fallback -->
+    {# <h1>{{title}}</h1>
+    <div class="right_top_links">
+        <a href="#"><i class="imgTxt txtHelp"></i>Help fot this page</a>
+    </div>
+    #}
+    {% block content %}{{ content|raw }}{% endblock content %}
+
+</div>
+<!-- /content -->
+
+{% block globalfooter %}
+    <footer id="#footer">
+        <div class='forfooter'></div>
+        <div class="footer">
+            {% block footer %}{% endblock footer %}
+            <p>&copy; {{ "now"|date("Y") }} by WepoCRM </p>
+            {# Zend Framework {{ constant('\\Zend\\Version\\Version::VERSION') }} #}
+        </div>
+    </footer>
+{% endblock globalfooter %}
+
+{% block inline %}{% endblock inline %}
+</body>
+</html>

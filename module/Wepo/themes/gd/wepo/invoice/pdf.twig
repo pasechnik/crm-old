@@ -1,0 +1,41 @@
+{% extends 'partial/pdfview.twig' %}
+{% set title = 'Invoice : ' ~ model.subject %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block detailinfo %}
+    <div class="clearfix">
+        <div class="table">
+            <h2>Detail information</h2>
+                <div id="details"  >
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width=30><b>N&#176;</b></th>
+                                {% for key, value in details|first.toView if key in detailFields %}
+                                    {% if (key != 'order_id') and (key != 'invoice') %}
+                                        <th><b>&nbsp;&nbsp;{{translate(detail_labels[key])}}</b></th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for detail in details %}
+                               <tr>
+                               <td width=30>{{loop.index}}</td>
+                                   {% for key, value in detail.toView if key in detailFields%}
+                                       {% if key!= 'order_id'%}
+                                               {% if (key != 'order_id') and (key != 'invoice') %}
+                                                   <td>&nbsp;&nbsp;{{value}}</td>
+                                               {% endif %}
+                                       {% endif %}
+                                   {% endfor %}
+                               </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+{% endblock detailinfo %}
+
+{#display='block'#}

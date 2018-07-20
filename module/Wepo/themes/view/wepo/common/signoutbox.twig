@@ -1,0 +1,103 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Sign Out') %}
+
+{% block header %}
+    <div id="header" class="header">
+        <div id="headerBlock">
+            <div class="left_header">
+                {% if user.id() %}
+                    <div class="logo"><a href="{{ url( 'common', { 'data':'dashboard' } ) }}" class="imgTxt txtLogo"></a></div>
+                    <div class="search_form" id="search_form">
+                        <form action="{{ url( 'common', { 'data':'search', 'view':'list' }, { 'query': { 'q':search_query, 'back':saurlhash } } ) }}" method="get" name="main_search"
+                              id="main_search">
+                            <div class="input">
+                                {#<label for="search_query">Search</label>#}
+                                <input class="form-control" type="text" name="q" id="search_query" value=""
+                                       placeholder="Global search {{ viewboxparams.q ? 'for "'~viewboxparams.q~'"': '' }}"/>
+                            </div>
+
+                            <div class="button" id="search_button" style="z-index:10;">
+                                <a href="/" class="imgTxt txtSearch submitLink" title="Global search">Search</a>
+                            </div>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="logo"><a href="{{ url( 'home' ) }}" class="imgTxt txtLogo"></a></div>
+                {% endif %}
+            </div>
+            <div class="right_header" style="z-index: 10">
+
+                {% if user.id() %}
+                    <div class="header_links clearfix">
+
+                        <div class="with_subLinks">
+                            <a id="help_link" href="#">Help<span class="link_arr"></span></a>
+
+                            <div id="help_sublinks" class="subLinks">
+                                <span class="imgTxt txtArrow"></span>
+                                <ul>
+                                    <li><a href="{{ url( 'help', { 'action': 'manual' } ) }}">Manual</a></li>
+                                    <li><a href="{{ url( 'help', { 'action': 'faq' } ) }}">FAQ</a></li>
+                                    {#<li><a href="#">Forum</a></li>#}
+                                    {#<li><a href="#">Blog</a></li>#}
+                                    {#<li><a href="#">Support</a></li>#}
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="{{ url( 'setup', { 'action': 'index'} )~saurl }}">{{ translate('Setup') }}</a>
+                    </div>
+                {% endif %}
+                {% if user.id() %}
+                    <div class="login_block">
+                        {#                  <img src="/img/user.jpg" alt="{{ user.fname }} {{ user.lname }}"/>#}
+                        <img style="width: auto; max-width: 40px;  height: auto; max-height: 40px"
+                             src="{{ WepoLink(user, 'avatar') }}"
+                             alt="{{ user.fname }} {{ user.lname }}"/>
+
+                        <div class="with_subLinks">
+                            {#<a href="{{ url( 'user', { 'action': 'view','id':user.id() } )~saurl }}">{{ user.fname }} {{ user.lname }} <span class="link_arr"></span></a>#}
+                            <a id="owner_link" href="#">{{ user.fname }} {{ user.lname }} <span
+                                    class="link_arr"></span></a>
+
+                            <div id="owner_sublinks" class="subLinks">
+                                <span class="imgTxt txtArrow"></span>
+                                <ul>
+                                    <li>
+                                        {#                                      <a href="{{ url( null, { 'data':'user', 'view': 'view','id':user.id() } )~saurl }}">{{ translate('View profile') }}</a>#}
+                                        <a href="{{ url( 'common', { 'data':'user', 'view': 'view','id':user.id() } )~saurl }}">{{ translate('View profile') }}</a>
+                                    </li>
+                                    {#<li><a href="{{ url( 'user', { 'action': 'edit','id':user.id() } )~saurl }}">{{ translate('Edit profile') }}</a></li>#}
+                                    <li>
+                                        <a href="{{ url( 'common', { 'data': 'signout' } ) }}">{{ translate('Sign Out') }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div id="mainMenu" class="menu" style="max-width: 100%; min-width: 95%; width: 100%;">
+            <ul class="clearfix">
+                <li class="signin">
+                    <a id="menu-signin" href="{{ url('common', { 'data':'signin'}) }}"><span class="menu icon"></span><span
+                            class="tooltip top">Sign In</span><span class="menu-text">Sign In</span></a>
+                </li>
+                <li class="signup">
+                    <a id="menu-signup" href="{{ url('common', { 'data':'signout'}) }}"><span class="menu icon"></span><span
+                            class="tooltip bottom">Sign Up</span><span class="menu-text">Sign Up</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- /div#header.header -->
+{% endblock header %}
+
+{% block content %}
+
+    {% for block in data.signout %}
+        {% include block.template with block %}
+    {% endfor %}
+
+{% endblock content %}

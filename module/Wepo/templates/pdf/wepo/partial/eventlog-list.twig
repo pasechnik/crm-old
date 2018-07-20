@@ -1,0 +1,16 @@
+{% if key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% elseif key == 'executor_id' %}
+    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(avalue, 'executor_id')} )~saurl }}" >
+        {{ avalue.executorfname}}
+        {{ avalue.executorlname}}
+    </a>
+{% elseif key == 'table_id' %}
+    {{avalue.table}}
+{% elseif key == 'event_id' %}
+    {{avalue.event}}
+{% else %}
+    {{attribute(avalue, key)}}
+{% endif %}

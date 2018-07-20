@@ -1,0 +1,51 @@
+{#{% extends 'layout/layout.twig' %}#}
+{#{% set title = translate(model.getModelName~' convertation') %}#}
+{#{% block title %}{{ parent() }} - {{ title }}{% endblock title %}#}
+{% block content %}
+    <div class="view_header">
+        {% block headeractions %}
+            {% if saurlback !='/' %}
+                <a href="{{ saurlback }}" class="titleBack" title="Back"></a>
+            {% else %}
+                <a href="{{ url ( 'common', { 'data':modelname, 'view': 'list' } ) }}" class="titleBack" title="Back"></a>
+            {% endif %}
+            <div class="title"><h1>{{ title }}</h1></div>
+            <span class="edited">
+            </span>
+        {% endblock headeractions %}
+    </div>
+    <div class="view_block">
+    <div class="buttons" style="padding-left: 140px">
+        <form action="{{ url( 'common', { 'data':modelname, 'view': 'convert', 'id':model.id() } ) }}" method="post">
+            {% block actions %}
+                <a href=""
+                   class="btn-icon yes submitLink">{{ translate('Confirm convertation') }}</a>
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="btn-icon cancel">{{ translate('Cancel') }}</a>
+            {% endblock actions %}
+            <input type="hidden" name="object_id" id="object_id" value="{{ model.id() }}"/>
+        </form>
+    </div>
+    {% block photo %}
+        <div class="lead_photo">
+            <div class="photo">
+                {#{% block avatar %}#}
+                {#<img src="{{ WepoLink(mainuser.company_id, model, 'avatar', 'Leads') }}" alt="" style="max-width:120px;max-height:120px;">#}
+                {#{% endblock avatar %}#}
+            </div>
+        </div>
+    {% endblock photo %}
+    <div class="lead_info">
+        <h3>{{ translate( model.getModelName~' '~model.title~' will be converted' ) }}</h3>
+        <table>
+            <tbody>
+                {% for key,object in convertedObjects %}
+                    <tr>
+                        <th>{{ key }}</th>
+                        <td>{{ object.title }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

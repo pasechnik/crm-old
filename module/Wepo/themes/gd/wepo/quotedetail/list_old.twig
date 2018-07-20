@@ -1,0 +1,122 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Quote') %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<h1>{{title}}: № {{quote.id}}</h1>
+<br/>
+<div>
+    <table border=2 width=50% >
+        <tr>
+           <th colspan="2" align="center">
+               {{translate('Quote info:')}}
+           </th>
+       </tr>
+    {% for key, value in quote.toView %}
+       {%if key != 'id' %}
+       <tr align="left">
+           <th>&nbsp&nbsp{{field_labels[key]}}</th>
+            {% if key == 'owner'%}
+                {% if quote.owner_id != 0 %}
+                    <td><a href="{{ url( 'user', { 'action': 'view','id':quote.owner_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                {% else %}
+                    <td>&nbsp;&nbsp;{{value}}</td>
+                {%endif%}
+            {% elseif key == 'contact'%}
+                {%if quote.contact_id != 0 %}
+                    <td><a href="{{ url( 'contact', { 'action': 'view','id':quote.contact_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                {%else%}
+                    <td>&nbsp;&nbsp;{{value}}</td>
+                {%endif%}
+            {% elseif key == 'changer'%}
+                {%if quote.changer_id != 0 %}
+                    <td><a href="{{ url( 'user', { 'action': 'view','id':quote.changer_id} )~saurl }}" >&nbsp;&nbsp;{{value}}</a></td>
+                {%else%}
+                    <td>&nbsp;&nbsp;{{value}}</td>
+                {%endif%}
+            {% else %}
+                <td>&nbsp;&nbsp;{{value}}</td>
+            {% endif %}
+       </tr>
+        {% endif %}
+    {% endfor %}
+        </table>
+        <br/>
+</div>
+<div>
+    <a href="{{ url( 'quotedetail', { 'action': 'add', 'quoteid': quoteid} ) }}">{{translate('Add new product')}}</a> &nbsp;
+    <a href="{{ url( 'field', { 'action': 'list', 'table':table.id } )~saurl }}">{{translate('Choose output fields')}}</a> &nbsp;<br/><br/>
+    {% if paginator.getTotalItemCount %}
+    <form action="{{ url( 'quotedetail', { 'action': 'delete' } ) }}" method="post" name="cheked">
+    <table border=2 width=100%>
+        <tr align=center>
+                <td><input name="all" type="checkbox" value="all" onClick="check();"/></td>
+                {% for key,value in labels %}
+                {% if (params.desc!=0) %}
+                <td align="center"><b><a href="{{ url( 'quotedetail', { 'action': 'list','sort':key,'quoteid':quoteid} ) }}">{{value}}</a></b>
+                    {% if params.sort==key%}
+                        <img src="/img/up.png">
+                    {% endif%}
+                </td>
+                {%  else %}
+                <td align="center"><b><a href="{{ url( 'quotedetail', { 'action': 'list','sort':key,'desc':1,'quoteid':quoteid } ) }}">{{value}}</a></b>
+                {% if params.sort==key%}<img src="/img/down.png">{% endif %}
+                </td>
+                {% endif %}
+                {% endfor %}
+                <td colspan="3"><b>Actions</b></td>
+        </tr>
+    {% for akey,avalue in paginator.getCurrentItems %}
+        <tr>
+            <td align="center"><input name="checkedid[]" type="checkbox" value="{{avalue.id}}"  id="{{avalue.id}}" class="check" /></td>
+            {% for key,value in labels %}
+                <td align="center">
+                        {% if key == 'product' %}
+                            {% if attribute(avalue, 'product_id') != 0 %}
+                                <a href="{{ url( 'product', { 'action': 'edit','id':attribute(avalue, 'product_id')} ) }}" >{{ attribute(avalue, key) }}</a>
+                            {%else%}
+                                {{ attribute(avalue, key) }}
+                            {%endif%}
+                        {% else %}
+                            {{ attribute(avalue, key) }}
+                        {%endif%}
+                </td>
+            {% endfor%}
+            <td align="center"><a href="{{ url( 'quotedetail', { 'action': 'view','quoteid':avalue.quote_id,'id':avalue.id } ) }}">view</a></td>
+            <td align="center"><a href="{{ url( 'quotedetail', { 'action': 'edit', 'quoteid':avalue.quote_id,'id':avalue.id } ) }}">edit</a></td>
+            <td align="center"><a href="{{ url( 'quotedetail', { 'action': 'delete','id':avalue.id } ) }}">delete</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    <input name="submit" type="submit" value="Remove checked" />
+    </form>
+    {% endif %}
+    {%if paginator.count > 1%}
+         {{ paginationControl(paginator, 'Elastic', 'partial/pagination', { 'route': 'quotedetail', 'params':params} ) }}
+    {%endif%}
+</div>
+<a href="{{ url( 'quote', { 'action': 'list' } ) }}">{{translate('Back to quotes')}}</a><br/><br/>
+{% endblock content %}
+{% block script %}
+            <script>
+                var option = true;
+                function check()
+                {
+                    if(option==true)
+                    {
+                       for(i=0; i<document.getElementsByClassName("check").length; i++)
+                       {
+                           document.getElementsByClassName("check")[i].checked = true;
+                       }
+                       option=false;
+                    }
+                    else
+                    {
+                       for(j=0; j<document.getElementsByClassName("check").length; j++)
+                       {
+                           document.getElementsByClassName("check")[j].checked = false;
+                       }
+                       option=true;
+                    }
+                }
+            </script>
+{% endblock script %}

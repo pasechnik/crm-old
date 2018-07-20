@@ -1,0 +1,28 @@
+<!--begin tinymenu.twig-->
+<script>
+
+    window.pattern=function(editor) {
+        editor.addButton('pattern', {
+            type: 'menubutton',
+            text: 'Pattern',
+            title: 'Insert pattern',
+            icon: false,
+            menu: [
+                {
+                    {% for key, folder in pattern_items %}
+                    text: '{{ key }}', menu: [
+                        {% for p,item in folder %}
+                        {
+                            text: '{{ item }}', onclick: function () {  editor.insertContent('{% raw %}{{ {% endraw %}{{ key }}.{{ p }} {% raw %}}}{% endraw %}'); }
+                        },
+                        {% endfor %}
+                    ]
+                {% if not loop.last %} },{ {% endif %}
+
+                    {% endfor %}
+                }
+            ]
+        });
+    };
+</script>
+<!--end tinymenu.twig-->

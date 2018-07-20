@@ -1,0 +1,85 @@
+<div class="table" id="searchwidget_{{loop.index}}">
+    <div class="title tableToolbar">
+        <span class="icon small" style="background-image: url(/css/img/icons/32x32-icons/{{ widget.model }}.png)"></span>
+        <h2><a href="{{ url( widget.modelname, widget.params ) }}">{{ name|capitalize }}</a></h2>
+
+        <div class="left_buttons" style="margin: 7px 10px;">
+
+            <span style="font-style: italic; color: #999999; ">
+                (
+            {% if  widget.paginator.getTotalItemCount == 0 %}
+                nothing
+            {% elseif widget.paginator.getTotalItemCount == 1 %}
+                {{ widget.paginator.getTotalItemCount }} match
+            {% else %}
+                {{ widget.paginator.getTotalItemCount }} matches
+            {% endif %}
+                )
+            </span>
+
+        </div>
+        <div class="right_buttons">
+            <a href="#" class="resize_button table_head_link1"></a>
+            <a href="#" class="minimize_button table_head_link1"></a>
+        </div>
+    </div>
+    <div class="widget_content">
+        <table>
+            <thead>
+                <tr>
+                {% for avalue in widget.labels %}
+                    <th>{{ avalue }}</th>
+                {% endfor %}
+                {% if widget.actions %}
+                    <th><b>Actions</b></th>
+                {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for datarow in widget.paginator %}
+                <tr>
+                    {% for key,label in widget.labels %}
+                        {% if loop.index0  %}
+                    <td style="vertical-align: middle;">
+                        {% else %}
+                    <th style="vertical-align: middle;">
+                        {% endif %}
+                        {% include 'partial/'~widget.model~'-list.twig'  with {'avalue':datarow, 'key':key }  %}
+                        {#{{ ''~attribute(datarow, key) }}#}
+                        {% if loop.index0  %}
+                        </td>
+                        {% else %}
+                    </th>
+                        {% endif %}
+                    {% endfor %}
+                    {% if widget.actions %}
+                        {% block action %}
+                    <td>
+                                {% for action, conf in widget.actions %}
+                                    {% if attribute(conf, 'subid') is not empty %}
+                        <a title="{{ action }}"
+                           href="{{ url( conf.route, { 'action': conf.action_name|default(action),(conf.subid):''~attribute(datarow, conf.sub_id),(conf.id):''~datarow._id } )~widget.saurl }}"><img
+                                src="/img/1.png" class="{{ action }}" alt="{{ action }}"/></a>&nbsp;
+                                    {% else %}
+                        <a title="{{ action }}"
+                           href="{{ url( conf.route, { 'action': conf.action_name|default(action),(conf.id):''~datarow._id } )~widget.saurl }}"><img
+                                src="/img/1.png" class="{{ action }}" alt="{{ action }}"/></a>&nbsp;
+                                    {% endif %}
+                                {% endfor %}
+                    </td>
+                        {% endblock action %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <br/>
+
+        <div class="buttons clearfix">
+            {% if widget.paginator.count > 1 %}
+                {% include 'partial/pagination.twig' with {'pages':widget.paginator.getPages, 'route': widget.modelname, 'params':widget.params} %}
+            {% endif %}
+        </div>
+
+    </div>
+</div>

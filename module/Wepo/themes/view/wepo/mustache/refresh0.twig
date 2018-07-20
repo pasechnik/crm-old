@@ -1,0 +1,12 @@
+{% extends 'layout/layout.twig' %}
+{% set seconds = seconds|default(0) %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block meta %}<META HTTP-EQUIV="refresh" CONTENT="{{seconds}}; url={{tourl|default('/')}}">{% endblock meta %}
+{% block content %}
+{% endblock content %}
+
+{% block header %}
+{% endblock header %}
+
+{% block globalfooter %}
+{% endblock globalfooter %}

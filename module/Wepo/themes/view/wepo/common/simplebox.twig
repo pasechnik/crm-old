@@ -1,0 +1,5 @@
+{% block content %}
+    {% for dash in data.view %}
+        {% include dash.template with dash %}
+    {% endfor %}
+{% endblock content %}

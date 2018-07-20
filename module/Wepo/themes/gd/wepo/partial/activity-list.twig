@@ -1,0 +1,18 @@
+{% if key == 'subject' %}
+    <a href="{{ url( 'activity', { 'action': 'view','id':avalue.id() } )~saurl }}" >{{attribute(avalue, key)}}</a>
+{% elseif key == 'owner_id' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(avalue, 'owner_id')} ) }}" >{{ avalue.ownerfname}}
+        {{ avalue.ownerlname}}</a>
+{% elseif key == 'table_id' and attribute(avalue, 'owner_id') is not empty %}
+    {{ avalue.table}}
+{% elseif key == 'type_id' and attribute(avalue, 'owner_id') is not empty %}
+    {{ avalue.type}}
+{% elseif key == 'target_id' and attribute(avalue, 'target_id') is not empty %}
+    <a href="{{ url( avalue.table|lower[:length-1], { 'action': 'view','id':''~attribute(avalue, 'target_id')} )~saurl }}">{{attribute(avalue, 'target')}}</a>
+{% elseif key[-4:] == '_dtm' %}
+    {{attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT'))}}
+{% elseif key[-5:] == '_date' %}
+    {{attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT'))}}
+{% else %}
+    {{attribute(avalue, key)}}
+{% endif %}

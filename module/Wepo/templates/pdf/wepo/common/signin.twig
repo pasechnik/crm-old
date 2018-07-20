@@ -1,0 +1,117 @@
+<div class='shake_it {% if not good_credentials  %}bad_credentials{% else %}good_credentials{% endif %}'>
+    <h3 class="wepolabel"><a href="{{ url( 'home' ) }}" class="imgTxt txtLogo"></a></h3>
+
+    <div class="bord">
+        {{ form().openTag(form)|raw }}
+
+        <table style="margin: auto;">
+            {% set element = form.getBaseFieldset.get('login') %}
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="fields[login]" type="email" id="wepologin" placeholder="Email" class="placehold"
+                               value="{{ element.value }}"/>
+
+                        <div id="loginico"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="winput">
+                        <input name="fields[password]" type="password" id="wepopassword" placeholder="**********"
+                               class="placehold" value=""/>
+
+                        <div id="passwdico"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" value="Sign in" id="weposubmit"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <br/>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <a style="float:left;color:#e0ffff; "
+                       href="{{ url('common',{ 'data':'resetpassword'}) }}">Forgot password?</a>
+                    <a style="float:right;color:#6bc784;" href="{{ url('common',{ 'data':'signup' }) }}">Create an
+                        account</a>
+                </td>
+            </tr>
+
+        </table>
+
+        {{ form().closeTag()|raw }}
+    </div>
+</div>
+
+<table style="margin: auto;">
+    <tr>
+        <td>
+            <br/>
+            <br/>
+            <br/>
+            <span style="color:#e0ffff;font-size: small;"> &#169; {{ "now"|date("Y") }}
+                by Wepo Inc. All rights reserved </span>
+        </td>
+    </tr>
+</table>
+{% block script %}
+    <script>
+
+        $(function(){
+            $('input').click(function(){
+                $('.shake_it').removeClass("animation");
+            });
+
+            $('#form').submit(
+                function(){
+                    var result = false;
+                    $.ajax(
+                        {
+                            url:window.location.pathname,
+                            type: 'post',
+                            async: false,
+                            timeout: 3000,
+                            data: {
+                                'fields[login]' : $('#wepologin').val(),
+                                'fields[password]' : $('#wepopassword').val()
+                            },
+                            success: function(results)
+                            {
+                                if( $(results).find('div.shake_it').hasClass('bad_credentials') )
+                                {
+                                    $('#wepopassword').val('');
+                                    $('.shake_it').addClass("animation");
+                                    $('#wepologin').css('border','1px solid red');
+                                    $('#wepopassword').css('border','1px solid red');
+                                    $('#weposubmit').attr('disabled',true);
+
+                                    setTimeout(function(){
+                                        $('#wepologin').css('border','1px solid white');
+                                        $('#wepopassword').css('border','1px solid white');
+                                        $('#weposubmit').attr('disabled',false);
+                                    },1300);
+                                }
+                                else{
+                                    $('#weposubmit').prop('value','Signing in');
+                                    window.location.href = '{{ redirect_url }}';
+                                }
+                            }
+                        }
+                    )
+                    return result;
+                }
+            )
+        });
+
+    </script>
+{% endblock script %}

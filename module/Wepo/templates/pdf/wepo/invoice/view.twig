@@ -1,0 +1,127 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'Invoice : ' ~ model.subject %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block photo %}
+{% endblock photo %}
+{% block edit %}
+{% endblock edit %}
+{% block actions %}
+{% endblock actions %}
+{% block headeractions %}
+
+
+    <div class="buttons left">
+        <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+        <a href="{{ url(null,{ 'action': 'delete','id':''~model.id() } )~saurldoubleback }}" class="delete btn-icon" title="Delete">{{ translate("Delete") }}</a>
+    </div>
+
+    <div class="title"><h1>{{ title }}</h1></div>
+    <div class="editedBy">
+        {% if model.toView["changer"] is defined %}
+            Last Update: {{ model.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }} by {{ model.changerfname }} {{model.changerlname}}
+        {% endif %}
+    </div>
+
+    <div class="buttons">
+        {#<a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}" class="edit btn-icon">#}
+            {#{{ translate('Edit') }}#}
+        {#</a>#}
+    </div>
+
+    <div class="buttons right">
+        <a href="#" class="btn-small previous" title="Previous"></a>
+        <a href="#" class="btn-small next" title="Next"></a>
+    </div>
+
+{% endblock headeractions %}
+{% block detailinfo %}
+    {#<pre>{{ dump(details|first.toView) }}</pre>#}
+        <div class="table">
+            <h2 style="padding-top: 17px;">Detail information</h2>
+            <div class="buttons" style="padding: 10px;">
+                {#<a id="details_button" href="" onClick="show(); return false;">Show</a>#}
+                {#<a class="green_but submitLink" href="{{ url( 'invoice', { 'action': 'convert', 'id': params.id} )~saurl }}">{{translate('Generate payment')}}</a>#}
+                {#<a class="green_but submitLink" target="_blank" href="{{ url( 'invoice', { 'action': 'viewpdf', 'id': params.id} ) }}">{{translate('Generate pdf')}}</a>#}
+
+                <a id="details_button" class="show btn-icon">Show</a>
+                <a class="yes btn-icon green_but submitLink" href="{{ url( 'invoice', { 'action': 'convert', 'id': params.id} )~saurl }}">{{translate('Generate payment')}}</a>
+                <a class="pdf btn-icon green_but submitLink" target="_blank" href="{{ url( 'invoice', { 'action': 'viewpdf', 'id': params.id} ) }}">{{translate('Generate pdf')}}</a>
+            </div>
+                <div id="details" class="hide">
+                    <table>
+                        {#{% set detailsToDisplay = details|first.toView %}#}
+                        <thead>
+                            <tr>
+                                <th width=30><b>№</b></th>
+                                {% for key, value in detail_labels %}
+                                    {% if (key != 'order_id') and (key != 'invoice') %}
+                                        {#<pre>{{ dump(key) }}</pre>#}
+                                        <th><b>&nbsp;&nbsp;{{translate(value)}}</b></th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                           {% for avalue in details %}
+                               <tr>
+                                   {#<pre>{{ dump(detail.toView) }}</pre>#}
+                               <td width=30>{{loop.index}}</td>
+                                   {#{% for key, value in detail.toView %}#}
+                                   {% for key, value in detail_labels %}
+                                       <td>{% include 'partial/invoicedetail-list.twig' %}</td>
+                                       {#{% if key!= 'order_id'%}#}
+                                               {#{% if (key != 'order_id') and (key != 'invoice') %}#}
+                                                   {#&#123;&#35;<td>&nbsp;&nbsp;{{value}}</td>&#35;&#125;#}
+                                                   {#<td>&nbsp;&nbsp;{{attribute(detail,key)}}</td>#}
+                                               {#{% endif %}#}
+                                       {#{% endif %}#}
+                                   {% endfor %}
+                               </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+{% endblock detailinfo %}
+{% block script %}
+    <script>
+        $(function(){
+           $('#details').hide();
+
+           $('#details_button').click(function()
+           {
+              if ($(this).text() === 'Hide')
+              {
+                $('#details').hide({duration:600,effect:'blind'});
+                $(this).text('Show');
+                $(this).switchClass('hide','show');
+              var interval = setInterval(function(){
+                    if ($(window).scrollTop() < $('#header').height() - $('#mainMenu').height() )
+                    {
+                      fixedMenu();
+                      clearInterval(interval);
+                    }
+                },1);
+              }
+              else{
+                $('#details').show({duration:600,effect:'blind'});
+                $(this).text('Hide');
+                $(this).switchClass('show','hide');
+              }
+           });
+
+        $('.info_total_tax').text('Tax');
+          $('.info_total_adjustment').text('Adjustment');
+
+        });
+    </script>
+{% endblock script %}
+
+{% block style %}
+    <style>
+        #details_button{
+            cursor: pointer;
+            width: 30px;
+        }
+    </style>
+{% endblock style %}

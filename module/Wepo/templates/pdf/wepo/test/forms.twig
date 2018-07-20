@@ -1,0 +1,7 @@
+<a href="{{ url('test', {'action':'index'}) }}">Index</a>
+<a href="{{ url('test', {'action':'fields'}) }}">Fields</a>
+<a href="{{ url('test', {'action':'perms'}) }}">Permissions</a>
+<a href="{{ url('test', {'action':'forms'}) }}">Forms</a>
+
+
+{% include 'common/form.twig' with { form: form } %}

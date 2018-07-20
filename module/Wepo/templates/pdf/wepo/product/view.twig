@@ -1,0 +1,20 @@
+{% extends 'partial/view.twig' %}
+
+{% set title = 'Product: ' ~ model.name %}
+
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+
+{% block photo %}
+{% endblock photo %}
+
+{% block actions %}
+    {% if model.status != 'deleted' %}
+        <a href="{{ url( null, { 'action': 'delete','id':''~model.id() } )~saurl }}" class="delete btn-icon">{{translate('Delete')}}</a> &nbsp;
+        <a href="{{ url( 'pricebook', { 'action': 'product','product':''~model.id() } )~saurl }}" class="add btn-icon">{{translate('Add to Pricebook')}}</a> &nbsp;
+    {% elseif model.status == 'deleted' %}
+        <a href="{{ url( null, { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}" class="restore btn-icon green_but submitLink">{{translate('Restore')}}</a> &nbsp;
+        {% if permission == 1 %}
+            <a href="{{ url( null, { 'action': 'clean', 'id':'' ~model.id()} )~delsaurl }}" class="clean btn-icon red_but submitLink">{{translate('Clean')}}</a> &nbsp;
+        {% endif %}
+    {% endif %}
+{% endblock actions %}

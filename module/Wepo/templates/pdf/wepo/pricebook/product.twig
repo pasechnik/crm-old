@@ -1,0 +1,79 @@
+{% extends 'partial/add.twig' %}
+{% block upperform %}
+<div class="table" onKeyUp="test();" onKeyPress="PutToPrice();" onClick="PutToPrice();">
+    <h2>{{ translate('Total price : ') }}<span id="showTotalPrice"><b> $</b></span></h2>
+    <div class="hide">
+        <select name="prices"  id="prices">
+            {% for key,value in prices %}
+                <option value={{key}}>{{value}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endblock upperform %}
+
+{% block script %}
+    {{ parent() }}
+    <script>
+        $( function(){
+            PutToPrice();
+            $('#product_id,#discount').keyup( PutToPrice );
+            $('#discount_type,#discount').change( PutToPrice );
+        });
+
+        function test ()
+        {
+            var price = 0;
+            var disc = 0;
+            var priceType = 0;
+            var res = NaN;
+            price = parseFloat(document.getElementById("product_price").value);
+            disc = parseFloat(document.getElementById("discount").value);
+            priceType = document.getElementById("discount_type").value;
+            if (isNaN(price))
+            {
+                document.getElementById("showTotalPrice").innerHTML = "<b>0 $ </b>";
+            }
+            if (!isNaN(price))
+            {
+                res = price;
+                if (!isNaN(disc))
+                {
+                    if (priceType==='Direct Price Reduction')
+                    {
+                        if(disc > price)
+                        {
+                            res = 0;
+                        }
+                        else
+                            res = price - disc;
+                    }
+                    else
+                    {
+                        res = price/100*disc;
+                    }
+                }
+                res = res.toFixed(2);
+                document.getElementById("showTotalPrice").innerHTML= "<b>"+res+" $ </b>";
+            }
+        }
+
+        function PutToPrice()
+        {
+            var price;
+            price = document.getElementById('product_price');
+            price.value = price.value;
+            test ();
+        }
+    </script>
+{% endblock script %}
+
+{% block style %}
+        <style type="text/css">
+                <!--
+                .hide {
+                    overflow:hidden;
+                    display: none;
+                }
+        </style>
+{% endblock style %}

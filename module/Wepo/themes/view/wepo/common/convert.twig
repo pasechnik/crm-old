@@ -1,0 +1,59 @@
+{#{% extends 'layout/layout.twig' %}#}
+{#{% set title = translate(model.getModelName~' convertation') %}#}
+{#{% block title %}{{ parent() }} - {{ title }}{% endblock title %}#}
+
+{% block content %}
+<div class="viewtable">
+    <div class="view_header">
+        {% block headeractions %}
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data' : modelname, 'view': 'list' } )  }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+            </div>
+
+            <div class="title">
+                <h1 class="{{ title|lower|replace(' ', '_') }}">
+                    {{ title }}
+                </h1>
+            </div>
+
+            <span class="edited">
+            </span>
+        {% endblock headeractions %}
+    </div>
+    <div class="view_block">
+    {% block photo %}
+        <div class="lead_photo">
+            <div class="photo">
+                {#{% block avatar %}#}
+                {#<img src="{{ WepoLink(mainuser.company_id, model, 'avatar', 'Leads') }}" alt="" style="max-width:120px;max-height:120px;">#}
+                {#{% endblock avatar %}#}
+            </div>
+        </div>
+    {% endblock photo %}
+    <div class="lead_info" style="width: 100%; margin: 0;">
+        <h3 style="text-align: center;padding: 0;">{{ translate( model.getModelName~'   "'~model.title~'" will be converted' ) }}</h3>
+        <table>
+            <tbody>
+                {% for key,object in convertedObjects %}
+                    <tr>
+                        <th>{{ key }}</th>
+                        <td>{{ object.title }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+        <div class="buttons"  style="text-align: center;">
+            <form action="{{ url( 'common', { 'data':modelname, 'view': 'convert', 'id':model.id() } ) }}" method="post">
+                {% block actions %}
+                    <a href="" style="float: none"
+                       class="btn-icon yes submitLink">{{ translate('Confirm convertation') }}</a>
+                    <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                       style="float: none" class="btn-icon cancel">{{ translate('Cancel convertation') }}</a>
+                {% endblock actions %}
+                <input type="hidden" name="object_id" id="object_id" value="{{ model.id() }}"/>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

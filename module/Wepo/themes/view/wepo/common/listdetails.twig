@@ -1,0 +1,772 @@
+{% block style %}
+    <style>
+
+        #data td.qty, td.discount, td.list_price, td.tax,td.description{
+            transition: 0.7s;
+        }
+
+        .td_editing {
+            background: #eee !important;
+            cursor: pointer !important;
+        }
+
+        .ui-dialog-content {
+            height: auto !important;
+        }
+
+        .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons {
+            height: auto !important;
+        }
+
+        .dialog-form > .select2{
+            margin-top: 9px !important;
+        }
+
+        .dialog-form > input{
+            width: 294px !important;
+            height: 30px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 5px !important;
+            display: block;
+            background: #fff;
+            border: none;
+            box-shadow: inset 0 1px 3px #ccc;
+        }
+
+
+        textarea.form_description{
+            resize: none;
+            width: 294px !important;
+            height: 60px !important;
+            margin-top: 9px !important;
+            margin-left: 1px !important;
+            padding-left: 5px !important;
+            padding-top: 6px;
+            background: #fff;
+            border: none;
+            box-shadow: inset 0 1px 3px #ccc;
+        }
+
+        .ui-button:first-of-type, .ui-button:last-of-type {
+            width: 68px !important;
+        }
+
+        .index{
+            color: #1191d4;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+        _thisurl = location.href;
+
+        function Total()
+        {
+            var sum = 0;
+
+            $('#tbody tr').each(function(index)
+            {
+                var price = $(this).find('.total').text();
+                    price = price.replace(/[$,]/g, '');
+                    price = parseFloat(price);
+                sum += price;
+            });
+
+            var discount = $('.discount_Price:first').text();
+                discount = discount.replace(/[$,]/g, '');
+                discount = parseFloat(discount);
+
+            var tax = $('.tax_Price:first').text();
+                tax = tax.replace(/[$,]/g, '');
+                tax = parseFloat(tax);
+
+            var adjustment = $('.adjustment_Price:first').text();
+                adjustment = adjustment.replace(/[$,]/g, '');
+                adjustment = parseFloat(adjustment);
+
+            $('.sub_total_Price').text('$'+sum.formatMoney(2, '.', ','));
+
+            sum = sum + tax + adjustment - discount;
+
+            $('.grand_total_Price').text('$'+sum.formatMoney(2, '.', ','));
+        }
+
+        $(function ()
+        {
+            $('#body').on("click", "#c_all", function ()
+            {
+                if ( $('div.checked', this).size() )
+                {
+                    $('input.check').prop('checked', true);
+                    $('div.checkboxArea').addClass('checked');
+                    $('tr', "#tbody").addClass('checked');
+                    $('#deletebtn, #restorebtn, #clearbtn').removeClass('disabled');
+                }
+                else {
+                    $('input.check').prop('checked', false);
+                    $('div.checkboxArea').removeClass('checked');
+                    $('tr', "#tbody").removeClass('checked');
+                    $('#deletebtn, #restorebtn, #clearbtn').addClass('disabled');
+                }
+            });
+        });
+
+        //FOR DIALOG ACTIONS URL'S
+        restoreurl = "{{ url( null, { 'data':modelname, 'view': 'restore' } ) }}";
+        cleanurl   = "{{ url( null, { 'data':modelname, 'view': 'clean' } ) }}";
+        deleteurl  = "{{ url( null, { 'data':modelname, 'view': 'delete' } ) }}";
+
+        $(function () {
+
+            $('#body').on("click", "div.alphabet a.ajax", function () {
+                $('div.alphabet a.ajax').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            $('#body').on("click", "a.ajax", function () {
+                var _target = $(this).attr('ajax-target');
+                var _src = $(this).attr('ajax-src');
+                var _location = $(this).attr('href');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+
+                startloader();
+
+                $(_target).load(_location + _src, null, function () {
+                    stoploader();
+                    setCheckboxes();
+
+                    if ($('#tbody').find('#No_record').length) {
+                        $('#deletebtn').addClass('hidden');
+                    }
+
+                });
+
+                _thisurl = _location;
+
+                return false;
+            });
+
+            $('#refresh').click(function ()
+            {
+                var _target   = $('a.ajax.active').attr('ajax-target');
+                var _location = $('a.ajax.active').attr('href');
+                var _src      = $('a.ajax.active').attr('ajax-src');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+
+                startloader();
+
+                $(_target).load(_thisurl + _src, null, function () {
+                    stoploader();
+                    setCheckboxes();
+                });
+                return false;
+            });
+
+            $('#body').on("click", "a#deletebtn", function ()
+            {
+                var flag = true;
+                apiDialog();
+
+                $(document).ajaxStop(function()
+                {
+                    if ( flag ){
+                         flag = false;
+                         Total();
+                    }
+                });
+            });
+
+            $('#body').on("click", "img.delete", function ()
+            {
+                var flag = true;
+                window.id    = $(this).closest('tr').find('.check').val();
+                window.title = $(this).closest('tr').find('.d_title').text();
+                apiDialog('single');
+
+                $(document).ajaxStop(function()
+                {
+                    if ( flag ){
+                         flag = false;
+                         Total();
+                    }
+                });
+
+                return false;
+            });
+
+            $('#body').on("click", ".tooltip", function () {
+                return false;
+            });
+
+        });
+    </script>
+
+    <script>
+
+        $(function()
+        {
+            $(".dialog-form input").keydown(function(event){
+                if ( (event.keyCode =='188') || (event.keyCode=='110') ) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+        $(function ()
+        {
+            $('select.select2_details').each(function (index)
+            {
+                var scope = $(this).attr('data-scope');
+
+                $(this).select2(
+                {
+                    placeholder: "Please select the Product",
+                    allowClear: true,
+                    ajax: {
+                        url: '/api/v2/data/'+scope,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            data = {
+                                q: params.term,
+                                p: params.page
+                            };
+
+                            if (window.Query)
+                            {
+                                data.pricebook = window.Query;
+                            }
+                            else
+                            {
+                                data.pricebook = 'a00000000000000000000001';
+                            }
+                            return data;
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.data,
+                                pagination: {
+                                    more: (params.page * 10) < data.count
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    templateResult: function (item) {
+                        if (item.loading) return item.text;
+
+                        if (item.list_price == ''){
+                            item.list_price = '0.00'
+                        }
+                        return $('<div />').text(item.title +' '+'$'+parseFloat(item.list_price).formatMoney(2, '.', ',')).html();
+                    },
+                    templateSelection: function (item)
+                    {
+                        $('input.form_listprice').val(parseFloat(item.list_price).formatMoney(2, '.', ','));
+                        return $('<div />').text(item.title || item.text).html();
+                    }
+                });
+            });
+
+            $('select.select2_detailsPBook').each(function (index)
+            {
+                var scope = $(this).attr('data-scope');
+                var query = $(this).attr('data-query')||'';
+                $(this).select2(
+                {
+                    placeholder: "Please select the Pricebook",
+                    allowClear: true,
+                    ajax: {
+                        url: '/api/v2/data/'+scope,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            data = {
+                                q: params.term,
+                                p: params.page
+                            };
+
+                            if (query.length)
+                            {
+                                data.query = query;
+                            }
+                            return data;
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.data,
+                                pagination: {
+                                    more: (params.page * 10) < data.count
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    templateResult: function (item)
+                    {
+                        if (item.loading) return item.text;
+                        return $('<div />').text(item.title).html();
+                    },
+                    templateSelection: function (item)
+                    {
+                        return $('<div />').text(item.title || item.text).html();
+                    }
+                });
+            });
+
+            $('select.static-select2').select2(
+                    { minimumResultsForSearch: 5 }
+            );
+
+            $('.select2-selection').click(function()
+            {
+                $('.select2-search__field').focus();
+            });
+        });
+
+        Number.prototype.formatMoney = function (c, d, t) {
+            var n = this,
+                c = isNaN(c = Math.abs(c)) ? 2 : c,
+                d = d == undefined ? "." : d,
+                t = t == undefined ? "," : t,
+                s = n < 0 ? "-" : "",
+                i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+
+        $(function ()
+        {
+            $("#data td.qty,td.discount,td.list_price,td.tax").keydown(function(event){
+                if ( (event.keyCode =='188') || (event.keyCode=='110') ) {
+                    event.preventDefault();
+                }
+            });
+
+            $('body').on('mouseenter', "#data td.qty,td.discount,td.list_price,td.tax,td.description", function ()
+            {
+                if ($('td.width_10p').find('img.update').length) {
+                    $(this).addClass('td_editing');
+                }
+            });
+
+            $('body').on('mouseleave', "#data td.qty,td.discount,td.list_price,td.tax,td.description", function ()
+            {
+                if ($('td.width_10p').find('img.update').length) {
+                    $(this).removeClass('td_editing');
+                }
+            });
+
+            $('body').on("click", "#data td.qty,td.discount,td.list_price,td.tax,td.description", function ()
+            {
+                if ($('td.width_10p').find('img.update').length)
+                {
+                    $(this).attr('contentEditable', true).focus();
+                    $(this).css({'background': '#eee '});
+
+                    window.oldTotal = $(this).closest('tr').find('td.total').text();
+                    window.oldTotal = window.oldTotal.replace(/[$,]/g, '');
+                }
+            });
+
+            $(document).on("blur", "#data td.qty,td.discount,td.list_price,td.tax,td.description", function (event)
+            {
+                if ($('td.width_10p').find('img.update').length)
+                {
+                    $(this).css({'background': 'none'});
+
+                  //count total and amount
+                    var amount = $(this).closest('tr').find('td.amount');
+                    var total  = $(this).closest('tr').find('td.total');
+
+                    var qty = $(this).closest('tr').find('td.qty').text();
+                        qty = qty.replace(/[$,]/g, '');
+
+                    var lPrice = $(this).closest('tr').find('td.list_price').text();
+                        lPrice = lPrice.replace(/[$,]/g, '');
+
+                    var tax = $(this).closest('tr').find('td.tax').text();
+                        tax = tax.replace(/[$,]/g, '');
+
+                    var discount = $(this).closest('tr').find('td.discount').text();
+                        discount = discount.replace(/[$,]/g, '');
+
+                    var amountPrice = (parseInt(qty) * parseFloat(lPrice));
+                    amount.text('$' + amountPrice.formatMoney(2, '.', ','));
+
+                    var totalPrice = (parseInt(qty) * parseFloat(lPrice) + parseFloat(tax) - parseFloat(discount));
+                    total.text('$' + totalPrice.formatMoney(2, '.', ','));
+                  //end count total and amount
+
+                    var editUrl = $(event.target).closest('tr').find('a.actionview').eq(1).attr('href'); //URL
+                        editUrl = editUrl.substring(0, editUrl.indexOf('?'));
+
+                    var target = $(event.target).attr('class');
+                    var field  = $(event.target).closest('tr').find('.' + target).text();
+                        field  = field.replace(/[$,]/g, '');
+
+                    $(document).ajaxStart(function () {
+                        startloader();
+                    });
+
+                    var data = {};
+                    data['fields[' + target + ']'] = field;
+
+                    var request = $.ajax(
+                    {
+                        url: editUrl,
+                        type: 'POST',
+                        traditional: true,
+                        data: data,
+                        success: function () {
+                            stoploader();
+                        },
+                        error: function () {
+                            alert('An ERROR has occurred');
+                            location.reload();
+                        }
+                    });
+
+                    $(document).ajaxComplete(function(){
+                        Total();
+                    });
+                }
+            });
+
+        });
+
+        $(function ()
+        {
+            $(document).on("click",'a.insert',function (e)
+            {
+                stoploader();
+                e.preventDefault();
+                var formUrl = $(this).attr('href');
+
+                $('.dialog-form').removeClass('hidden');
+                $('.dialog-form').dialog(
+                {
+                    open: function ()
+                    {
+                        $('.dialog-form input').val('');
+
+                        $(window).on('scroll resize', function ()
+                        {
+                            $('.dialog-form').dialog("option", "position", $('.dialog-form').dialog("option", "position"));
+                        });
+                    },
+                    show: {effect: '', duration: 600, my: "top", at: "center", of: window},
+                    hide: {effect: '', duration: 400},
+                    title: "Do you want to add new item ?",
+                    modal: false,
+                    width: '355',
+                    resizable: false,
+                    draggable: false,
+                    closeOnEscape: false,
+                    buttons: {
+                        Save: function ()
+                        {
+                                startloader();
+                                var form_list_price = $('input.form_listprice').val();
+                                    form_list_price = form_list_price.replace(/[$,]/g, '');
+
+                                var form_qty = $('input.form_qty').val();
+                                    form_qty = form_qty.replace(/[$,]/g, '');
+                                    form_qty = parseInt(form_qty);
+
+                                var form_discount = $('input.form_discount').val();
+                                    form_discount = form_discount.replace(/[$,]/g, '');
+
+                                var form_tax = $('input.form_tax').val();
+                                    form_tax = form_tax.replace(/[$,]/g, '');
+
+                                var form_description = $('textarea.form_description').val();
+
+                                var pricebook_id = $('.select2_details option:last').attr('value');
+
+                                if (form_qty == '' || !(form_qty)) {
+                                    form_qty = 1;
+                                }
+                                if (form_tax == '') {
+                                    form_tax = 0;
+                                }
+                                if (form_discount == '') {
+                                    form_discount = 0;
+                                }
+
+                            $.ajax({
+                                url: formUrl,
+                                type: 'POST',
+                                traditional: true,
+                                data: {
+                                    'fields[list_price]'           : form_list_price,
+                                    'fields[qty]'                  : form_qty,
+                                    'fields[discount]'             : form_discount,
+                                    'fields[tax]'                  : form_tax,
+                                    'fields[description]'          : form_description,
+                                    'fields[pricebook_detail_id]'  : pricebook_id
+                                },
+                                success: function ()
+                                {
+                                    $('#refresh').trigger('click');
+                                    setCheckboxes();
+
+                                    $('.select2_details option,.select2_detailsPBook option').each(function(){
+                                        $(this).remove();
+                                    });
+                                },
+                                error: function () {
+                                    alert('An ERROR has occurred');
+                                    location.reload();
+                                }
+                            });
+
+                            $(document).ajaxComplete(function(){
+                                Total();
+                            });
+
+                            $(this).dialog("close");
+                            $('.select2_details,.select2_detailsPBook').val(null).trigger('change');
+                            $('div.dialog-form input,textarea').val('');
+                        },
+                        Cancel: function ()
+                        {
+                            $(this).dialog("close");
+                            $('.select2_details,.select2_detailsPBook').val(null).trigger('change');
+                            $('div.dialog-form input,textarea').val('');
+
+                            $('.select2_details option,.select2_detailsPBook option').each(function(){
+                                $(this).remove();
+                            });
+                        }
+                    }
+                });
+            });
+
+            $('.select2_detailsPBook').change(function()
+            {
+                $('.select2_details').val(null).trigger('change');
+                $('div.dialog-form .form_listprice').val('');
+                window.Query = $(this).val();
+            });
+
+        });
+    </script>
+
+{% endblock script %}
+
+<div id="progress">Loading...</div>
+
+<div class="listtable">
+    <div class="title">
+
+        <div class="listtitle">
+
+            {# title #}
+            <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/product.png)"></span>
+
+            <h1 class="{{ title|lower|replace(' ', '_') }}">{{ title }}</h1>
+
+        </div>
+
+        <div class="buttons">
+
+            {# links #}
+            {% if links %}
+                {% for icon_key, link in links %}
+                    <a class="btn-icon {{ icon_key }}"
+                       href="{{ url( link.route, link.routeparams, { 'query': link.queryparams|merge( { 'back': saurlhash } ) } ) }}">{{ translate( link.label ) }}</a>
+                {% endfor %}
+            {% endif %}
+
+            {# search form #}
+            <div id="titleSearch" class="titleSearch">
+                <form class="search_form"
+                      action="{{ url( null, viewboxparams|removeKey( [ 'q', 'p' ] ), { 'query': queryparams|merge( { 'back': saurlhash } ) } ) }}"
+                      method="get" name="list_search">
+                    <input class="long_placehldr" type="text" name="q" value="{{ search_query }}"
+                           placeholder="Search in &quot;{{ title }}&quot;"/>
+
+                    <div class="searchico"></div>
+                </form>
+            </div>
+
+        </div>
+
+        {# clear filters q or letter #}
+        {% if search_query or letter %}
+            <div class="buttons" style="padding-left: 8px;">
+                <a href="{{ url( null, viewboxparams|removeKey( [ 'q', 'p' ] ), { 'query': queryparams|removeKey( [ 'letter', 'p', 'q' ] )|merge( { 'back': saurlhash } ) } ) }}">Show
+                    all records</a>
+            </div>
+        {% endif %}
+
+        <div style='display: inline; font-size: larger; font-style: italic;color:#999999; vertical-align: super;'
+             id="letter"></div>
+
+        <div class="buttons right">
+            <a id="refresh" class="refresh btn-icon" href="">{{ translate('Refresh') }}</a>
+
+            {#<a class="choose btn-icon"#}
+               {#href="{{ url( 'common', { 'action': 'field', 'view':'list', 'data':modelname }, { 'query': queryparams|merge({ 'back':saurlhash }) } ) }}">#}
+                {#{{ translate('Output fields') }}#}
+            {#</a>#}
+
+        </div>
+    </div>
+    <div id="tableBody">
+        <form id="deleteForm" action="{{ url( null, { 'data': modelname, 'view': 'delete' } )~saurl }}"
+              method="post"
+              name="checked"
+              data-scope={{ modelname }}>
+            <table id="data" class="data">
+                <thead>
+                <tr class="tableHeader">
+                    <th class="width_4p">
+                        {% if actions.delete %}
+                            <div id="c_all" class="checkbox">
+                                <input type="checkbox" name="c_all_input" value=""/>
+                            </div>
+                        {% endif %}
+                    </th>
+                    <th class="index"> # </th>
+                    {% block sortUrlConstruction %}
+                        {% for value in fields %}
+                            <th class="{% if column.sort == value %}checked{% endif %}">
+                                <a href="{{ url( null, viewboxparams|merge({ 'sort':value, 'desc':column.desc==0?1:0 }), { 'query': queryparams } ) }}">{{ attribute( labels, value ) }}</a>
+                                {% if column.sort == value %}
+                                    <span class="{{ column.desc != 0 ? 'down':'up' }}"></span>
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                    {% endblock sortUrlConstruction %}
+                    {% if actions is not empty %}
+                        <th class="width_10p">Actions</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody id="tbody">
+                {% for akey,avalue in paginator.getCurrentItems %}
+                    {% set record_acl = [] %}
+                    {% for aclByType in avalue._acl %}
+                        {% for item in aclByType.data %}
+                            {% if item not in record_acl %}
+                                {% set record_acl = record_acl|merge([item]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {#{{ dump(aclByType) }}#}
+                    {% endfor %}
+                    <tr>
+                        <td class="first_td">
+                            {% if actions.delete and 'delete' in record_acl %}
+                                <div class="checkbox">
+                                <input title="" type="checkbox" name="checkedid[]" id="{{ avalue.id() }}"
+                                       value="{{ avalue.id() }}" class="check"/>
+                                </div>
+                            {% endif %}
+
+                        </td>
+
+                        <td class="index">
+                            {{ loop.index }}
+                        </td>
+
+                        {% for key in fields %}
+                            <td class="{% if column.sort == value %}checked{% endif %}{{ key }}">
+                                {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                            </td>
+                        {% endfor %}
+                        {% if actions is not empty %}
+                            <td class="width_10p">
+                                {% for action, conf in actions %}
+                                    <a class="actionview"
+                                       href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(avalue, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                            src="/img/1.png" class="{{ action }}" alt="{{ action }}"/><span
+                                            class="tooltip top">{{ action|capitalize }}</span></a>&nbsp;
+                                {% endfor %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+
+            <div class="tableBottomToolbar">
+                <div class="buttons left">
+                    {% if actions.delete %}
+                        <a id="deletebtn" class="delete btn-icon disabled">{{ translate('Delete selected') }}</a>
+                    {% endif %}
+                </div>
+
+                <div class="buttons right">
+                    {% if paginator.count > 1 %}
+                        {% include 'partial/pagination.twig' with { 'pages':paginator.getPages, 'route': null, 'params':viewboxparams } %}
+                    {% endif %}
+                </div>
+
+                <div class="buttons">
+
+                    {% if paginator.getTotalItemCount > 5 %}
+                        <div class="selectRows" id="selectRows">
+                            <div class="msg"><span>Rows on the page:</span>
+                            </div>
+                            {% for i in rows %}
+                                <a href="{{ url( null, viewboxparams, { 'query': queryparams | merge({ 'rowcount': i }) } ) }}"
+                                   class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <div style="float: right; padding-top: 2px;" class="msg" id="total_count">
+                    {% if paginator.getTotalItemCount > 0 %}
+                        Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                    {% endif %}
+                </div>
+
+                <div class="alphabet">
+                    <a id="#All" ajax-src="#tableBody" ajax-target="#tableBody"
+                       class="ajax {% if not letter %}active{% endif %}"
+                       href="{{ url( null, viewboxparams|removeKey( [ 'p' ] ), { 'query': queryparams|removeKey( [ 'letter', 'p' ] )|merge( { 'back': saurlhash } ) } ) }}">All</a>
+                    {% for _letter in 'A'..'Z' %}
+                        <a id="#{{ _letter }}" ajax-src="#tableBody" ajax-target="#tableBody"
+                           class="ajax {% if letter == _letter %}active{% endif %}"
+                           href="{{ url( null, viewboxparams, { 'query': { 'letter':_letter, 'back': saurlhash, 'q': search_query } } ) }}">{{ _letter }}</a>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="dialog-message"></div>
+
+<div class="dialog-form hidden">
+
+    <select class="select2_detailsPBook" data-scope="pricebook"></select>
+    <select class="select2_details" data-scope="pricebookdetail"></select>
+    <input type="text" class="form_listprice long_placehldr"   placeholder="List Price"/>
+    <input type="text" class="form_qty long_placehldr"         placeholder="Quantity"/>
+    <input type="text" class="form_discount long_placehldr"    placeholder="Discount"/>
+    <input type="text" class="form_tax long_placehldr"         placeholder="Tax"/>
+    <textarea          class="form_description long_placehldr" placeholder="Description"/></textarea>
+
+</div>

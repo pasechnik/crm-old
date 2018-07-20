@@ -1,0 +1,8 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Manual') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+{% block content %}
+
+    <h1>{{title}}</h1>
+
+{% endblock content %}

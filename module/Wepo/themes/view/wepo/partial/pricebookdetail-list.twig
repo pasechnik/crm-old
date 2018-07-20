@@ -1,0 +1,33 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'pricebookdetail', 'id':''~attribute( avalue, 'id') } ) }}" ><span class="d_title">{{ attribute(avalue, "title") }}</span></a>
+{% elseif key == 'pricebook_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'pricebook', 'id':''~attribute( avalue, 'pricebook_id') } ) }}" >{{ attribute(avalue, "pricebook_title") }}</a>
+{% elseif key == 'product_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'product', 'id':''~attribute( avalue, 'product_id') } ) }}" >{{ attribute(avalue, "product_title") }}</a>
+{% elseif key == 'owner_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'user', 'id':''~attribute( avalue, 'owner_id') } ) }}" >{{ attribute(avalue, "owner_title") }}</a>
+{% elseif key == 'changer_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'user', 'id':''~attribute( avalue, 'changer_id') } ) }}" >{{ attribute(avalue, "changer_title") }}</a>
+{% elseif key == 'creator_title' %}
+    <a href="{{ url( 'common', { 'view': 'view', 'data':'user', 'id':''~attribute( avalue, 'creator_id') } ) }}" >{{ attribute(avalue, "creator_title") }}</a>
+{% elseif key[-4:] == '_dtm' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+{% elseif key[-5:] == '_date' and attribute(avalue, key) is not empty %}
+    {{ attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+{% elseif key[-5:] == 'price' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'product_active' %}
+    {% if  attribute(avalue, key) == 'true' %}<img src="/img/checked.png" alt="Yes" />{% endif %}
+{% elseif key == 'total' %}
+    ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+{% elseif key == 'discount_title' %}
+    {% if avalue.discount_type_title == '% of Price'%}
+        {{ attribute(avalue, key)|number_format(2, '.', ',') }}&nbsp;%
+    {% elseif attribute(avalue, key) != 0 %}
+      - ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+    {% else %}
+        ${{ attribute(avalue, key)|number_format(2, '.', ',') }}
+    {% endif %}
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}

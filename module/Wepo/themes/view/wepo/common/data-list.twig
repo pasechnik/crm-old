@@ -1,0 +1,5 @@
+{% if key == 'title' %}
+    <span class="d_title">{{ attribute(avalue, key) }}</span>
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}

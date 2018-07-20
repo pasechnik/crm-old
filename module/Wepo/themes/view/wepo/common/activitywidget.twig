@@ -1,0 +1,137 @@
+{% block style %}
+    <style>
+
+        .selectBox-dropdown{
+            color: #1191d4 !important;
+        }
+
+        .corner{
+            float: right;
+            margin-right: -12px;
+            opacity: 0.3;
+        }
+
+        #activityWidget_select + .selectBox {
+            width: 130px !important;
+            height: 19px !important;
+            margin-top: -1px;
+        }
+
+        #activityWidget_select + .selectBox > .selectBox-label {
+            padding: 2px !important;
+            font-size: 14px;
+            margin-top: -7px;
+        }
+
+        .selectBox-dropdown-menu{
+            overflow: hidden !important;
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+        $(function(){
+            $('.widget').each(function(){
+                $(this).find('.corner').css('margin-top', - $(this).height()/2);
+            });
+        });
+    </script>
+
+    <script>
+        $(function()
+        {
+            $('#activityWidget_select').selectBox();
+            $('ul.selectBox-dropdown-menu > li > a:first:contains("Add new")').remove();
+            $('#activityWidget_select').closest('.selectBox').change(function()
+            {
+                var url = '';
+                url = $('#activityWidget_select').find('option:selected').val();
+                if (url.length)
+                {
+                    window.location.href = url;
+                    $('a.selectBox').addClass('disabled');
+                }
+            });
+        });
+    </script>
+{% endblock script %}
+
+<div class="widget {{ params.data }}">
+    <div class="title">
+        <div class="listtitle">
+            <span class="small icon"
+                  style="background-image: url(/css/img/icons/32x32-icons/{{ params.data }}.png)"></span>
+            <h2>{{ title }}</h2>
+        </div>
+        <div class="buttons controls">
+            {% if links %}
+                <select id="activityWidget_select">
+                   <option id="firstOption" value="">Add new</option>
+                        {% for icon_key, link in links %}
+                            {% if icon_key !='list'  %}
+                                <option value="{{ url(link.route, link.routeparams, { 'query': link.queryparams|merge({ 'back':saurlhash }) } ) }}">
+                                    {{ translate(link.label) }}
+                                </option>
+                            {% endif %}
+                    {% endfor %}
+                </select>
+                {% if 'list' in links|keys  %}
+                    <a class="btn-icon list"
+                       href="{{ url(links.list.route, links.list.routeparams, { 'query': links.list.queryparams|merge({ 'back':saurlhash }) } ) }}">
+                        {{ translate(links.list.label) }}
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="buttons right controls">
+            <a style="cursor: pointer;" class="minibutton minimize_button"></a>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="widget_content">
+        <table class="data">
+            <thead>
+                <tr class="tableHeader">
+                    {% for value in fields %}
+                        <th class="{% if column.sort == value %}checked{% endif %}">
+                                {{ attribute( labels, value ) }}
+                            {% if column.sort == value %}
+                                <span class="{{ column.desc!=0 ? 'down':'up' }}"></span>
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+
+                    {% if actions %}
+                        <th class="width_10p"> Actions </th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for akey,avalue in paginator.getCurrentItems %}
+                <tr>
+                    {% for key in fields %}
+                        <td class="{% if column.sort == key %}checked{% endif %}">
+                            {% include [ 'partial/'~ modelname ~'-list.twig', 'common/data-list.twig' ] %}
+                        </td>
+                    {% endfor %}
+
+                    {% if actions %}
+                        <td class="width_10p">
+                                {% for action, conf in actions %}
+                                    <a class="actionview"
+                                       href="{{ url(conf.route, conf.routeparams|merge({ 'id':''~ attribute(avalue, conf.id) }), { 'query': conf.queryparams|merge({ 'back':saurlhash }) } ) }}"><img
+                                            src="/img/1.png" class="{{ action }}" alt="{{ action }}"/><span
+                                            class="tooltip top">{{ action|capitalize }}</span></a>
+                                {% endfor %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+             <img src="/css/img/icons/other-icons/corner.jpeg" class="corner"/>
+    </div>
+</div>

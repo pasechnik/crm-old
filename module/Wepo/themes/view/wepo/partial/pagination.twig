@@ -1,0 +1,50 @@
+{% if pages.pageCount  %}
+    <div class="pagination">
+        <div class="msg">
+            <span>{{ translate("Page %s of %s")|format(pages.current, pages.last) }}</span>
+        </div>
+
+        {#{% if pages.totalItemCount %}#}
+            {#<div class="msg">#}
+                {#{{ translate("Rows %s - %s of %s")|format(pages.firstItemNumber, pages.lastItemNumber, pages.totalItemCount) }}#}
+            {#</div>#}
+        {#{% else %}#}
+            {#<div class="msg">{{ translate("Rows: %s")|format(o) }}</div>#}
+        {#{% endif %}#}
+
+        <!-- First page link -->
+        {% if pages.previous  %}
+            <a class="working" href="{{ url( route, params|merge({'page': first }), { 'query': queryparams } ) }}"> &lt;&lt;</a>
+        {% else %}
+            <a class="disabled"> &lt;&lt;</a>
+        {% endif %}
+        <!-- Previous page link -->
+        {% if pages.previous %}
+            <a class="working" href="{{ url( route, params|merge({'page': previous }), { 'query': queryparams } ) }}"> &lt;</a>
+        {% else %}
+            <a class="disabled">&lt;</a>
+        {% endif %}
+        <!-- Numbered page links -->
+        {% if pages.totalItemCount %}
+            {% for page in pages.pagesInRange %}
+                {% if page != pages.current %}
+                    <a class="working" href="{{ url( route, params|merge({'page': page }), { 'query': queryparams } ) }}">{{page}}</a>
+                {% else %}
+                    <a class="active">{{page}}</a>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        <!-- Next page link -->
+        {% if pages.next %}
+            <a class="working" href="{{ url( route, params|merge({'page': pages.next }), { 'query': queryparams } ) }}"> &gt;</a>
+        {% else %}
+            <a class="disabled"> &gt;</a>
+        {% endif %}
+        <!-- Last page link -->
+        {% if pages.next %}
+            <a class="working" href="{{ url( route, params|merge({'page': pages.last }), { 'query': queryparams } ) }}">&gt;&gt;</a>
+        {% else %}
+            <a class="disabled">&gt;&gt;</a>
+        {% endif %}
+    </div>
+{% endif %}

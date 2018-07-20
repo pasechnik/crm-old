@@ -1,0 +1,28 @@
+{% extends 'partial/view.twig' %}
+{% set title = 'User: ' ~ model.fname ~ ' ' ~model.lname %}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block actions %}
+  {% if model.status != 'deleted' %}
+    <a href="{{ url( null, { 'action': 'edit','id':''~model.id() } )~saurl }}">{{translate('Edit')}}</a>&nbsp;
+    <a href="{{ url( null, { 'action': 'delete','id':''~model.id() } )~saurl }}">{{translate('Delete')}}</a>&nbsp;
+  {% elseif model.status == 'deleted' %}
+    <a class="green_but submitLink" href="{{ url( 'user', { 'action': 'restore', 'id':'' ~model.id()} )~saurl }}">{{translate('Restore')}}</a> &nbsp;
+    {% if permission == 1 %}
+        <a class="red_but submitLink" href="{{ url( 'user', { 'action': 'clean', 'id':'' ~model.id()} )~delsaurl }}">{{translate('Clean')}}</a> &nbsp;
+    {% endif %}
+  {% endif %}
+{% endblock actions %}
+{% block script %}
+    <script src="/js/upper.js"></script>
+{% endblock script %}
+
+{% block style %}
+    <style type="text/css">
+        #scrollTop{
+            background:url(/img/totop.png) 0 0 no-repeat;
+            display:block; width:30px; height:30px;
+            position:fixed; bottom:10px; right:2%;
+            z-index:2000;
+}
+    </style>
+{% endblock style %}

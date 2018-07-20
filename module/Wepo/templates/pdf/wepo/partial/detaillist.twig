@@ -1,0 +1,1207 @@
+{% extends 'layout/layout.twig' %}
+
+{% block script %}
+    <script>
+
+        $(function () {
+
+
+             if ( (typeof($('#addNew_tr').next().get(0)) === 'undefined') )
+                   {
+                      $('#No_rec').show();
+                      $("#tbody").append("<tr id='No_rec' align='center'>\n\
+                                            <h2><td colspan = 20 style = 'font-size:20px; vertical-align: bottom; font-style: italic; color: #999999; '>\n\
+                                                No records\n\
+                                            </td></h2>\n\
+                                        </tr>");
+                   }
+
+//                $('select').selectBox();
+                $('#body').on("click","#c_all",function(){
+                    if ($('div.checked', this).size()) {
+                        $('input.check').prop('checked', true);
+                        $('div.checkboxArea').addClass('checked');
+                        $('tr', "#tbody").addClass('checked');
+                        $('#deletebtn').removeClass('disabled');
+                        $('#restorebtn').removeClass('disabled');
+                        $('#clearbtn').removeClass('disabled');
+                    }
+                    else {
+                        $('input.check').prop('checked', false);
+                        $('div.checkboxArea').removeClass('checked');
+                        $('tr', "#tbody").removeClass('checked');
+                        $('#deletebtn').addClass('disabled');
+                        $('#restorebtn').addClass('disabled');
+                        $('#clearbtn').addClass('disabled');
+                    }
+                });
+
+                // search input animation
+                $('#titleSearchIcon').click(function () {
+                    if ($('#titleSearch').is(':visible')) {
+                        $('#titleSearch').stop().animate({ width: '0px', height: '0px', opacity: 0 }, 200
+                            , function () {
+                                $(this).hide();
+                            }
+
+                        );
+                    }
+                    else {
+                        $('#titleSearch').show(200,
+                            function () {
+                                $('#titleSearch').stop().animate({ width: '220px', height: '31px', opacity: 1 }, 200);
+                            }
+                        );
+                    }
+                    return false;
+                });
+            }
+
+        );
+    </script>
+
+    <script>
+        _thisurl = location.href;
+        {#restoreurl = "{{ url( null, { 'action': 'restore' } ) }}";#}
+        {#cleanurl = "{{ url( null, { 'action': 'clean' } ) }}";#}
+        {#deleteurl = "{{ url( null, { 'action': 'delete' } ) }}";#}
+
+        $(function() {
+
+            $('#body').on("click","div.alphabet a.ajax",function() {
+                $('div.alphabet a.ajax').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            $('#body').on("click","a.ajax", function() {
+                var _target = $(this).attr('ajax-target');
+                var _src = $(this).attr('ajax-src');
+                var _location = $(this).attr('href');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+                $("#tbody").html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+
+                $(_target).load(_location + _src, null, function () {
+                     setCheckboxes();
+                     $('#addNew_tr').hide();
+                     $('.quick_add').removeClass('disabled');
+                     $('#No_rec').show();
+
+                  if ( (typeof($('#addNew_tr').next().get(0)) === 'undefined') )
+                   {
+                      $('#No_rec').show();
+                      $("#tbody").append("<tr id='No_rec' align='center'>\n\
+                                            <h2><td colspan = 20 style = 'font-size:20px; vertical-align: bottom; font-style: italic; color: #999999; '>\n\
+                                                No records\n\
+                                            </td></h2>\n\
+                                        </tr>");
+                   }
+                });
+                _thisurl = _location;
+                return false;
+            });
+
+             $('#refresh').click(function() {
+                var _target = $('a.ajax.active').attr('ajax-target');
+                var _location = $('a.ajax.active').attr('href');
+                var _src = $('a.ajax.active').attr('ajax-src');
+
+                if (_src.length) {
+                    _src = ' ' + _src;
+                }
+
+                $('#tbody').html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+                 $(_target).load(_thisurl + _src, null, function() {
+                    setCheckboxes();
+
+                    // ajax editing
+                     $('.checkedqty').addClass('qty');
+                     $('.checkeddiscount').addClass('discount');
+                     $('.checkedproduct_price').addClass('product_price');
+                     $('.checkeddiscount_type').addClass('discount_type');
+                     $('.checkedtitle').addClass('title');
+                     $('#addNew_tr').hide();
+                     $('.quick_add').removeClass('disabled');
+                     $('#No_rec').show();
+                    //
+                });
+
+                return false;
+            });
+            $('#body').on("click","#deletebtn", function() {
+                dialogfnct('delete');
+            });
+
+            $('#body').on("click", ".single_del", function(){
+                single_action = true;
+                title =  $(this).closest( 'tr' ).find('.d_title').text();
+                id = $(this).closest( 'tr' ).find('.check').val();
+                dialogfnct('delete');
+            });
+ });
+    </script>
+
+<script>
+//inline editting functions
+     function reset()
+     {
+        $('#tbody').find('.save_edited').addClass('edit');
+        $('#tbody').find('.save_edited').removeClass('saves');
+        $('#tbody').find('.save_edited').removeClass('save_edited');
+        $('.edit_title').text('Edit');
+        $('.actionview').removeClass('disabled');
+     }
+
+     function limit_digit(classname)
+     {
+        $('#tableBody').on("keypress",classname,function(e){
+           var code = e.keyCode;
+           text = $(this).text();
+           text = jQuery.trim(text).substring(0,50);
+
+          if ( !((code >= 48) && (code <= 57)) && (code !== 8) && (code !== 46) || (text.length > 15) )
+          {
+              e.preventDefault();
+          }
+       });
+     }
+
+     function detail_edit(event,classes)
+     {
+       model = "{{modelname}}";
+         $('#tableBody').on(event,classes,function(arg){
+
+         dscnt = $(arg.target).closest('tr').find('.discount').text();
+         dscnt = jQuery.trim(dscnt).substring(0,50);
+         dscnt = dscnt.replace('$','');
+         dscnt = dscnt.replace('-','');
+         dscnt = dscnt.replace('%','');
+
+         dscntType = $(arg.target).closest('tr').find('#discont_select').val();
+         dscntType = jQuery.trim(dscntType).substring(0,50);
+
+        if (model !=='pricebookdetail'){
+             product_p = $(arg.target).closest('tr').find('#pricebooklist').val();
+        }
+          else{
+             product_p = $(arg.target).closest('tr').find('.product_price').text();
+          }
+
+         product_p = jQuery.trim(product_p).substring(0,50);
+         product_p = product_p.replace(',','');
+         product_p = product_p.replace('$','');
+
+        if (discount === '')
+        {
+            discount = 0;
+        }
+
+
+      qty = $(arg.target).closest('tr').find('.qty').text();
+        qty = jQuery.trim(qty).substring(0,50);
+          qty_t = qty;
+
+       if (qty === '')
+        {
+            qty = 1;
+        }
+
+      dscnt = $(arg.target).closest('tr').find('.discount').text();
+        dscnt = jQuery.trim(dscnt).substring(0,50);
+           disc_t = dscnt;
+
+       if (dscnt === '')
+        {
+            dscnt = 0;
+        }
+
+        if ( dscntType == 'Direct Price Reduction')
+        {
+            price = product_p * qty - dscnt;
+        }
+        else
+        {
+            price = product_p * qty * (dscnt/100);
+        }
+
+     if (model == 'pricebookdetail')
+     {
+        if ( dscntType == 'Direct Price Reduction')
+        {
+            price = product_p - dscnt;
+        }
+        else
+        {
+            price = product_p * (dscnt/100);
+        }
+     }
+       price = Math.max( price, 0).toFixed(2);
+       $(arg.target).closest('tr').find('.final_price').text('$'+price);
+
+     });
+}
+    function replace_tr(){
+      $('.last').closest('tr').find('.title').replaceWith($(window.clone).closest('tr').find('.title'));
+      $('.last').closest('tr').find('.product_price').replaceWith($(window.clone).closest('tr').find('.product_price'));
+      $('.last').closest('tr').find('.pricebook_id').replaceWith($(window.clone).closest('tr').find('.pricebook_id'));
+      $('.last').closest('tr').find('.qty').replaceWith($(window.clone).closest('tr').find('.qty'));
+      $('.last').closest('tr').find('.discount_type').replaceWith($(window.clone).closest('tr').find('.discount_type'));
+      $('.last').closest('tr').find('.discount').replaceWith($(window.clone).closest('tr').find('.discount'));
+      $('.last').closest('tr').find('.final_price').replaceWith($(window.clone).closest('tr').find('.final_price'));
+      $('#tbody').find('.last').removeClass('last');
+    }
+
+
+    function dblclk(arg)
+    {
+        editmode(arg.target);
+    }
+
+    function editmode(arg)
+   {
+
+    $('.to_Edit').dblclick(function()
+       {
+          reset();
+          replace_tr();
+          $('#addNew_tr').hide();
+          $('.quick_add').removeClass('disabled');
+       });
+
+        window.getSelection().removeAllRanges();
+
+        $(arg).find('.last').removeClass('last');
+        $('#addNew_tr').removeClass('last');
+
+      //when sorting
+        $('.checkedqty').addClass('qty');
+        $('.checkeddiscount').addClass('discount');
+        $('.checkedproduct_price').addClass('product_price');
+        $('.checkeddiscount_type').addClass('discount_type');
+        $('.checkedtitle').addClass('title');
+
+
+      //reset for img
+        $(arg).find('.save_edited').addClass('edit');
+        $(arg).find('.save_edited').removeClass('saves');
+        $(arg).find('.save_edited').removeClass('save_edited');
+        $('.edit_title').text('Edit');
+
+      //Border & background
+        $(arg).find('.product_price,.discount,.qty,.checkedqty').attr('contentEditable',false);
+        $(arg).find('.product_price,.discount,.qty,.discount_type').css('border','none');
+        $(arg).find('.product_price,.discount,.qty,.discount_type').css('background','none');
+
+        var $tr   = $(arg).closest('tr');
+        var clone = $tr.clone();
+        window.clone = clone[0];
+
+        $(arg).closest('tr').find('img').addClass('last');
+        $(arg).closest('tr').addClass('last');
+
+        $('.actionview').addClass('disabled');
+        $(arg).closest('tr').find('.edit_ajax').removeClass('disabled');
+
+        //values from table
+            product_p = $(arg).closest('tr').find('.product_price').text();
+              product_p = jQuery.trim(product_p).substring(0,50);
+
+           discount = $(arg).closest('tr').find('.discount').text();
+              discount = jQuery.trim(discount).substring(0,50);
+
+           var discount_type;
+            discount_type = $(arg).closest('tr').find('.discount_type').text();
+              discount_type = jQuery.trim(discount_type).substring(0,50);
+
+      discount_cut = discount;
+       discount_cut = discount_cut.replace('%','');
+        discount_cut = discount_cut.replace('-','');
+         discount_cut = discount_cut.replace('$','');
+         $(arg).closest('tr').find('.discount').closest('td').text(discount_cut);
+        // end values
+
+        //discount select
+        $(arg).closest('tr').find('.discount_type').closest('td').text('');
+         $(arg).closest('tr').find('.discount_type').closest('td').append('<select style = "height:24px" class = "last" id = "discont_select">\n\
+                                                                           </select>');
+        //price select
+        if ( model !=='pricebookdetail' ){
+            $(arg).closest('tr').find('.product_price').closest('td').text('');
+             $(arg).closest('tr').find('.product_price').closest('td').append('<input style = "height:24px" id="pricebooklist" class = "last"> </input>');
+        }
+
+        $(window).dblclick(function(e){
+            e.preventDefault();
+        });
+
+        //current edit image changing
+        $(arg).closest('tr').find('img.edit').addClass('saves');
+        $(arg).closest('tr').find('img.saves').addClass('save_edited');
+        $(arg).closest('tr').find('img.save_edited').removeClass('edit');
+        $(arg).closest('tr').find('.edit_title').text('Save');
+
+
+        if ( model !=='pricebookdetail' )
+        {
+          $(arg).closest('tr').find('.discount,.qty').attr('contentEditable',true);
+          $(arg).closest('tr').find('.product_price,.discount,.qty,.discount_type').css('border','1px solid #d0e4ed');
+          $(arg).closest('tr').find('.product_price,.discount,.qty,.discount_type').css('background','#e1f5fe');
+          $(arg).closest('tr').find('.product_price,.discount,.qty,.discount_type').addClass('last');
+
+          $(arg).closest('tr').find('.product_price,.discount,.qty,.discount_type').mouseover(function(){
+            $(this).css('box-shadow','0px 1.5px 2px #222');
+          });
+
+            $(arg).closest('tr').find('.product_price,.discount,.qty,.discount_type').mouseleave(function(){
+              $(this).css('box-shadow','none');
+            });
+        }
+           else
+          {
+              $(arg).closest('tr').find('.discount').attr('contentEditable',true);
+              $(arg).closest('tr').find('.discount,.discount_type').css('border','1px solid #d0e4ed');
+              $(arg).closest('tr').find('.discount,.discount_type').css('background','#e1f5fe');
+              $(arg).closest('tr').find('.discount,.discount_type').addClass('last');
+
+           $(arg).closest('tr').find('.discount,.discount_type').mouseover(function(){
+             $(this).css('box-shadow','0px 1.5px 2px #222');
+            });
+
+            $(arg).closest('tr').find('.discount,.discount_type').mouseleave(function(){
+              $(this).css('box-shadow','none');
+            });
+          }
+
+        $("#discont_select").val(discount_type);
+
+        // float-up price
+        var product_p;
+        var pbdrop;
+
+        product_p = product_p.replace(',','');
+        product_p = product_p.replace('$','');
+        product_p = product_p.replace('.00', '');
+
+        if (product_p.substr(-1) == '0' && product_p != 0 && product_p.indexOf('\.')!=-1){
+            product_p = product_p.slice(0,-1);
+        }
+
+        //selectize
+        window.pricebookid = $(arg).closest('tr').find('.save_edited').closest('a').data('pricebookid');
+        var productid = $(arg).closest('tr').find('.save_edited').closest('a').data("productid");
+        pbdrop = $('#pricebooklist').selectize({
+            valueField: 'final_price',
+            labelField: 'final_price',
+            searchField: 'title',
+            hideSelected: false,
+            create: true,
+            persist: false,
+            maxItems: 1,
+            dropdownParent:'body',
+            createOnBlur: true,
+            preload:true,
+            onDropdownOpen: function (arg) {
+                $(arg).stop().hide().slideDown();
+            },
+            onDropdownClose: function (arg) {
+                $(arg).stop().show().slideUp();
+            },
+            onItemAdd: function(value, $item){
+                if ($item[1].innerText === 'undefined'){
+                    $('.last').closest('tr').find('.pricebook_id').text('');
+                    window.pricebookid = '';
+                }
+                else{
+                    $('.last').closest('tr').find('.pricebook_id').text($item[1].innerText);
+                    window.pricebookid = $item[1].id;
+                }
+            },
+            render: {
+                item: function(item, escape){
+                    var result = escape(item.final_price);
+                    return '<div>$'+result+'</div><div class="hidden" id="'+escape(item.pricebook_id)+'">'+escape(item.pricebook)+'</div>';
+                },
+                option: function(item, escape){
+                    var title = escape(item.title);
+                    if (title === 'undefined')
+                    {
+                        title = 'Yours custon price';
+                    }
+                return '<div class="dropdown-option">' +
+                                '<span>' +
+                                    title+
+                                '</span>'+
+                        '</div>';
+                }
+            },
+            load:  function (query, callback) {
+                       $.ajax({
+                           url: '/api/v1/search/pricebookdetail',
+                           type: 'GET',
+                           dataType: 'json',
+                           data: {
+                               q: query,
+                               product_id: productid
+                           },
+                           error: function () {
+                               $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                               callback();
+                           },
+                           success: function (res) {
+                               $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                               callback(res.data);
+                               if (product_p || product_p == '0'){
+                                  pbdrop[0].selectize.setValue(product_p);
+                                  if(!pbdrop[0].selectize.getValue()){
+                                      pbdrop[0].selectize.addOption({final_price:product_p, title:'Yours custon price'});
+                                      pbdrop[0].selectize.addItem(product_p);
+                                    }
+                               }
+                           }
+                       });
+                   }
+        });
+
+    //discount selectize
+    window.discdrop = $('#discont_select').selectize({
+            onDropdownOpen: function (arg) {
+                $(arg).stop().hide().slideDown();
+            },
+            onDropdownClose: function (arg) {
+                $(arg).stop().show().slideUp();
+            },
+            options: [{
+                text: '% of Price',
+                value: '% of Price'
+            },
+            {
+                text: 'Direct Price Reduction',
+                value: 'Direct Price Reduction'
+            }
+        ]
+        });
+
+{#   product selectize     #}
+ if ( window.addMode)
+ {
+    $(arg).closest('tr').find('.title').closest('td').append('<select style = "height:24px" class = "last" id = "product_select"></select>');
+    proddrop = $('#product_select').selectize({
+            valueField: '_id',
+            labelField: 'title',
+            searchField: 'title',
+            hideSelected: true,
+            create: false,
+            persist: false,
+            maxItems: 1,
+            dropdownParent:'body',
+            createOnBlur: true,
+            preload:true,
+            onDropdownOpen: function (arg) {
+                $(arg).stop().hide().slideDown();
+            },
+            onDropdownClose: function (arg) {
+                $(arg).stop().show().slideUp();
+            },
+            onChange: function(){
+                productid = proddrop[0].selectize.getValue();
+                netcost = $(arg).closest('tr').find('.hidden').text();
+                if (model == 'pricebookdetail'){
+                    $(arg).closest('tr').find('.product_price').text(netcost);
+                }
+                else{
+                pbdrop[0].selectize.clear();
+                pbdrop[0].selectize.clearOptions();
+                netcost = netcost.replace('undefined','');
+                pbdrop[0].selectize.addOption({final_price:netcost, title:'Default product price'});
+                pbdrop[0].selectize.addItem(netcost);
+                $(arg).closest('tr').find('.pricebook_id').text('');
+                pbdrop[0].selectize.load(function (callback){
+                           $.ajax({
+                           url: '/api/v1/search/pricebookdetail',
+                           type: 'GET',
+                           dataType: 'json',
+                           data: {
+                               q: '',
+                               product_id: productid
+                           },
+                           error: function () {
+                               $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                               callback();
+                           },
+                           success: function (res) {
+                               $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                               callback(res.data);
+                           }
+                       });
+                   });
+               }
+            },
+            render: {
+                item: function(item, escape){
+                    var result = escape(item.title);
+                        price =  escape(item.price);
+                    return '<div>'+result+'</div><div class="hidden">'+price+'</div>';
+                },
+                option: function(item, escape){
+                    var title = escape(item.title);
+                    if (title === 'undefined')
+                    {
+                        title = 'Yours custon price';
+                    }
+                return '<div class="dropdown-option">' +
+                                '<span>' +
+                                    title+
+                                '</span>'+
+                        '</div>';
+                }
+            },
+            load:  function (query, callback) {
+                       $.ajax({
+                           url: '/api/v1/search/product',
+                           type: 'GET',
+                           dataType: 'json',
+                           data: {
+                               q: query
+                           },
+                           error: function () {
+                               $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                               callback();
+                           },
+                           success: function (res) {
+                               $('div.selectize-input', '.multi').css('background-position', '0px 0px');
+                               callback(res.data);
+                           }
+                       });
+                   }
+        });
+ }
+{#    end product selectize    #}
+
+    if($('#discont_select').hasClass('selectized')){
+       window.discdrop[0].selectize.setValue(discount_type);
+    }
+        $(".selectize-input").addClass('last');
+        $(".selectize-input").find('.item').addClass('last');
+        $('.last').closest('tr').find(".selectize-input").css('padding-left','10px');
+        $(".selectize-input").css('background-image', 'none');
+        $('.last').closest('tr').find(".selectize-input").css('width', '200px');
+        $('.last').closest('tr').find(".selectize-input").css('height', '22px');
+        $('.last').closest('tr').find(".selectize-input").css('padding-top', '2px');
+        $(".selectize-input").css('background-position', '0px 0px');
+        $('#addNew_tr').find("#product_select").closest('td').find('.selectize-input').css('width', '300px');
+        $('#save_tr').addClass('last');
+    }
+
+ $(function(){
+
+     product_p = ''; product_price = ''; qty = ''; discount = ''; discount_type = '';qty_dot =''; discount_dot = '';
+     qty_lastElem = ''; discount_lastElem = '';
+
+     model = "{{modelname}}";
+
+
+    $('#tableBody').on("click",".qty",function(){
+        if ($(this).hasClass('last')){
+            $(this).text('');
+            $(this).closest('tr').find('.discount').text(disc_t);
+            $(this).mouseleave(function(){
+               $('.to_Edit').click(function(){
+                   $(this).closest('tr').find('.qty').text(qty);
+               });
+            });
+        }
+   });
+
+   $('#tableBody').on("click",".discount",function(){
+        if ($(this).hasClass('last')){
+        $(this).text('');
+        $(this).closest('tr').find('.qty').text(qty);
+        $(this).mouseleave(function(){
+           $('.to_Edit').click(function(){
+               $(this).closest('tr').find('.discount').text(disc_t);
+           });
+        });
+      }
+   });
+
+
+   $('#tableBody').on("dblclick",".to_Edit", dblclk);
+
+    if ( model !=='pricebookdetail' )
+    {
+      detail_edit("keyup",".discount,.qty");
+      detail_edit("change",".product_price,.discount_type");
+    }
+        else
+        {
+          detail_edit("change",".title");
+          detail_edit("keyup",".discount");
+          detail_edit("change",".discount_type");
+        }
+
+  $(document).mousedown(function(arg)
+  {
+      if( $('#addNew_tr').hasClass('last')){
+          $('.quick_add').addClass('disabled');
+      }
+
+      if ( (!($(arg.target).hasClass('last')) ) && ( !($(arg.target).hasClass('selectBox')) ) && ( !($(arg.target).find('div').hasClass('last')))&&(!($(arg.target).parent().closest('td').hasClass('last')))&&(!($(arg.target).hasClass('save'))) )
+      {
+        reset();
+        $('#No_rec').show();
+        window.addMode = false;
+            if ($('#tbody').find('.last').length)
+            {
+              $('.selectize-dropdown').addClass('hidden');
+              $('#addNew_tr').hide();
+              $('.quick_add').removeClass('disabled');
+              replace_tr();
+            }
+       }
+  });
+
+//Save after editing
+ $('#tableBody').on("click",".save_edited",function(argg){
+
+        id =  $(this).closest('tr').find('.edit_ajax').attr('data-id');
+        product_price = $(this).closest('tr').find('#pricebooklist').val();
+
+        if (product_price === '')
+        {
+           product_price = product_p;
+        }
+
+        {#qty = $(this).closest('tr').find('.qty').text();
+        qty = jQuery.trim(qty).substring(0,50);
+#}
+        qty = qty_t;
+
+        if (qty === '')
+        {
+            qty = 1;
+        }
+
+{#      discount = $(this).closest('tr').find('.discount').text();#}
+        discount = disc_t;
+
+        if (discount === '')
+        {
+            discount = 0;
+        }
+
+        discount_type = $('#discont_select').val();
+
+        if ( model !== 'pricebookdetail')
+        {
+         url = "{{url( null, { 'action': 'edit', (masterRoute~'id'):master.id()})}}";
+          url = url.replace('index.html',id+'/index.html');
+        }
+          else
+          {
+               url = "{{url( null, { 'action': 'edit', (masterRoute~'id'):master.id()})}}";
+                url = url.replace('index.html','id/'+id+'/index.html');
+          }
+
+    if ( (qty.length)&&(discount.length) )
+    {
+          qty_dot = qty.split(".").length-1;
+          discount_dot = discount.split(".").length-1;
+
+          qty_lastElem = qty[qty.length -1];
+          discount_lastElem = discount[discount.length -1];
+    }
+        $.ajax({
+                url:url ,
+                type: 'POST',
+                traditional: true,
+                data: { 'fields[product_price]': product_price, 'fields[discount]': discount,'fields[qty]': qty, 'fields[discount_type]': discount_type, 'fields[pricebook_id]':pricebookid },
+                beforeSend: function ()
+                {
+                    if  (($(argg.target).closest('tr').find('.final_price').text() !== '$NaN' )&&(qty_dot <= 0 )&&(discount_dot <= 1)&&(qty_lastElem !== '.')&&(discount_lastElem !== '.'))
+                    {
+                          $('#tbody').html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+                    }
+                    else{
+                          replace_tr();
+                    }
+                },
+                success: function (arg)
+                {
+                     if(arg.status)
+                     {
+
+                       if (model !=='pricebookdetail')
+                          {
+                             Estim_priceurl = "http://" + window.location.hostname + "/"+"{{modelname}}"+"/list/"+"{{masterRoute~'id'}}"+ "/" + "{{master.id()}}" + "/index.html .viewtable";
+                             $('.viewtable').load(Estim_priceurl);
+                          }
+
+                           $('#tbody').html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+                             loadurl = "http://" + window.location.hostname + "/"+"{{modelname}}"+"/list/"+"{{masterRoute~'id'}}"+ "/" + "{{master.id()}}" + "/index.html #tableBody";
+                               $('#tableBody').load(loadurl, null, function (){
+                                  setCheckboxes();
+                                    $('#addNew_tr').hide();
+                               });
+                      }
+
+                       else
+                       {
+                          alert('Invalid input data!');
+                       }
+                },
+                error: function(){
+                    alert('Error');
+                }
+            });
+        fixedMenu();
+        argg.preventDefault();
+   });
+
+   $('#addNew_tr').hide();
+
+   $('.quick_add').on("click",function(){
+
+     reset();
+     replace_tr();
+     window.addMode = true;
+
+       $('#No_rec').hide();
+       $('#addNew_tr').show({duration:500});
+       $('#addNew_tr').css('display','block !important');
+       $('#addNew_tr').find('.width_10p').text('');
+       $('#addNew_tr').find('.width_10p').append('<div id="save_tr" class="buttons"><a class="submitLink btn-icon save" type="submit" value="save" title="Save">Save</a></div>');
+         editmode($('#addNew_tr').find('.to_Edit')[0]);
+
+         $('#addNew_tr').find('.qty').text('1');
+         $('#addNew_tr').find('.discount').text('0.00');
+          window.discdrop[0].selectize.setValue('Direct Price Reduction');
+
+           $('#addNew_tr').find('.title').css('border','1px solid #d0e4ed');
+           $('#addNew_tr').find('.title').css('background','#e1f5fe');
+           $('#addNew_tr').find('.title').addClass('last');
+
+
+          $('#addNew_tr').find('.title').mouseover(function(){
+            $(this).css('box-shadow','0px 1.5px 2px #222');
+          });
+
+             $('#addNew_tr').find('.title').mouseleave(function(){
+              $(this).css('box-shadow','none');
+            });
+      });
+
+    $('#tableBody').on('click',"#save_tr",function()
+      {
+          $('#letter').hide();
+          product_id = $('#addNew_tr').closest('tr').find('#product_select').val();
+          product_price = $('#addNew_tr').closest('tr').find('#pricebooklist').val();
+          qty = $('#addNew_tr').closest('tr').find('.qty').text();
+          discount = $('#addNew_tr').closest('tr').find('.discount').text();
+          discount_type = $('#addNew_tr').closest('tr').find('#discont_select').val();
+
+          if ( typeof product_price === "undefined" )
+          {
+              product_price = $('#addNew_tr').closest('tr').find('.product_price ').text();
+          }
+
+             if ( model !== 'pricebookdetail')
+             {
+                 url = "{{url( null, { 'action': 'add', (masterRoute~'id'):master.id()})}}";
+                  url = url.replace('index.html'+'/index.html');
+             }
+              else
+              {
+                   url = "{{url( null, { 'action': 'add', (masterRoute~'id'):master.id()})}}";
+                   url = url.replace('index.html','id/'+'/index.html');
+              }
+
+           $.ajax({
+                url:url ,
+                type: 'POST',
+                traditional: true,
+                data: { 'fields[product_id]':product_id, 'fields[product_price]': product_price, 'fields[discount]': discount,'fields[qty]': qty, 'fields[discount_type]': discount_type, 'fields[pricebook_id]':pricebookid },
+                beforeSend: function ()
+                {
+                   $('#tbody').html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+                },
+                success: function (arg)
+                {
+                     if(arg.status)
+                     {
+                         if (model !=='pricebookdetail')
+                          {
+                             Estim_priceurl = "http://" + window.location.hostname + "/"+"{{modelname}}"+"/list/"+"{{masterRoute~'id'}}"+ "/" + "{{master.id()}}" + "/index.html .viewtable";
+                             $('.viewtable').load(Estim_priceurl);
+                          }
+
+                           $('#tbody').html('<td align = "center" colspan="15"> <img style = "padding:10px;" src =/css/img/icons/32x32-icons/ajax-loader.gif> </td>');
+                             loadurl = "http://" + window.location.hostname + "/"+"{{modelname}}"+"/list/"+"{{masterRoute~'id'}}"+ "/" + "{{master.id()}}" + "/index.html #tableBody";
+                               $('#tableBody').load(loadurl, null, function ()
+                               {
+                                  setCheckboxes();
+                                    $('#addNew_tr').hide();
+                                      $('.quick_add').removeClass('disabled');
+                               });
+                      }
+                       else
+                       {
+                           loadurl = "http://" + window.location.hostname + "/"+"{{modelname}}"+"/list/"+"{{masterRoute~'id'}}"+ "/" + "{{master.id()}}" + "/index.html #tableBody";
+                             $('#tableBody').load(loadurl, null, function ()
+                               {
+                                  setCheckboxes();
+                                    $('#addNew_tr').hide();
+                                      $('.quick_add').removeClass('disabled');
+                               });
+                           alert('Invalid input data or Product has already exist!');
+                       }
+                },
+                error: function(){
+                    alert('Error');
+                }
+            });
+            fixedMenu();
+      });
+
+    $('#search_query').closest('div').click(function(){
+        reset();
+        replace_tr();
+        $('#addNew_tr').hide();
+        $('.quick_add').removeClass('disabled');
+      });
+});
+
+</script>
+
+<script>
+//editing on enter
+   $(function() {
+
+        $('body').keydown( function(event)
+        {
+           if ( ( event.keyCode === 13 )&&($('.last').hasClass('saves')))
+           {
+              $('.save_edited').trigger('click');
+           }
+
+               if  (( event.keyCode === 13 )&&(!$('.selectize-control').hasClass('loading')))
+               {
+                  $('#save_tr').trigger('click');
+               }
+
+        limit_digit('.qty');//digits only
+         limit_digit('.discount');//digits only
+        }
+        );
+    });
+</script>
+{% endblock script %}
+
+{% block style %}
+    <style>
+        #tbody tr{
+            -webkit-user-select: none;
+        }
+        .add{
+            cursor: pointer;
+        }
+        #save_tr{
+            cursor: pointer;
+        }
+    </style>
+{% endblock style %}
+
+{% block content %}
+    <div class="viewtable">
+        <div class="view_header">
+            <div class="buttons left">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+            </div>
+
+            <div class="title"><h1>{{ title }}</h1></div>
+            <span class="editedBy">
+                {% if master.toView["changer"] is defined %}
+                    Last Update: {{master.changed_dtm|date(constant('\\Wepo\\Constant::DATETIME_FORMAT'))}} by {{master.changerfname}} {{master.changerlname}}
+                {% endif %}
+            </span>
+
+            {% block detailedit %}
+                {% if master.status != 'deleted' %}
+                        <div class="buttons">  <a href="{{ url( masterRoute, { 'action': 'edit','id':''~master.id() } )~saurl }}" class="edit btn-icon" title="Edit">{{translate("Edit")}}</a> </div>
+                {% endif %}
+            {% endblock detailedit %}
+
+            <div class="buttons right_area">
+                <a href="#" class="btn-small previous" title="Previous"></a>
+                <a href="#" class="btn-small next" title="Next"></a>
+            </div>
+        </div>
+
+        {#{{ dump(master.toArray) }}#}
+        <div class="view_block">
+            <div class  = "viewToolbar">
+                <div class="buttons">
+                    {% if master.status !='deleted' %}
+                             <a href="{{ url(masterRoute,{ 'action': 'delete','id':''~master.id() } )~saurldoubleback }}" class="delete btn-icon">{{translate("Delete")}}</a> &nbsp;
+                    {% elseif master.status == 'deleted' %}
+                             <a href="{{ url( masterRoute, { 'action': 'restore', 'id':'' ~master.id()} )~saurl }}" class="restore btn-icon green_but submitLink">{{translate('Restore')}}</a> &nbsp;
+                        {% if permission == 1 %}
+                             <a href="{{ url( masterRoute, { 'action': 'clean', 'id':'' ~master.id()} )~saurldoubleback }}" class="clean btn-icon red_but submitLink">{{translate('Clean')}}</a> &nbsp;
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+              <div class="viewData">
+                <div class="lead_info" style="width: 45%;">
+                    <h3 style="min-height: 10px;">{{ translate(MasterName ~ ' information') }}</h3>
+                    <table>
+                        <tbody>
+                        {% block output %}
+                        {% for key, value in master.toArray %}
+                        {% if field_labels[key] is defined  %}
+                            <tr>
+                                <th>{{ field_labels[key] }}</th>
+                                <td id="data_{{key}}">
+                                    {% if key == 'owner_id' and master.owner_id is not empty %}
+                                        <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(master, 'owner_id')} )~saurl }}" >
+                                            {{ master.ownerfname}}
+                                            {{ master.ownerlname}}
+                                        </a>
+                                    {% elseif key == 'changer_id' and master.changer_id is not empty %}
+                                         <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(master, 'changer_id')} )~saurl }}" >
+                                            {{ master.changerfname}}
+                                            {{ master.changerlname}}
+                                        </a>
+                                    {% elseif key[-6:] == '_price' %}
+                                        ${{ value|number_format(2, '.', ',') }}
+                                    {% elseif key == 'contact' %}
+                                            <a href="{{ url( 'contact', { 'action': 'view','id':''~attribute(master, 'contact_id')} )~saurl }}" >
+                                                {{ attribute(master, "contact") }}
+                                            </a>
+                                    {% elseif key == 'pricebook_id' %}
+                                        <a href="{{ url( 'pricebookdetail', { 'action': 'list','pricebookid':''~attribute(master, 'pricebook_id')} )~saurl }}" >{{master.pricebook}}
+                                    {% elseif key == 'status_id' %}
+                                        {{master.status|capitalize}}
+                                    {% elseif key == 'modifier' %}
+                                        {% if master.price_type == '% of Price' %}
+                                             {{ master.modifier|number_format(2, '.', ',') }} %
+                                         {% elseif  master.modifier == 0  %}
+                                            ${{  master.modifier|number_format(2, '.', ',') }}
+                                         {% else %}
+                                           - ${{ master.modifier|number_format(2, '.', ',') }}
+                                         {% endif %}
+                                    {% elseif key == 'tax' %}
+                                       ${{ master.tax|number_format(2, '.', ',') }}
+                                    {% elseif key == 'adjustment' %}
+                                      {% if  master.adjustment < 0 %}
+                                         - ${{ master.adjustment[1:]|number_format(2, '.', ',')}}
+                                      {% else %}
+                                           ${{ master.adjustment|number_format(2, '.', ',') }}
+                                      {% endif %}
+                                    {% elseif key == 'quote_id' %}
+                                        {{master.quote}}
+                                    {% elseif key == 'order_id' %}
+                                        {{master.order}}
+                                    {% elseif key[-4:] == '_dtm' %}
+                                        {{ value|date(constant('\\Wepo\\Constant::DATETIME_FORMAT')) }}
+                                    {% elseif key[-5:] == '_date' %}
+                                        {{ value|date(constant('\\Wepo\\Constant::DATE_FORMAT')) }}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% if loop.index0 == loop.length//2 and loop.length >3 %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="lead_other_info" style="width: 45%;">
+                    <h3 style="min-height: 10px;">{{ translate('Other information') }}</h3>
+                    <table>
+                        <tbody>
+                        {% endif %}
+                        {% endfor %}
+                        {% endblock output %}
+                        </tbody>
+                    </table>
+                    {% if master.toView|length < 4 %}
+                        <div class="buttons">
+                            {{ block('actions') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="listtable">
+        <div class="title">
+            <div class="listtitle">
+                  <span class="icon_1" style="background-image: url(/css/img/icons/32x32-icons/{{ detailsName[0:-1]|lower }}.png)"></span>
+                <h1 class="{{ detailsName|lower|replace(' ', '_') }}">
+                    {{ detailsName }}
+                </h1>
+            </div>
+            {% block link %}
+                <div class="buttons">
+                     <a class="quick_add add last btn-icon" title="Quick Add">{{translate("Quick Add")}}</a>
+                     <a class="add last btn-icon" href="{{ url( null, { 'action': 'add', (masterRoute~'id'): master.id()} )~saurl }}" title="Add">{{translate("Add new")}}</a>
+
+                    <div id="titleSearch" class="titleSearch" style="">
+                        <form class="search_form" action="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}"
+                              method="get" name="list_search">
+                            <input class="long_placehldr" type="text" name="q" value="{{ search_query }}"
+                                   placeholder="Search in &quot;{{ title }}&quot;"/>
+                            <div class="searchico"></div>
+                        </form>
+                    </div>
+                </div>
+
+      {% if search_query %}
+         <div class="buttons" style="padding-left: 8px;">
+            <a href="{{ url( null, params|removeKey([ 'q', 'p']) )~saurl }}">Show all records</a>
+         </div>
+      {% endif %}
+      <div style='display: inline; font-size: larger; font-style: italic;color:#999999; vertical-align: super;' id="letter"></div>
+
+                <div class="buttons right">
+                    <a id="refresh" class="refresh btn-icon" href="">
+                        {{ translate('Refresh') }}
+                    </a>
+                    <a class="choose btn-icon" href="{{ url( 'setup', { 'action': 'view', 'table':table.id } )~saurl }}">{{ translate('Output fields') }}</a>
+                </div>
+            {% endblock link %}
+        </div>
+        <div id="tableBody">
+{#            {% if paginator.getTotalItemCount %}#}
+                <form id="mainForm" action="{{ url( modelname, { 'action': 'delete' } )~saurl }}" method="post"
+                      name="checked">
+                    <table class="data">
+                        <thead class="tableHeader">
+                        <tr>
+                            <th class="width_4p">
+                                <div id="c_all" class="checkbox">
+                                    <input type="checkbox" name="c_all_input" value=""/>
+                                </div>
+                            </th>
+                            {% block sortUrlConstruction %}
+                                {% for key,value in labels %}
+                                    <th class="{% if params.sort==key %}checked{% endif %}">
+                                        <a href="{{ url( modelname, { 'action': 'list', (masterRoute~'id'):master.id(),'sort':key,'desc': params.desc==0?1:0} ) }}">{{ value }}</a>
+                                        {% if params.sort==key %}
+                                            <span class="{{ params.desc!=0 ? 'down':'up'}}"></span>
+                                        {% endif %}
+                                    </th>
+                                {% endfor %}
+                            {% endblock sortUrlConstruction %}
+                            <th class="width_10p">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody">
+
+                            <tr id="addNew_tr">
+                               <td></td>
+                                    {% for key,value in labels %}
+                                        <td class="{% if params.sort==key %}checked{% endif %}{{key}} to_Edit"></td>
+                                    {% endfor %}
+                                <td class="width_10p"></td>
+                            </tr>
+
+                            {% for akey,avalue in paginator.getCurrentItems %}
+                                <tr>
+                                    <td>
+                                        <div class="checkbox">
+                                            <input type="checkbox" name="checkedid[]" id="{{ avalue.id() }}"
+                                                   value="{{ avalue.id() }}" class="check"/>
+                                        </div>
+                                    </td>
+                                    {% for key,value in labels %}
+                                        {% if key == 'discount' or key[-5:] == 'price' %}
+                                            <td class="{% if params.sort==key %}checked{% endif %}{{key}} to_Edit"  style="text-align: right; width: 10%; padding-right:95px">
+                                        {% else %}
+                                            <td class="{% if params.sort==key %}checked{% endif %}{{key}} to_Edit" >
+                                         {% endif %}
+                                            {% block data %}
+                                                {{ attribute(avalue, key) }}
+                                            {% endblock data %}
+                                        </td>
+                                    {% endfor %}
+                                    <td class="width_10p">
+                                        {% block action %}
+                                            <a class="actionview" href="{{ url( null, { 'action': 'view', (masterRoute~'id'):master.id(),'id':avalue.id() } )~saurl }}"><img
+                                                    src="/img/1.png" class="view"/><span class="tooltip top">View</span></a>&nbsp;
+                                            <a data-id="{{avalue.id()}}" data-productid="{{avalue.product_id}}" data-pricebookid="{{avalue.pricebook_id}}"  href="{{ url( null, { 'action': 'edit', (masterRoute~'id'):master.id(),'id':avalue.id() } )~saurl }}" class="actionview edit_ajax"><img
+                                                    src="/img/1.png" class="edit"/><span class="tooltip top edit_title">Edit</span></a>&nbsp;
+                                            <a class="actionview"><img src="/img/1.png" class="delete single_del"/><span class="tooltip top">Delete</span></a>
+                                            <div>
+                                                  <a style="margin-left: 22px;font-size:12px;cursor: pointer;" class="hidden cancel_edited"><span>Cancel</span></a>
+                                            </div>
+                                        {% endblock action %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <br/><div class="tableBottomToolbar">
+                        {% block downButtons %}
+
+                            <div class="buttons left">
+                                <a id="deletebtn" class="delete btn-icon disabled">{{ translate('Delete selected') }}</a>
+                            </div>
+                            <div class="buttons right">
+                                {% if paginator.count > 1 %}
+                                    {% include 'partial/pagination.twig' with {'pages':paginator.getPages, 'route': null, 'params':params} %}
+                                {% endif %}
+                            </div>
+                            <div class="buttons">
+
+                                {% if paginator.getTotalItemCount > 5 %}
+                                    <div class="selectRows">
+                                        <div class="msg"><span>Rows on the page:</span>
+                                        </div>
+                                        {% for i in rows %}
+                                            <a href="{{ url( null, { 'action': 'rowscount' } )~saurl }}&rows={{ i }}"
+                                               class="{% if paginator.getItemCountPerPage == i %}active{% endif %}">{{ i }}</a>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <div style="float: right; padding-top: 2px;" class = "msg" >
+                             <table>
+                                 <tbody>
+                                     <tr>
+                                        <td id = "total_count">
+                                          {% if paginator.getTotalItemCount > 0 %}
+                                            Total&nbspcount&nbsp:&nbsp{{ paginator.getTotalItemCount }}
+                                          {% endif %}
+                                        </td>
+                                     </tr>
+                                 </tbody>
+                             </table>
+                            </div>
+
+                            <div class="alphabet">
+                                <a id="#All" ajax-src="#tableBody" ajax-target="#tableBody"
+                                   class="ajax {% if not letter %}active{% endif %}"
+                                   href="{{ url( null, params, { 'query': { 'back': back, 'q': search_query } } ) }}">All</a>
+                                {% for _letter in 'A'..'Z' %}
+                                    <a id="#{{ _letter }}" ajax-src="#tableBody" ajax-target="#tableBody"
+                                       class="ajax {% if letter == _letter %}active{% endif %}"
+                                       href="{{ url( null, params, { 'query': { 'letter':_letter, 'back': back, 'q': search_query } } ) }}">{{ _letter }}</a>
+                                {% endfor %}
+                            </div>
+
+                        {% endblock downButtons %}
+                    </div>
+                </form>
+{#            {% endif %}#}
+        </div>
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+    <div class="dialog-message"></div>
+{% endblock content %}

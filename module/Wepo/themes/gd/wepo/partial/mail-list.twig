@@ -1,0 +1,122 @@
+{% if key == 'title' %}
+    <a href="{{ url( 'mail', { 'action': 'view','id': avalue.id() } )~saurl }}" >{{ attribute(avalue, key) }}</a>
+{% elseif key == 'changer_id' and attribute(avalue, 'changer_id') is not empty %}
+    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(avalue, 'changer_id')} )~saurl }}" >
+        {{ avalue.changerfname}}
+        {{ avalue.changerlname}}
+    </a>
+{% elseif key == 'status_id' %}
+    {{ attribute(avalue, "status") }}
+{% elseif key == 'owner_id' and attribute(avalue, 'owner_id') is not empty %}
+    <a href="{{ url( 'user', { 'action': 'view','id':''~attribute(avalue, 'owner_id')} )~saurl }}" ></a>
+{% elseif key == 'contact_id' and attribute(avalue, 'contact_id') is not empty %}
+    <a href="{{ url( 'contact', { 'action': 'view','id':''~attribute(avalue, 'contact_id')} )~saurl }}" >{{ attribute(avalue, "contact") }}</a>
+{#{% elseif key == 'from' %}#}
+    {#{% set valueArray = attribute(avalue, key)|split(",") %}#}
+    {#&#123;&#35;{{ dump(valueArray) }}&#35;&#125;#}
+    {#{% set count = 0 %}#}
+    {#{% set person = "" %}#}
+    {#<div class="hide" id="targets{{avalue._id}}">#}
+        {#{% for mail in valueArray %}#}
+            {#{% if mail is not empty %}#}
+                {#<span style="padding-left: 60px; display: block">#}
+                    {#{% set person %}#}
+                        {#{{mail}}#}
+                    {#{% endset %}#}
+                        {#{{mail}}#}
+                    {#{% set count  = count+1 %}#}
+                {#</span>#}
+            {#{% endif %}#}
+        {#{% endfor %}#}
+    {#</div>#}
+    {#{% if count > 1 %}#}
+        {#{{person}}#}
+        {#<a class="showhide" id="show_btn{{avalue._id}}" data-id="{{avalue._id}}" href="" onClick="show(this); return false;">&nbsp;...</a>#}
+    {#{% elseif count == 1%}#}
+        {#{{person}}#}
+    {#{% endif %}#}
+{#{% elseif key == 'to' %}#}
+    {#{% set valueArray = attribute(avalue, key)|split(",") %}#}
+    {#&#123;&#35;{{ dump(valueArray) }}&#35;&#125;#}
+    {#{% set count = 0 %}#}
+    {#{% set person = "" %}#}
+    {#<div class="hide" id="targets{{avalue._id}}">#}
+        {#{% for mail in valueArray %}#}
+            {#{% if mail is not empty %}#}
+                {#<span style="padding-left: 60px; display: block">#}
+                    {#{% set person %}#}
+                    {#{{mail}}#}
+                    {#{% endset %}#}
+                    {#{{mail}}#}
+                    {#{% set count  = count+1 %}#}
+                {#</span>#}
+            {#{% endif %}#}
+        {#{% endfor %}#}
+    {#</div>#}
+    {#{% if count > 1 %}#}
+        {#{{person}}#}
+        {#<a class="showhide" id="show_btn{{avalue._id}}" data-id="{{avalue._id}}" href="" onClick="show(this); return false;">&nbsp;...</a>#}
+    {#{% elseif count == 1%}#}
+        {#{{person}}#}
+    {#{% endif %}#}
+{% elseif key[-4:] == '_dtm' %}
+    {{attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATETIME_FORMAT'))}}
+{% elseif key[-4:] == 'date' %}
+    {{attribute(avalue, key)|date(constant('\\Wepo\\Constant::DATE_FORMAT'))}}
+{% else %}
+    {{ attribute(avalue, key) }}
+{% endif %}
+
+<style type="text/css">
+    <!--
+    .hide {
+        position: absolute;
+        display: none;
+        margin-top: -15px;
+        padding: 15px;
+        background-color: white;
+        border:solid 1px rgba(0, 0, 0, 0.06);
+        -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.24);
+        max-height: 150px;
+        overflow: auto;
+    }
+    .showhide {
+        color: green;
+    }
+</style>
+
+<script>
+    $('.showhide').on( "mouseenter", function() {
+        var id = $(this).parent().find('a.showhide').attr('data-id');
+        $(this).parent().find('#targets'+id).show();
+        {#            $(this).parent().find('#person'+id).show();#}
+        {#            $(this).parent().find('#show_btn'+id).text('...');#}
+    });
+
+    $('.hide').on( "mouseleave", function() {
+        var id = $(this).parent().find('a.showhide').attr('data-id');
+        $(this).parent().find('#targets'+id).hide();
+        {#            $(this).parent().find('#person'+id).show();#}
+        $(this).parent().find('#show_btn'+id).text('\u00A0...');
+    });
+    {#        var flag = true;#}
+    function show(self)
+    {
+        var id = $(self).attr('data-id');
+        if($(self).text()==='\u00A0...')
+        {
+            document.getElementById('targets'+id).style.display='block';
+            {#                document.getElementById('person'+id).style.display='none';#}
+            {#                $('#show_btn'+id).text('Hide');#}
+            {#                flag = false;#}
+        }
+        {#else
+        {
+            document.getElementById('targets'+id).style.display='none';
+{#                document.getElementById('person'+id).style.display='';#}
+        {#                $('#show_btn'+id).text('...');#}
+        {#                flag = true;#}
+        {#            }#}
+    }
+</script>

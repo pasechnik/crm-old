@@ -1,0 +1,131 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Fields')%}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block script %}
+      {{parent()}}
+<script>
+    $(
+      function(){
+          $( ".sortable" ).sortable({opacity: 1,  axis: "y", containment: "table", cursorAt: { bottom: 0 }, cursor:'ns-resize',
+              stop: function (event, ui){
+                    var n = 1;
+                    for (var i = 0; i < event.target.children.length; i++) {
+                           id = event.target.children[i].id;
+                           $('#'+id).closest("tr").find(".orderinput").val(n);
+                           n=n+1;
+                     }
+                     n=1;
+                }
+        });
+          $( ".sortable" ).disableSelection();
+//          $('select').selectBox( );
+          $('#c_all').click(
+            function (){
+                if ( $('div.checked', '#c_all' ).size() )
+                {
+                    $('input.check').prop('checked', true);
+                    $('div.checkboxArea').addClass('checked');
+                }
+                else
+                {
+                    $('input.check').prop('checked', false);
+                    $('div.checkboxArea').removeClass('checked');
+                }
+
+        });
+        $('#c_all_label').click(
+            function(){
+                $('#c_all_input').click();
+                $('#c_all').click();
+            }
+        );
+
+      }
+    );
+</script>
+{% endblock script %}
+{% block style %}
+    {{parent()}}
+    <style>
+        .sortable td{  margin: 0; padding: 10px; }
+        .orderinput {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 1px 1px 3px 1px #bfbfbf;
+            background-repeat: no-repeat;
+            border-color: transparent;
+            background-color: #fff;
+            margin: 0px !important;
+            vertical-align: bottom;
+            text-align: center;
+            width: 15px;
+            height: 15px;
+            float: left;
+        }
+        #c_all {margin-left: 1px;}
+    </style>
+{% endblock style %}
+{% block content %}
+    <div class="viewtable">
+        <form action="{{ url( 'setup', { 'action': 'save', 'table':table_id } )~back }}" method="post" name="cheked">
+            <div class="form_header">
+                <div class="buttons">
+                    <a href="{{ saurlback !='/' ? saurlback : url( null, { 'action': 'list' } ) }}" class="back btn-icon" title="Back">{{ translate("Back") }}</a>
+                    <a href="#" class="btn-icon task submitLink" title="Save">{{translate("Save")}}</a>
+                </div>
+                <div class="title"><h1>{{translate('Configure')}}</h1></div>
+                    {# <div class="success_msg"><i class="imgTxt txtSuccess"></i>Profile has been saved successfully!</div> #}
+                <noscript><input type="submit" name="save" /></noscript>
+            </div>
+            <div class="table fieldset">
+                <h2>{{title}}</h2>
+                <table class="data">
+                    <thead>
+                        <tr class="tableHeader">
+                            <th style="width: 70px;">
+                                <div id="c_all" class="checkbox actionview" >
+                                    <span class="tooltip top">Visible</span>
+                                    <input type="checkbox" name="c_all_input" id="c_all_input" value="" /><br/><br/>
+                                </div>
+{#                                <label id="c_all_label" for="c_all" >{{translate('Visible')}}</label>#}
+                            </th>
+                            <th>{{translate('Order')}}</th>
+                            <th>{{translate('Label')}}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sortable" id="tbody">
+                         <div id="cont">
+                             {% set count= 1 %}
+                        {% for avalue in rows %}
+                            <tr class="ui-state-default" id="order{{count}}">
+                                <td style="width:70px">
+                                    <input type="hidden" name="row[{{avalue.id()}}][id]" value="{{avalue.id()}}" />
+                                    <div class="checkbox">
+                                        <input type="checkbox" name="row[{{avalue.id()}}][visible]" id="{{avalue.id()}}" value="1" {% if avalue.visible %}checked="checked"{% endif %} class="check" />
+                                    </div>
+
+                                </td>
+                                <td>
+                                   {# <select name="row[{{avalue.id()}}][order]" style="width:60px;" disabled="true">
+                                        {% for i in range(1, rows|length) %}
+                                            <option value="{{i}}" {% if avalue.order==i %}selected="selected"{% endif %}>{{i}}</option>
+                                        {% endfor %}
+                                    </select>#}
+                                   <input type="text" class="orderinput" name="row[{{avalue.id()}}][order]" readonly="true" value="{{count}}"/>
+                                </td>
+                                <td >
+                                    <input type="text" name="row[{{avalue.id()}}][label]" value="{{avalue.label}}" style="width:150px; float: left" />
+                                </td>
+                            </tr>
+                                {% set count = count+1 %}
+                        {% endfor %}
+                         </div>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+  <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

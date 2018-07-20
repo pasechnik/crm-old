@@ -1,0 +1,88 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Fields')%}
+{% block title %}{{parent()}} - {{ title }}{% endblock title %}
+{% block content %}
+<div class="view_header">
+    {#{% if saurlback !='/' %}
+        <a href="{{ saurlback }}" class="titleDashboard" title="Back"></a>
+     {% else %}#}
+        <a href="{{ url( 'dashboard' ) }}" class="titleDashboard" title="To dashboard"></a>
+{#    {% endif %}#}
+    <div class="title"><h1>Welcome to Wepo</h1></div>
+</div><br/>
+<div class="right_top_links">
+</div>
+<div class="fullwidth_area drop_area"></div>
+<div class="left_area half_area drop_area">
+    <div class="table" id="settings">
+        <div class="title tableToolbar">
+            <h2>Personal settings</h2>
+            <div class="right_buttons">
+                <a href="#" class="resize_button table_head_link1"></a>
+                <a href="#" class="minimize_button table_head_link1"></a>
+            </div>
+        </div>
+        <div class="widget_content">
+            <table>
+                <tbody>
+                    <tr>
+{#                            <a href="{{ url( null, { 'action': 'view','id':''~avalue._id } )~saurl }}"><img src="/img/1.png" class="view"  alt="{{translate('View')}}" /></a>#}
+                        <th><a href="{{ url( 'user', { 'action': 'view', 'id':user.id() } )~saurl }}">My profile</a></th>
+                    </tr>
+                    <tr class="">
+                        <th><a href="{{ url( 'profile', { 'action': 'password' } )~saurl }}">Password change</a></th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="table" id="permissions">
+        <div class="title tableToolbar">
+            <h2>Users & Permissions</h2>
+            <div class="right_buttons">
+                <a href="#" class="resize_button table_head_link1"></a>
+                <a href="#" class="minimize_button table_head_link1"></a>
+            </div>
+        </div>
+        <div class="widget_content">
+            <table>
+                <tbody>
+                    <tr>
+                        <th><a href="{{ url( 'user', { 'action': 'list' } )~saurl }}">Users</a></th>
+                    </tr>
+                    <tr>
+                        <th><a href="{{ url( 'mailsetting', { 'action': 'list' } )~saurl }}">Users mail settings</a></th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="right_area half_area drop_area">
+    <div class="table" id="customization">
+        <div class="title tableToolbar">
+            <h2>Customization</h2>
+            <div class="right_buttons">
+                <a href="#" class="resize_button table_head_link1"></a>
+                <a href="#" class="minimize_button table_head_link1"></a>
+            </div>
+        </div>
+        <div class="widget_content">
+            <table>
+                <tbody>
+                    <tr>
+                        <th><a href="#">Modules (Models + Forms)</a></th>
+                    </tr>
+                    <tr class="">
+                        <th><a href="#">Views</a></th>
+                    </tr>
+                    <tr class="">
+                        <th><a href="#">Widgets</a></th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+{% endblock content %}

@@ -1,0 +1,69 @@
+{% extends 'partial/add.twig' %}
+{% set title = translate('New '~modelname) %}
+
+{% block script %}
+      {{parent()}}
+            <script>
+                $( function(){
+                    $('div[id="uidadditional[table_id]"] label').eq(0).click( setLead );
+                    $('div[id="uidadditional[table_id]"] label').eq(1).click( setContact );
+                    $('div[id="uidadditional[table_id]"] label').change('keyup',updateTargetArray);
+                });
+
+
+                function setLead(){
+                    $("label[for='idadditional[target_id]'] span").text('Lead:');
+                }
+
+
+                function setContact(){
+                    $("label[for='idadditional[target_id]'] span").text('Contact:');
+                }
+
+
+
+                function updateTargetArray()
+                {
+                    var target;
+                    var form;
+
+                    target = $('select[name="additional[target_id]"]');
+                    target.val('0');
+                    target.change();
+
+                    form = document.getElementById("form");
+                    form.submit();
+                }
+             </script>
+{% endblock script %}
+
+
+
+{% block additionalFieldset %}
+    <div class="table">
+        <h2>{{ fieldset.getLabel }}</h2>
+        <div class="form_info">* Required Field(s)</div>
+        <div class="form">
+            <div class="col">
+                {%for ekey, element in fieldset %}
+                    {% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}
+            </div>
+            <div class="col">
+                    {%endif%}
+                <div class="input">
+                    <label for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}>
+                        <span class="splabel">{{ element.getLabel }}:</span>
+                    </label>
+                    <div class="{% if loop.index0 %}selectize-wrapper{%else%}radio{%endif%}" id="uid{{ element.getName }}" >
+                        {{ formElement(element) }}
+                    </div>
+                    <label for="id{{element.getName}}" class="error" style="display: {% if element.getMessages %}{%else%}none{% endif %};">{% for message in element.getMessages %}{{message}}{% endfor %}</label>
+                </div>
+                {% endfor %}
+{#                <div class="input">
+                    <label for="iderror" class="error">{{message}}</label>
+                </div>#}
+            </div>
+        </div>
+    </div>
+{% endblock additionalFieldset %}

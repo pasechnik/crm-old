@@ -1,0 +1,25 @@
+{% extends 'layout/layout.twig' %}
+
+{% block content %}
+
+    {% for dash in data.view %}
+        {% include dash.template with dash %}
+    {% endfor %}
+
+    <div class="gridster">
+        <ul>
+            {% for wname, widget in data.widgets %}
+                {% if wname !='HistoryWhose.widget' and wname !='History.widget' and wname!='PaymentPatient.widget' %}
+
+                <li class="{{ widget.title }}" style="position: absolute;" data-row="1" data-col="1" data-sizex="2" data-sizey="2">
+                    {% include widget.template with widget %}
+                </li>
+
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <a align="center" id="scrollTop" href="#" onclick="top.goTop();return false;"></a>
+
+{% endblock content %}

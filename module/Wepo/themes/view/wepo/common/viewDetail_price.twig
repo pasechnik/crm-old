@@ -1,0 +1,149 @@
+    <div class="viewData" style="position: relative;">
+        {% set tabs = [] %}
+        {% for key, fieldset in fieldsets  %}
+            {% include [ 'partial/viewblocks/'~ key ~'.twig', 'partial/viewblocks/default.twig' ] %}
+        {% endfor %}
+    </div>
+
+
+    {% block style %}
+        <style>
+
+            td.discount_Price,td.tax_Price,td.adjustment_Price {
+                transition: 0.7s;
+            }
+
+            .td_editing {
+                background: #eee !important;
+                cursor: pointer !important;
+            }
+
+        </style>
+    {% endblock style %}
+
+    {% block script %}
+        <script>
+
+            Number.prototype.formatMoney = function (c, d, t)
+            {
+                var n = this,
+                        c = isNaN(c = Math.abs(c)) ? 2 : c,
+                        d = d == undefined ? "." : d,
+                        t = t == undefined ? "," : t,
+                        s = n < 0 ? "-" : "",
+                        i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                        j = (j = i.length) > 3 ? j % 3 : 0;
+                return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+            };
+
+            function Total()
+            {
+                var sum = 0;
+
+                $('#tbody tr').each(function(index)
+                {
+                    var price = $(this).find('.total').text();
+                        price = price.replace(/[$,]/g, '');
+                        price = parseFloat(price);
+                    sum += price;
+                });
+
+                var discount = $('.discount_Price:first').text();
+                    discount = discount.replace(/[$,]/g, '');
+                    discount = parseFloat(discount);
+
+                var tax = $('.tax_Price:first').text();
+                    tax = tax.replace(/[$,]/g, '');
+                    tax = parseFloat(tax);
+
+                var adjustment = $('.adjustment_Price:first').text();
+                    adjustment = adjustment.replace(/[$,]/g, '');
+                    adjustment = parseFloat(adjustment);
+
+                $('.sub_total_Price').text('$'+sum.formatMoney(2, '.', ','));
+
+                sum = sum + tax + adjustment - discount;
+
+                $('.grand_total_Price').text('$'+sum.formatMoney(2, '.', ','));
+            }
+
+            $(function()
+            {
+                if ($('div.buttons a.update').length)
+                {
+
+                    $('body').on("click", "td.discount_Price:first,td.tax_Price:first,td.adjustment_Price:first", function () {
+                        $(this).attr('contentEditable', true).focus();
+                        $(this).css({'background': '#eee '});
+                    });
+
+                    $('body').on('mouseenter', "td.discount_Price:first,td.tax_Price:first,td.adjustment_Price:first", function () {
+                        $(this).addClass('td_editing');
+                    });
+
+                    $('body').on('mouseleave', "td.discount_Price:first,td.tax_Price:first,td.adjustment_Price:first", function () {
+                        $(this).removeClass('td_editing');
+                    });
+
+                    $(document).on("blur", "td.discount_Price:first,td.tax_Price:first,td.adjustment_Price:first", function ()
+                    {
+                      $(this).css({'background': 'none'});
+
+                        var discountPrice = $('td.discount_Price:first').text();
+                            discountPrice = discountPrice.replace(/[$,]/g, '');
+                            discountPrice = parseFloat(discountPrice);
+
+                        var taxPrice = $('td.tax_Price:first').text();
+                            taxPrice = taxPrice.replace(/[$,]/g, '');
+                            taxPrice = parseFloat(taxPrice);
+
+
+                        var adjustmentPrice = $('td.adjustment_Price:first').text();
+                            adjustmentPrice = adjustmentPrice.replace(/[$,]/g, '');
+                            adjustmentPrice = parseFloat(adjustmentPrice);
+
+                        if ( discountPrice == ''   || !(discountPrice) )   discountPrice = 0;
+                        if ( taxPrice == ''        || !(taxPrice) )        taxPrice = 0;
+                        if ( adjustmentPrice == '' || !(adjustmentPrice) ) adjustmentPrice = 0;
+
+                        var subject = $('td.subject_Price:first').text();
+
+                        $('td.tax_Price').text('$' + parseFloat(taxPrice).formatMoney(2, '.', ','));
+                        $('td.discount_Price').text('$' + parseFloat(discountPrice).formatMoney(2, '.', ','));
+                        $('td.adjustment_Price').text('$' + parseFloat(adjustmentPrice).formatMoney(2, '.', ','));
+
+                        var editUrl = $('div.buttons a.update').attr('href');
+
+                        $(document).ajaxStart(function () {
+                            startloader();
+                        });
+
+                        $.ajax(
+                        {
+                            url: editUrl,
+                            type: 'POST',
+                            traditional: true,
+                            data: {
+                                'fields[discount]'   : discountPrice,
+                                'fields[tax]'        : taxPrice,
+                                'fields[adjustment]' : adjustmentPrice,
+                                'fields[subject]'    : subject
+                            },
+                            success: function () {
+                                stoploader();
+                            },
+                            error: function () {
+                                alert('An ERROR has occurred');
+                                location.reload();
+                            }
+                        });
+
+                        $(document).ajaxComplete(function(){
+                            Total();
+                        });
+                    });
+                }
+            });
+        </script>
+    {% endblock script %}
+

@@ -1,0 +1,398 @@
+{% block style %}
+    <style>
+
+        .copyaddress {
+            float: right;
+            background-color: transparent;
+            -webkit-border-radius: 6px;
+            border: 1px solid #d7d7d7;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 6px 10px;
+            color: #1191d4 !important;
+        }
+
+        .copyaddress:hover {
+            border: 1px solid #1191d4;
+        }
+
+        .copyaddress:active {
+            box-shadow: none;
+        }
+
+        #copy_to_sh {
+            margin-top: 19px;
+        }
+        .cardtype{
+            color: rgba(0,0,0, 0.5);
+        }
+
+    </style>
+{% endblock style %}
+
+{% block script %}
+    <script>
+        $(function () {
+            $('#product_id').change(PutToPrice);
+            $('#product_id,#raw_price,#discount_type,#discount,#adjustment,#vat,#sales_tax,#qty').change(countTotalPrice);
+//            $('#Leadform input, #Leadform select, #Leadform textarea').each(
+//                function(index){
+//                    var input = $(this);
+//                    console.log(input.attr('name'), input.val());
+//                    'Type: ' + input.attr('type') + 'Name: ' + input.attr('name') + 'Value: ' + input.val();
+//                }
+//            );
+//
+//            $('form a.submitLink').click(function (e) {
+//                $(".submitLink[type=submit]", $(this).parents("form")).removeAttr("clicked");
+//                $(this).attr("clicked", "true");
+//                e.preventDefault();
+//                apiPost($(this).parents("form"));
+//            });
+
+//            $('form.apiform a.submitLink').click(function (e)
+//            {
+//                $('form.apiform').valid();
+//                $(".submitLink[type=submit]", $(this).parents("form")).removeAttr("clicked");
+//                $(this).attr("clicked", "true");
+//                e.preventDefault();
+//
+//                $.when(apiSaveForm($(this).parents("form"))).then(function()
+//                {
+//                    $(document).ajaxComplete(function()
+//                    {
+//                       if ( window.status == 'true' ) {
+//                           $('form .success_msg').removeClass('hidden redColor').addClass('greenColor');
+//                           $('form .success_msg i').removeClass('txtError').addClass('txtSuccess').next('div').text('Data saved successfully');
+//                       }
+//                       else {
+//                           $('form .success_msg').removeClass('hidden greenColor').addClass('redColor');
+//                           $('form .success_msg i').removeClass('txtSuccess').addClass('txtError').next('div').text('Data doesn\'t save. Please, check your data');
+//                       }
+//                           setTimeout(function(){
+//                               $('form .success_msg').addClass('hidden');
+//                           },2200);
+//                    });
+//                });
+//                return false;
+//            });
+
+        });
+
+
+    </script>
+
+    <script>
+
+        function CopyAddress(from, to) {
+            var i = 0;
+            var Address = [];
+
+            from.find('input:text').each(function () {
+                Address.push($(this).val());
+            });
+
+            to.find('input:text').each(function () {
+                $(this).val(Address[i]);
+                i++;
+            });
+        }
+        function CopyPatientAddress() {
+
+            patient_id = $("select[name='fields[patient_id]'] option:last").val();
+            apiGet('patient', patient_id, function (item) {
+                $("input[name^='address']").each(function () {
+                    var opt = $(this).attr('name');
+                    opt = opt.substr(opt.indexOf('[') + 1, opt.length - opt.indexOf('[') - 2);
+                    $(this).val(item['data'][opt]);
+                });
+            });
+        }
+        function CopyPatientCard() {
+
+            patient_id = $("select[name='fields[patient_id]'] option:last").val();
+            apiList('CardPatient', {'patient': patient_id}, function (item) {
+                $("select[name='instructions[payment_card_id]']").empty().append($('<option>', {value: 0})
+                    .text('None')).val(0).trigger('change');
+                $.each(item['data'], function (key, value) {
+                    if (value.card_status_id == '1') {
+                        $("select[name='instructions[payment_card_id]']")
+                            .append($('<option>', {value: value.id})
+                                .html('<span class="cardtype">Primary</span> ' + value.title)).val(value.id).trigger('change');
+                    } else {
+                        $("select[name='instructions[payment_card_id]']")
+                            .append($('<option>', {value: value.id})
+                                .html('<span class="cardtype">Secondary</span> ' + value.title));
+                    }
+                });
+//                $("select[name='instructions[payment_card_id]'] option:last").val(item['data']['payment_card_id']).trigger('change');
+//                $("select[name='instructions[payment_card_id]']").next('.select2').find('.select2-selection__rendered').text(item['data']['payment_card_title']).append('<span class="select2-selection__clear">×</span>')
+            });
+        }
+
+        $(function ()
+        {
+            if ($('div#address').length) {
+                $('div#address').find('div.col:first .input:last').after('<input type="button" class="copyaddress" id="copy_to_sh"  value="Copy to Shipping" />');
+                $('div#address').find('div.col:last .input:last').after('<input type="button" class="copyaddress"  id="copy_to_bil" value="Copy to Billing" />');
+
+                $('input#copy_to_sh').click(function () {
+                    CopyAddress($('div#address').find('div.col:first'), $('div#address').find('div.col:last'));
+                });
+
+                $('input#copy_to_bil').click(function () {
+                    CopyAddress($('div#address').find('div.col:last'), $('div#address').find('div.col:first'));
+                });
+            }
+
+            if ($('div#fields').length) {
+                $('div#fields').find('select[name="fields[patient_id]"]').after('<input type="button" class="address copyaddress" id="copy_patient"  title="Copy Patient Address" />');
+                $('div#fields').find('.col:last').css('margin-left',- $('.copyaddress').width() - 17+'px');
+
+                $('input#copy_patient').click(function () {
+                    CopyPatientAddress();
+                });
+
+                $('select[name="fields[patient_id]"]').change(function () {
+                    CopyPatientCard();
+                });
+            }
+        });
+
+    </script>
+    <script>
+        $(function ()
+        {
+            $("select[name='fields[patient_id]']").each(function (index) {
+                var scope = $(this).attr('data-scope');
+                var query = $(this).attr('data-query') || '';
+                $(this).select2(
+                    {
+                        placeholder: 'Please select...',
+                        allowClear: true,
+                        ajax: {
+                            url: '/api/v2/data/' + scope,
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                data = {
+                                    q: params.term, // search term
+                                    p: params.page
+                                };
+
+                                if (query.length) {
+                                    data.query = query;
+                                }
+                                return data;
+                            },
+                            processResults: function (data, params) {
+                                params.page = params.page || 1;
+
+                                return {
+                                    results: data.data,
+                                    pagination: {
+                                        more: (params.page * 10) < data.count
+                                    }
+                                };
+                            },
+                            cache: true
+                        },
+                        minimumInputLength: 1,
+                        templateResult: function (item) {
+                            if (item.loading) return item.text;
+                            return $('<div />').text(item.title).html();
+                        },
+                        templateSelection: function (item) {
+//                            if (item.title) {
+//                                $("input[name^='address']").each(function () {
+//                                    var opt = $(this).attr('name');
+//                                    opt = opt.substr(opt.indexOf('[') + 1, opt.length - opt.indexOf('[') - 2);
+//                                    $(this).val(item[opt]);
+//                                });
+//                            }
+//                            else {
+//                                $("input[name^='address']").each(function () {
+////                                    $(this).val(null);
+//                                });
+//
+//                            }
+                            return $('<div />').text(item.title || item.text).html();
+                        }
+                    }
+                );
+            });
+            $('select.static-select2').select2(
+                {minimumResultsForSearch: 5}
+            );
+            $('.select2-selection').click(function () {
+                $('.select2-search__field').focus();
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            var $quote = $("select[name='fields[quote_id]']");
+//            quote.each(function (index) {
+            var scope = $quote.attr('data-scope');
+            var query = $quote.attr('data-query') || '';
+            $quote.select2(
+                {
+                    placeholder: 'Please select...',
+                    allowClear: true,
+                    ajax: {
+                        url: '/api/v2/data/' + scope,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            data = {
+                                q: params.term, // search term
+                                p: params.page
+                            };
+
+                            if (query.length) {
+                                data.query = query;
+                            }
+                            return data;
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.data,
+                                pagination: {
+                                    more: (params.page * 10) < data.count
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    templateResult: function (item) {
+                        if (item.loading) return item.text;
+                        return $('<div />').text(item.title).html();
+                    },
+                    templateSelection: function (item)
+                    {
+
+                        if (item.patient_id)
+                        {
+                            $("select[name='fields[patient_id]'] option:last").val(item.patient_id).trigger('change');
+                            $("select[name='fields[patient_id]']").next('.select2').find('.select2-selection__rendered').text(item.patient_title).append('<span class="select2-selection__clear">×</span>');
+                            $("input[name^='address']").each(function () {
+                            var opt = $(this).attr('name');
+                                opt = opt.substr(opt.indexOf('[') + 1, opt.length - opt.indexOf('[') - 2);
+                                $(this).val(item[opt]);
+                            });
+                        }
+                        else {
+                            if ($("select[name='fields[quote_id]'] option:last").val() !== "" && ('address' in item))
+                            {
+                                $("[name='fields[patient_id]'] option:last ").val(null).trigger('change');
+
+                                $("input[name^='address']").each(function () {
+                                    $(this).val(null);
+                                });
+                            }
+                        }
+                        return $('<div />').text(item.title || item.text).html();
+                    }
+                }
+            );
+        });
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <div class="viewtable">
+        <div class="form_header">
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon"
+                   title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+        {% do form.setAttribute('class',form.getAttribute('class')) %}
+        {{ form().openTag(form)|raw }}
+        {% block upperform %}
+        {% endblock upperform %}
+        {% block formDetails %}
+            {% for fkey, fieldset in form %}
+                {% if fieldset.getAttribute('class')=='table' and fieldset is not empty %}
+                    <div class='table fieldset'>
+                        <h2>{{ fieldset.getLabel }}</h2>
+
+                        <div class="form_info">* Required Field(s)</div>
+                        <div class="form" id="{{ fieldset.getAttribute('name') }}">
+                            <div class="col">
+                                {% for ekey, element in fieldset %}
+                                {#{% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}#}
+                                {% if ekey == fieldset|length//2 - 1 %}
+                            </div>
+                            <div class="col">
+                                {% endif %}
+                                <div class="input">
+                                    <label
+                                        for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}
+                                    >
+                                    {% if element.Label!=NULL %}
+                                        <span
+                                            class="splabel">{{ element.getLabel }}&nbsp;:</span>
+                                    {% endif %}
+                                    </label>
+                                    {% if element.getAttribute('type')=='checkbox' %}
+                                        <div
+                                            class="checkbox">{{ formElement(element) }}</div>
+                                    {% else %}
+                                        {{ formElement(element) }}
+                                    {% endif %}
+                                    <label for="id{{ element.getName }}"
+                                           class="error {% if element.getMessages %}{% else %}hidden{% endif %}">{% for message in element.getMessages %}{{ message }}{% endfor %}</label>
+                                    {#{ WepoElementErrors(element) }#}
+                                </div>
+                                {% endfor %}
+                                <div class="input">
+                                    <label for="iderror"
+                                           class="error">{{ message }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='buttons' %}
+                    <div class="listtable">
+                        <div class="buttons clearfix {{ fieldset.getName }}">
+                            {% for ekey, element in fieldset %}
+                                <a href="#" class="submitLink btn-icon save"
+                                   type='submit'
+                                   value='{{ element.getLabel }}'
+                                   title='{{ element.getValue }}'>{{ element.getValue }}</a>
+                                <noscript>{{ formRow(element) }}</noscript>
+                            {% endfor %}
+                            <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                               class="btn-icon cancel"
+                               title="Cancel">{{ translate("Cancel") }}</a>
+
+                            <div class="success_msg hidden"><i
+                                    class="imgTxt txtError"></i>
+
+                                <div>some global error message</div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='additional' %}
+                    {% block additionalFieldset %}
+                    {% endblock additionalFieldset %}
+                {% else %}
+                    <div class="">
+                        {% for ekey, element in fieldset %}
+                            {{ formElement(element) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock formDetails %}
+        {{ form().closeTag(form)|raw }}
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

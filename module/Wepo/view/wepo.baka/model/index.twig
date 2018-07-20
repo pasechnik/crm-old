@@ -1,0 +1,72 @@
+{% extends 'layout/layout.twig' %}
+{% set title = translate('Model Admin') %}
+{% block title %}{{ parent() }} - {{ title }}{% endblock title %}
+
+{% block content %}
+{#<div class="paperTable">#}
+    {#<div class="tableTitle">#}
+        {#<h1 class="{{ title|lower|replace(' ', '_') }}">#}
+            {#{{ test }}#}
+        {#</h1>#}
+
+    {#</div>#}
+    {#<div class="table mainTable">#}
+
+        {#<div class="tableGrid">#}
+
+            {#<div>I want to know db tables list</div>#}
+            {#<br />#}
+            {#<ul>#}
+                {#{% for key,value in adapters %}#}
+                    {#<li>{{ key+1 }}. <a href="{{ url( 'model', { 'action':'dbcmpr', 'db': value }) }}">{{ value }}</a></li>#}
+                {#{% endfor %}#}
+            {#</ul>#}
+        {#</div>#}
+    {#</div>#}
+{#</div>#}
+
+<div class="paperTable">
+    <div class="tableTitle">
+        <h1 class="{{ title|lower|replace(' ', '_') }}">
+            {{ title }}
+        </h1>
+    </div>
+
+    <div class="table mainTable">
+        <div class="tableGrid">
+            <table>
+                <thead>
+                <tr class="tableHeader">
+                    {% block sortUrlConstruction %}
+                        {% for key,value in export_tables %}
+                            <th>
+                                <a href="{{ url( 'model', { 'action':'dbcmpr', 'db': key }) }}">{{ key }}</a>
+                            </th>
+                        {% endfor %}
+                    {% endblock sortUrlConstruction %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for key, value in 1..listLength %}
+                    <tr>
+                        {% for akey, avalue in export_tables %}
+                            <td>
+                                {% block data %}
+                                    {% if avalue[key] is defined %}
+                                        <a href="{{ url( 'model', { 'action':'modelcmpr','db':akey,'from':avalue[key]['_models']['from'],'to':avalue[key]['_models']['to'] }) }}">
+                                            Convert {{ avalue[key]['_models']['from'] }} to {{ avalue[key]['_models']['to'] }}
+                                        </a>
+                                    {% endif %}
+                                {% endblock data %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a align="center" id="scrollTop" href="#" onclick="top.goTop(); return false;"></a>
+    </div>
+</div>
+
+{% endblock content %}

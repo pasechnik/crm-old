@@ -1,0 +1,192 @@
+{% block script %}
+    <script>
+        $(function () {
+            $('#product_id').change(PutToPrice);
+            $('#product_id,#raw_price,#discount_type,#discount,#adjustment,#vat,#sales_tax,#qty').change(countTotalPrice);
+//            $('#Leadform input, #Leadform select, #Leadform textarea').each(
+//                function(index){
+//                    var input = $(this);
+//                    console.log(input.attr('name'), input.val());
+//                    'Type: ' + input.attr('type') + 'Name: ' + input.attr('name') + 'Value: ' + input.val();
+//                }
+//            );
+
+//            $('form a.submitLink').click(function (e) {
+//                $(".submitLink[type=submit]", $(this).parents("form")).removeAttr("clicked");
+//                $(this).attr("clicked", "true");
+//                e.preventDefault();
+//                apiPost();
+//            });
+        });
+
+
+        function apiPost() {
+            var formData = $('#Leadform').serializeArray();
+            // JSON.stringify(frm.serializeArray());
+            var json = {};
+            $.each(formData, function(){
+                var name = this.name.replace(/[^\[]+\[([^\]]+)\]/g, '$1');
+                json[name] = this.value || '';
+            });
+            $.ajax({
+                type: "POST",
+                url: "/api/v2/data/lead",
+                data: {data:json},
+                dataType: "json",
+                success: function(data){
+                    console.log(data);
+                },
+                error:function(data){
+                    console.log(data);
+                }
+            });
+            console.log(json);
+        }
+
+
+    </script>
+
+    <script>
+
+        function setListPrice() {
+            var Price = '';
+            var list_price = $('input[name="fields[list_price]"]');
+
+            if ($('select[name="fields[product_id]"]').length) {
+                Price = $('select[name="fields[product_id]"]').next('div').find('div.item').text();
+            }
+            else {
+                Price = $('select[name="fields[pricebook_detail_id]"]').next('div').find('div.item').text();
+            }
+
+            if (Price.indexOf('$') > 0) {
+                Price = Price.substring(Price.indexOf('$') + 1, Price.length);
+                list_price.val(Price);
+            }
+
+            else {
+                list_price.val(0);
+            }
+        }
+
+        $(function () {
+            if ($('input[name="fields[list_price]"]').val() == '') {
+                setListPrice();
+            }
+
+            var product = '';
+
+            if ($('select[name="fields[product_id]"]').length) {
+                product = $('select[name="fields[product_id]"]');
+            }
+            else {
+                product = $('select[name="fields[pricebook_detail_id]"]');
+            }
+
+
+            product.next().find('.selectize-input').click(function () {
+                setListPrice();
+            });
+
+            product.change(function () {
+                setListPrice();
+            });
+        });
+
+    </script>
+{% endblock script %}
+
+{% block content %}
+    <div class="viewtable">
+        <div class="form_header">
+            <div class="buttons">
+                <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                   class="back btn-icon"
+                   title="Back">{{ translate("Back") }}</a>
+            </div>
+            <div class="title"><h1>{{ title }}</h1></div>
+        </div>
+        {% do form.setAttribute('class',form.getAttribute('class')) %}
+        {{ form().openTag(form)|raw }}
+        {% block upperform %}
+        {% endblock upperform %}
+        {% block formDetails %}
+            {% for fkey, fieldset in form %}
+                {% if fieldset.getAttribute('class')=='table' and fieldset is not empty %}
+                    <div class='table fieldset'>
+                        <h2>{{ fieldset.getLabel }}</h2>
+
+                        <div class="form_info">* Required Field(s)</div>
+                        <div class="form">
+                            <div class="col">
+                                {% for ekey, element in fieldset %}
+                                {#{% if ekey == fieldset|length//2 - 1 and fieldset|length > 3 %}#}
+                                {% if ekey == fieldset|length//2 - 1 %}
+                            </div>
+                            <div class="col">
+                                {% endif %}
+                                <div class="input">
+                                    <label
+                                        for="id{{ element.getName }}" {% for akey,attr in element.getLabelAttributes %} {{ akey }}="{{ attr }}" {% endfor %}
+                                    >
+                                    {% if element.Label!=NULL %}
+                                        <span
+                                            class="splabel">{{ element.getLabel }}
+                                            :</span>
+                                    {% endif %}
+                                    </label>
+                                    {% if element.getAttribute('type')=='checkbox' %}
+                                        <div
+                                            class="checkbox">{{ formElement(element) }}</div>
+                                    {% else %}
+                                        {{ formElement(element) }}
+                                    {% endif %}
+                                    <label for="id{{ element.getName }}"
+                                           class="error {% if element.getMessages %}{% else %}hidden{% endif %}">{% for message in element.getMessages %}{{ message }}{% endfor %}</label>
+                                    {#{ WepoElementErrors(element) }#}
+                                </div>
+                                {% endfor %}
+                                <div class="input">
+                                    <label for="iderror"
+                                           class="error">{{ message }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='buttons' %}
+                    <div class="listtable">
+                        <div class="buttons clearfix {{ fieldset.getName }}">
+                            {% for ekey, element in fieldset %}
+                                <a href="#" class="submitLink btn-icon save"
+                                   type='submit'
+                                   value='{{ element.getLabel }}'
+                                   title='{{ element.getValue }}'>{{ element.getValue }}</a>
+                                <noscript>{{ formRow(element) }}</noscript>
+                            {% endfor %}
+                            <a href="{{ saurlback !='/' ? saurlback : url( null, { 'data': modelname, 'view': 'list' } ) }}"
+                               class="btn-icon cancel"
+                               title="Cancel">{{ translate("Cancel") }}</a>
+
+                            <div class="success_msg hidden"><i
+                                    class="imgTxt txtError"></i>
+
+                                <div>some global error message</div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif fieldset.getAttribute('class')=='additional' %}
+                    {% block additionalFieldset %}
+                    {% endblock additionalFieldset %}
+                {% else %}
+                    <div class="">
+                        {% for ekey, element in fieldset %}
+                            {{ formElement(element) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock formDetails %}
+        {{ form().closeTag(form)|raw }}
+    </div>
+    <a align="center" id="scrollTop" href="#"></a>
+{% endblock content %}

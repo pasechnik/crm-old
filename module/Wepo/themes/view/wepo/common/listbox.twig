@@ -1,0 +1,14 @@
+{% extends 'layout/layout.twig' %}
+
+{% block script %}
+
+{% endblock script %}
+
+
+{% block content %}
+
+    {% for list in data.list %}
+        {% include list.template with list %}
+    {% endfor %}
+
+{% endblock content %}

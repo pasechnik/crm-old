@@ -1,0 +1,19 @@
+<div class="home">
+
+    <div class="bord">
+        <table style="margin: auto;">
+            <tr>
+                <td>
+                    {{ translate( 'Expand your business. Find and retain more customers. You can do it now with simple, clean and fast Wepo CRM.' ) }}
+                    {% if user.id() %}
+                        <a href="{{ url('common', { 'data':'dashboard'}) }}" title="Dashboard">Dashboard</a>
+                    {% else %}
+                        <a href="{{ url('common', { 'data':'signin'}) }}" title="Sign In">Sign In</a>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+

@@ -1,0 +1,11 @@
+/vendor/
+/upload/
+/composer.phar
+/composer.lock
+.idea/
+/.project
+/nbproject/
+/atlassian-ide-plugin.xml
+/.buildpath
+/.settings/*
+/fs_cache/file
